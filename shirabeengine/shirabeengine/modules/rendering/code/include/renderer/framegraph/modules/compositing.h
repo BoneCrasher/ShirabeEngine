@@ -17,13 +17,13 @@ namespace engine
         struct SCompositingModuleTag_t {};
 
         /**
-         * The FrameGraphModule<SGBufferModuleTag_t> class implements all compositing
+         * The RenderGraphModule<SGBufferModuleTag_t> class implements all compositing
          * related data structs and passes.
          */
         template<>
-        class SHIRABE_TEST_EXPORT CFrameGraphModule<SCompositingModuleTag_t>
+        class SHIRABE_TEST_EXPORT CRenderGraphModule<SCompositingModuleTag_t>
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SCompositingModuleTag_t>);
+            SHIRABE_DECLARE_LOG_TAG(CRenderGraphModule<SCompositingModuleTag_t>);
 
         public_structs:
             /**
@@ -32,14 +32,14 @@ namespace engine
              */
             struct SImportData
             {
-                SFrameGraphTextureView gbuffer0;
-                SFrameGraphTextureView gbuffer1;
-                SFrameGraphTextureView gbuffer2;
-                SFrameGraphTextureView gbuffer3;
-                SFrameGraphTextureView depth;
-                SFrameGraphTextureView lightAccumulationBuffer;
+                SRenderGraphImageView gbuffer0;
+                SRenderGraphImageView gbuffer1;
+                SRenderGraphImageView gbuffer2;
+                SRenderGraphImageView gbuffer3;
+                SRenderGraphImageView depth;
+                SRenderGraphImageView lightAccumulationBuffer;
 
-                SFrameGraphMaterial material;
+                SRenderGraphMaterial material;
             };
 
             /**
@@ -48,7 +48,7 @@ namespace engine
              */
             struct SExportData
             {
-                SFrameGraphTextureView output;
+                SRenderGraphImageView output;
             };
 
         public_methods:
@@ -65,14 +65,14 @@ namespace engine
              * @return                         Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SExportData> addDefaultCompositingPass(
-                    std::string const      &aPassName,
+                std::string const      &aPassName,
                     CGraphBuilder          &aGraphBuilder,
-                    SFrameGraphTextureView &aGbuffer0,
-                    SFrameGraphTextureView &aGbuffer1,
-                    SFrameGraphTextureView &aGbuffer2,
-                    SFrameGraphTextureView &aGbuffer3,
-                    SFrameGraphTextureView &aDepthStencil,
-                    SFrameGraphTextureView &aLightAccumulationBuffer);
+                    SRenderGraphImageView &aGbuffer0,
+                    SRenderGraphImageView &aGbuffer1,
+                    SRenderGraphImageView &aGbuffer2,
+                    SRenderGraphImageView &aGbuffer3,
+                    SRenderGraphImageView &aDepthStencil,
+                    SRenderGraphImageView &aLightAccumulationBuffer);
         };
 
     }

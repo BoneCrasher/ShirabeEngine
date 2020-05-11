@@ -39,7 +39,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-        bool CPassBase::acceptSerializer(IFrameGraphSerializer &aSerializer) const
+        bool CPassBase::acceptSerializer(IRenderGraphSerializer &aSerializer) const
         {
             bool const serialized = aSerializer.serializePass(*this);
             return serialized;
@@ -49,7 +49,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CPassBase::acceptDeserializer(IFrameGraphDeserializer &aDeserializer)
+        bool CPassBase::acceptDeserializer(IRenderGraphDeserializer &aDeserializer)
         {
             bool const deserialized = aDeserializer.deserializePass(*this);
             return deserialized;
@@ -60,7 +60,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CPassBase::registerResource(FrameGraphResourceId_t const &aResourceUID)
+        CEngineResult<> CPassBase::registerResource(RenderGraphResourceId_t const &aResourceUID)
         {
             mResourceReferences.push_back(aResourceUID);
             return { EEngineStatus::Ok };

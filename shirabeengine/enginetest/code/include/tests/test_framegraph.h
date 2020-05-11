@@ -7,10 +7,10 @@
 
 namespace Test
 {
-    namespace FrameGraph
+    namespace RenderGraph
     {
 
-        class Test__FrameGraph
+        class Test__RenderGraph
         {
         public_methods:
             bool testAll();

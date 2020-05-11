@@ -28,7 +28,7 @@ namespace engine::vulkan
 
     namespace local
     {
-        SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphRenderContext);
+        SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphRenderContext);
     }
 
     namespace detail
@@ -38,7 +38,7 @@ namespace engine::vulkan
         auto clearAttachments(Shared<CVulkanEnvironment>     aVulkanEnvironment
                             , Shared<CResourceManager>       aResourceManager
                             , Shared<asset::CAssetStorage>   aAssetStorage
-                            , SFrameGraphRenderContextState &aState
+                            , SRenderGraphRenderContextState &aState
                             , std::string             const &aRenderPassId) -> EEngineStatus
         {
             SVulkanState    &state        = aVulkanEnvironment->getState();
@@ -107,7 +107,7 @@ namespace engine::vulkan
         auto nextSubpass(Shared<CVulkanEnvironment>     aVulkanEnvironment
                          , Shared<CResourceManager>       aResourceManager
                          , Shared<asset::CAssetStorage>   aAssetStorage
-                         , SFrameGraphRenderContextState &aState) -> EEngineStatus
+                         , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             SVulkanState    &state        = aVulkanEnvironment->getState();
             VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
@@ -125,9 +125,9 @@ namespace engine::vulkan
         auto copyImage(Shared<CVulkanEnvironment>       aVulkanEnvironment
                      , Shared<CResourceManager>         aResourceManager
                      , Shared<asset::CAssetStorage>     aAssetStorage
-                     , SFrameGraphRenderContextState   &aState
-                     , SFrameGraphTexture const &aSourceImageId
-                     , SFrameGraphTexture const &aTargetImageId) -> EEngineStatus
+                     , SRenderGraphRenderContextState   &aState
+                     , SRenderGraphImage const &aSourceImageId
+                     , SRenderGraphImage const &aTargetImageId) -> EEngineStatus
         {
             SHIRABE_UNUSED(aSourceImageId);
             SHIRABE_UNUSED(aTargetImageId);
@@ -142,8 +142,8 @@ namespace engine::vulkan
         auto performImageLayoutTransfer(Shared<CVulkanEnvironment>       aVulkanEnvironment
                                       , Shared<CResourceManager>         aResourceManager
                                       , Shared<asset::CAssetStorage>     aAssetStorage
-                                      , SFrameGraphRenderContextState   &aState
-                                      , SFrameGraphTexture const &aTexture
+                                      , SRenderGraphRenderContextState   &aState
+                                      , SRenderGraphImage const &aTexture
                                       , CRange                    const &aArrayRange
                                       , CRange                    const &aMipRange
                                       , VkImageAspectFlags        const &aAspectFlags
@@ -179,8 +179,8 @@ namespace engine::vulkan
         auto copyImageToBackBuffer(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                  , Shared<CResourceManager>             aResourceManager
                                  , Shared<asset::CAssetStorage>         aAssetStorage
-                                 , SFrameGraphRenderContextState const &aState
-                                 , SFrameGraphTexture     const &aSourceImageId) -> EEngineStatus
+                                 , SRenderGraphRenderContextState const &aState
+                                 , SRenderGraphImage     const &aSourceImageId) -> EEngineStatus
         {
             SVulkanState &state = aVulkanEnvironment->getState();
 
@@ -260,7 +260,7 @@ namespace engine::vulkan
         auto beginFrameCommandBuffers(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                     , Shared<CResourceManager>             aResourceManager
                                     , Shared<asset::CAssetStorage>         aAssetStorage
-                                    , SFrameGraphRenderContextState const &aState) -> EEngineStatus
+                                    , SRenderGraphRenderContextState const &aState) -> EEngineStatus
         {
             SVulkanState &state = aVulkanEnvironment->getState();
 
@@ -294,7 +294,7 @@ namespace engine::vulkan
         auto endFrameCommandBuffers(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                   , Shared<CResourceManager>             aResourceManager
                                   , Shared<asset::CAssetStorage>         aAssetStorage
-                                  , SFrameGraphRenderContextState const &aState) -> EEngineStatus
+                                  , SRenderGraphRenderContextState const &aState) -> EEngineStatus
         {
             SVulkanState &vkState = aVulkanEnvironment->getState();
 
@@ -353,7 +353,7 @@ namespace engine::vulkan
         auto bindRenderPass(Shared<CVulkanEnvironment>           aVulkanEnvironment
                           , Shared<CResourceManager>             aResourceManager
                           , Shared<asset::CAssetStorage>         aAssetStorage
-                          , SFrameGraphRenderContextState const &aRenderContextState
+                          , SRenderGraphRenderContextState const &aRenderContextState
                           , ResourceId_t                  const &aRenderPassId
                           , ResourceId_t                  const &aFrameBufferId) -> EEngineStatus
         {
@@ -412,7 +412,7 @@ namespace engine::vulkan
         auto unbindRenderPass(Shared<CVulkanEnvironment>     aVulkanEnvironment
                             , Shared<CResourceManager>       aResourceManager
                             , Shared<asset::CAssetStorage>   aAssetStorage
-                            , SFrameGraphRenderContextState &aState
+                            , SRenderGraphRenderContextState &aState
                             , ResourceId_t            const &aFrameBufferId
                             , ResourceId_t            const &aRenderPassId) -> EEngineStatus
         {
@@ -432,7 +432,7 @@ namespace engine::vulkan
         auto beginGraphicsFrame(Shared<CVulkanEnvironment>     aVulkanEnvironment
                               , Shared<CResourceManager>       aResourceManager
                               , Shared<asset::CAssetStorage>   aAssetStorage
-                              , SFrameGraphRenderContextState &aState) -> EEngineStatus
+                              , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             return aVulkanEnvironment->beginGraphicsFrame().result();
         };
@@ -444,7 +444,7 @@ namespace engine::vulkan
         auto endGraphicsFrame(Shared<CVulkanEnvironment>     aVulkanEnvironment
                             , Shared<CResourceManager>       aResourceManager
                             , Shared<asset::CAssetStorage>   aAssetStorage
-                            , SFrameGraphRenderContextState &aState) -> EEngineStatus
+                            , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             return aVulkanEnvironment->endGraphicsFrame().result();
         };
@@ -456,7 +456,7 @@ namespace engine::vulkan
         auto present(Shared<CVulkanEnvironment>     aVulkanEnvironment
                    , Shared<CResourceManager>       aResourceManager
                    , Shared<asset::CAssetStorage>   aAssetStorage
-                   , SFrameGraphRenderContextState &aState) -> EEngineStatus
+                   , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             SVulkanState &vkState = aVulkanEnvironment->getState();
 
@@ -564,8 +564,8 @@ namespace engine::vulkan
         auto useMesh(Shared<CVulkanEnvironment>           aVulkanEnvironment
                    , Shared<CResourceManager>             aResourceManager
                    , Shared<asset::CAssetStorage>         aAssetStorage
-                   , SFrameGraphRenderContextState       &aState
-                   , SFrameGraphMesh               const &aMesh) -> EEngineStatus
+                   , SRenderGraphRenderContextState       &aState
+                   , SRenderGraphMesh               const &aMesh) -> EEngineStatus
         {
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
@@ -608,9 +608,9 @@ namespace engine::vulkan
         auto useMaterialWithPipeline(Shared<CVulkanEnvironment>       aVulkanEnvironment
                                    , Shared<CResourceManager>         aResourceManager
                                    , Shared<asset::CAssetStorage>     aAssetStorage
-                                   , SFrameGraphRenderContextState   &aState
-                                   , SFrameGraphMaterial       const &aMaterial
-                                   , SFrameGraphPipeline       const &aPipeline) -> EEngineStatus
+                                   , SRenderGraphRenderContextState   &aState
+                                   , SRenderGraphMaterial       const &aMaterial
+                                   , SRenderGraphPipeline       const &aPipeline) -> EEngineStatus
         {
             VkCommandBuffer vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer();
 
@@ -656,8 +656,8 @@ namespace engine::vulkan
         auto bindPipeline(Shared<CVulkanEnvironment>     aVulkanEnvironment
                         , Shared<CResourceManager>       aResourceManager
                         , Shared<asset::CAssetStorage>   aAssetStorage
-                        , SFrameGraphRenderContextState &aState
-                        , SFrameGraphPipeline     const &aPipeline) -> EEngineStatus
+                        , SRenderGraphRenderContextState &aState
+                        , SRenderGraphPipeline     const &aPipeline) -> EEngineStatus
         {
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
@@ -681,7 +681,7 @@ namespace engine::vulkan
         auto drawIndexed(Shared<CVulkanEnvironment>           aVulkanEnvironment
                        , Shared<CResourceManager>             aResourceManager
                        , Shared<asset::CAssetStorage>         aAssetStorage
-                       , SFrameGraphRenderContextState       &aState
+                       , SRenderGraphRenderContextState       &aState
                        , VkDeviceSize                  const  aIndexCount) -> EEngineStatus
         {
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
@@ -699,7 +699,7 @@ namespace engine::vulkan
         auto drawQuad(Shared<CVulkanEnvironment>     aVulkanEnvironment
                     , Shared<CResourceManager>       aResourceManager
                     , Shared<asset::CAssetStorage>   aAssetStorage
-                    , SFrameGraphRenderContextState &aState) -> EEngineStatus
+                    , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             SVulkanState     &vkState        = aVulkanEnvironment->getState();
             VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
@@ -716,8 +716,8 @@ namespace engine::vulkan
         auto drawFullscreenQuadWithMaterial(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                           , Shared<CResourceManager>             aResourceManager
                                           , Shared<asset::CAssetStorage>         aAssetStorage
-                                          , SFrameGraphRenderContextState       &aState
-                                          , SFrameGraphMaterial           const &aMaterial) -> EEngineStatus
+                                          , SRenderGraphRenderContextState       &aState
+                                          , SRenderGraphMaterial           const &aMaterial) -> EEngineStatus
         {
             //context.bindMaterial(aState, aMaterial);
             return detail::drawQuad(aVulkanEnvironment, aResourceManager, aAssetStorage, aState);
@@ -729,30 +729,30 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    framegraph::SFrameGraphRenderContext CreateRenderContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
+    framegraph::SRenderGraphRenderContext CreateRenderContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
                                                                     , Shared<CResourceManager>     aResourceManager
                                                                     , Shared<asset::CAssetStorage> aAssetStorage)
     {
         using namespace resources;
 
-        framegraph::SFrameGraphRenderContext context {};
+        framegraph::SRenderGraphRenderContext context {};
 
         context.clearAttachments
-            = [&] (SFrameGraphRenderContextState &aState, std::string const &aRenderPassId)
+            = [&] (SRenderGraphRenderContextState &aState, std::string const &aRenderPassId)
                 { return detail::clearAttachments(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                 , aState, aRenderPassId); };
         context.nextSubpass
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::nextSubpass(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.copyImage
-            = [&](SFrameGraphRenderContextState   &aState
-                 , SFrameGraphTexture const &aSourceImageId
-                 , SFrameGraphTexture const &aTargetImageId)
+            = [&](SRenderGraphRenderContextState   &aState
+                 , SRenderGraphImage const &aSourceImageId
+                 , SRenderGraphImage const &aTargetImageId)
                 { return detail::copyImage(aVulkanEnvironment, aResourceManager, aAssetStorage
                                          , aState, aSourceImageId, aTargetImageId); };
         context.performImageLayoutTransfer
-            = [&] (SFrameGraphRenderContextState   &aState
-                 , SFrameGraphTexture const &aTexture
+            = [&] (SRenderGraphRenderContextState   &aState
+                 , SRenderGraphImage const &aTexture
                  , CRange                    const &aArrayRange
                  , CRange                    const &aMipRange
                  , VkImageAspectFlags        const &aAspectFlags
@@ -767,17 +767,17 @@ namespace engine::vulkan
                                                           , aSourceLayout
                                                           , aTargetLayout); };
         context.copyImageToBackBuffer
-            = [&](SFrameGraphRenderContextState const &aState
-                 , SFrameGraphTexture     const &aSourceImageId)
+            = [&](SRenderGraphRenderContextState const &aState
+                 , SRenderGraphImage     const &aSourceImageId)
                 { return detail::copyImageToBackBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aState, aSourceImageId); };
         context.beginFrameCommandBuffers
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::beginFrameCommandBuffers(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.endFrameCommandBuffers
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::endFrameCommandBuffers(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.bindRenderPass
-            = [&] (SFrameGraphRenderContextState const &aRenderContextState
+            = [&] (SRenderGraphRenderContextState const &aRenderContextState
                  , ResourceId_t                  const &aRenderPassId
                  , ResourceId_t                  const &aFrameBufferId)
                 { return detail::bindRenderPass(aVulkanEnvironment, aResourceManager, aAssetStorage
@@ -785,45 +785,45 @@ namespace engine::vulkan
                                               , aRenderPassId
                                               , aFrameBufferId); };
         context.unbindRenderPass
-            = [&] (SFrameGraphRenderContextState &aState
+            = [&] (SRenderGraphRenderContextState &aState
                  , ResourceId_t            const &aFrameBufferId
                  , ResourceId_t            const &aRenderPassId)
                 { return detail::unbindRenderPass(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                 , aState, aFrameBufferId, aRenderPassId); };
         context.beginGraphicsFrame
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::beginGraphicsFrame(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.endGraphicsFrame
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::endGraphicsFrame(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.present
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::endGraphicsFrame(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.useMesh
-            = [&] (SFrameGraphRenderContextState &aState, SFrameGraphMesh const &aMesh)
+            = [&] (SRenderGraphRenderContextState &aState, SRenderGraphMesh const &aMesh)
                 { return detail::useMesh(aVulkanEnvironment, aResourceManager, aAssetStorage, aState, aMesh); };
         context.useMaterialWithPipeline
-            = [&] (SFrameGraphRenderContextState &aState
-                 , SFrameGraphMaterial     const &aMaterial
-                 , SFrameGraphPipeline     const &aPipeline)
+            = [&] (SRenderGraphRenderContextState &aState
+                 , SRenderGraphMaterial     const &aMaterial
+                 , SRenderGraphPipeline     const &aPipeline)
                 { return detail::useMaterialWithPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                        , aState, aMaterial, aPipeline); };
         context.bindPipeline
-            = [&] (SFrameGraphRenderContextState &aState
-                 , SFrameGraphPipeline     const &aPipeline)
+            = [&] (SRenderGraphRenderContextState &aState
+                 , SRenderGraphPipeline     const &aPipeline)
                 { return detail::bindPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
                                             , aState, aPipeline); };
         context.drawIndexed
-            = [&] (SFrameGraphRenderContextState       &aState
+            = [&] (SRenderGraphRenderContextState       &aState
                  , VkDeviceSize                  const  aIndexCount)
                 { return detail::drawIndexed(aVulkanEnvironment, aResourceManager, aAssetStorage
                                        , aState, aIndexCount); };
         context.drawQuad
-            = [&] (SFrameGraphRenderContextState &aState)
+            = [&] (SRenderGraphRenderContextState &aState)
                 { return detail::drawQuad(aVulkanEnvironment, aResourceManager, aAssetStorage, aState); };
         context.drawFullscreenQuadWithMaterial
-            = [&] (SFrameGraphRenderContextState       &aState
-                 , SFrameGraphMaterial           const &aMaterial)
+            = [&] (SRenderGraphRenderContextState       &aState
+                 , SRenderGraphMaterial           const &aMaterial)
                 { return detail::drawFullscreenQuadWithMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                               , aState, aMaterial); };
 

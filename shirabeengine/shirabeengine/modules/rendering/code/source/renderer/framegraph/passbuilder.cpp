@@ -16,11 +16,11 @@ namespace engine
                 PassUID_t const             &aPassUID,
                 Shared<CPassBase>            aPass,
                 Shared<CRenderPass>          aEnclosingRenderPass,
-                CFrameGraphMutableResources &aOutResourceData)
-            : mPassUID             (aPassUID                         )
-            , mPass                (std::move(aPass                 ))
-            , mEnclosingRenderPass (std::move(aEnclosingRenderPass  ))
-            , mResourceData        (aOutResourceData                 )
+                CRenderGraphMutableResources &aOutResourceData)
+            : mPassUID             (aPassUID                           )
+            , mPass                (std::move(aPass                   ))
+            , mEnclosingRenderPass (std::move(aEnclosingRenderPass    ))
+            , mResourceData        (aOutResourceData                   )
             , mAttachmentCollection(aEnclosingRenderPass->attachments())
         {}
         //<-----------------------------------------------------------------------------
@@ -28,19 +28,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphRenderTarget> CPassBuilder::createRenderTarget(
-            std::string        const &aName,
-            SFrameGraphTexture const &aDescriptor)
+        CEngineResult<SRenderGraphRenderTarget> CPassBuilder::createRenderTarget(
+            std::string                 const &aName,
+            SRenderGraphImageDescription const &aDescriptor)
         {
             // Basic abstract descriptor of resources being used.
-            SFrameGraphRenderTarget &resource = mResourceData.spawnResource<SFrameGraphRenderTarget>();
-            resource.assignTextureParameters(aDescriptor);
+            SRenderGraphRenderTarget &resource = mResourceData.spawnResource<SRenderGraphRenderTarget>();
+            resource.description           = aDescriptor;
             resource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
             resource.assignedPassUID       = mPassUID;
             resource.parentResource        = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource     = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName          = aName;
-            resource.type                  = EFrameGraphResourceType::Texture;
+            resource.type                  = ERenderGraphResourceType::Texture;
 
             mPass->registerResource(resource.resourceId);
 
@@ -51,19 +51,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTransientTexture> CPassBuilder::createTexture(
-                std::string        const &aName,
-                SFrameGraphTexture const &aDescriptor)
+        CEngineResult<SRenderGraphTransientImage> CPassBuilder::createImage(
+                std::string                  const &aName,
+                SRenderGraphImageDescription const &aDescriptor)
         {
             // Basic abstract descriptor of resources being used.
-            SFrameGraphTransientTexture &resource = mResourceData.spawnResource<SFrameGraphTransientTexture>();
-            resource.assignTextureParameters(aDescriptor);
+            SRenderGraphTransientImage &resource = mResourceData.spawnResource<SRenderGraphTransientImage>();
+            resource.description           = aDescriptor;
             resource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
             resource.assignedPassUID       = mPassUID;
             resource.parentResource        = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource     = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName          = aName;
-            resource.type                  = EFrameGraphResourceType::Texture;
+            resource.type                  = ERenderGraphResourceType::Texture;
 
             mPass->registerResource(resource.resourceId);
 
@@ -74,19 +74,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::useTexture(
-                SFrameGraphTexture                 &aTexture,
-                EFrameGraphViewPurpose       const &aSourceOrTarget,
-                EFormat                      const &aRequiredFormat,
-                CRange                       const &aArraySliceRange,
-                CRange                       const &aMipSliceRange,
-                EFrameGraphViewAccessMode    const &aMode,
-                EEngineStatus                const &aFailCode)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::useImage(
+            SRenderGraphImage                &aTexture,
+            ERenderGraphViewPurpose    const &aSourceOrTarget,
+            EFormat                    const &aRequiredFormat,
+            CRange                     const &aArraySliceRange,
+            CRange                     const &aMipSliceRange,
+            ERenderGraphViewAccessMode const &aMode,
+            EEngineStatus              const &aFailCode)
         {
-            FrameGraphResourceId_t const subjacentResourceId = aTexture.resourceId;
+            RenderGraphResourceId_t const subjacentResourceId = aTexture.resourceId;
 
-            EFrameGraphViewAccessMode const mode   = aMode;
-            EFrameGraphViewPurpose    const source = aSourceOrTarget;
+            ERenderGraphViewAccessMode const mode   = aMode;
+            ERenderGraphViewPurpose    const source = aSourceOrTarget;
 
             CRange adjustedArraySliceRange = aArraySliceRange;
             CRange adjustedMipSliceRange   = aMipSliceRange;
@@ -107,37 +107,37 @@ namespace engine
                         true,
                         true);
 
-            Optional_t<RefWrapper_t<SFrameGraphTextureView>> resource{};
+            Optional_t<RefWrapper_t<SRenderGraphImageView>> resource{};
 
-            SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
-            view.arraySliceRange       = adjustedArraySliceRange;
-            view.mipSliceRange         = adjustedMipSliceRange;
-            view.format                = aRequiredFormat;
-            view.source                = source;
-            view.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
-            view.assignedPassUID       = mPassUID;
-            view.parentResource        = aTexture.resourceId;
-            view.subjacentResource     = subjacentResourceId;
-            view.readableName          = CString::format("TextureView ID {} - {} #{}"
-                                                         , view.resourceId
-                                                         , ( mode == EFrameGraphViewAccessMode::Write ? "Write" : "Read" )
-                                                         , aTexture.resourceId);
-            view.type                  = EFrameGraphResourceType::TextureView;
-            view.mode.set(mode);
+            SRenderGraphImageView &view = mResourceData.spawnResource<SRenderGraphImageView>();
+            view.description.arraySliceRange = adjustedArraySliceRange;
+            view.description.mipSliceRange   = adjustedMipSliceRange;
+            view.description.format          = aRequiredFormat;
+            view.description.source          = source;
+            view.assignedRenderpassUID       = mEnclosingRenderPass->getRenderPassUid();
+            view.assignedPassUID             = mPassUID;
+            view.parentResource              = aTexture.resourceId;
+            view.subjacentResource           = subjacentResourceId;
+            view.type                        = ERenderGraphResourceType::TextureView;
+            view.readableName                = CString::format("TextureView ID {} - {} #{}"
+                                                               , view.resourceId
+                                                               , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
+                                                               , aTexture.resourceId);
+            view.description.mode.set(mode);
 
-            switch(view.source)
+            switch(view.description.source)
             {
-            case EFrameGraphViewPurpose::InputAttachment:
-                aTexture.requestedUsage.set(EFrameGraphResourceUsage::InputAttachment);
+            case ERenderGraphViewPurpose::InputAttachment:
+                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
                 break;
-            case EFrameGraphViewPurpose::ColorAttachment:
-                aTexture.requestedUsage.set(EFrameGraphResourceUsage::ColorAttachment);
+            case ERenderGraphViewPurpose::ColorAttachment:
+                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
                 break;
-            case EFrameGraphViewPurpose::DepthAttachment:
-                aTexture.requestedUsage.set(EFrameGraphResourceUsage::DepthAttachment);
+            case ERenderGraphViewPurpose::DepthAttachment:
+                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
                 break;
-            case EFrameGraphViewPurpose::ShaderInput:
-                aTexture.requestedUsage.set(EFrameGraphResourceUsage::SampledImage);
+            case ERenderGraphViewPurpose::ShaderInput:
+                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
                 break;
             default:
                 break;
@@ -155,19 +155,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::useTextureView(
-            SFrameGraphTextureView             &aTextureView,
-            EFrameGraphViewPurpose       const &aSourceOrTarget,
+        CEngineResult<SRenderGraphImageView> CPassBuilder::useImageView(
+            SRenderGraphImageView             &aTextureView,
+            ERenderGraphViewPurpose       const &aSourceOrTarget,
             EFormat                      const &aRequiredFormat,
             CRange                       const &aArraySliceRange,
             CRange                       const &aMipSliceRange,
-            EFrameGraphViewAccessMode    const &aMode,
+            ERenderGraphViewAccessMode    const &aMode,
             EEngineStatus                const &aFailCode)
         {
-            FrameGraphResourceId_t const subjacentResourceId = aTextureView.subjacentResource;
+            RenderGraphResourceId_t const subjacentResourceId = aTextureView.subjacentResource;
 
-            EFrameGraphViewAccessMode const mode   = aMode;
-            EFrameGraphViewPurpose    const source = aSourceOrTarget;
+            ERenderGraphViewAccessMode const mode   = aMode;
+            ERenderGraphViewPurpose    const source = aSourceOrTarget;
 
             CRange adjustedArraySliceRange = aArraySliceRange;
             CRange adjustedMipSliceRange   = aMipSliceRange;
@@ -188,29 +188,29 @@ namespace engine
                 true,
                 true);
 
-            Optional_t<RefWrapper_t<SFrameGraphTextureView>> resource{};
+            Optional_t<RefWrapper_t<SRenderGraphImageView>> resource{};
 
             // Can we cull?
             bool duplicateFound = false;
-            CEngineResult<FrameGraphResourceId_t> const duplicateViewIdQuery
-                = findDuplicateTextureView(subjacentResourceId
-                                           , aRequiredFormat
-                                           , source
-                                           , adjustedArraySliceRange
-                                           , adjustedMipSliceRange
-                                           , mode);
+            CEngineResult<RenderGraphResourceId_t> const duplicateViewIdQuery
+                = findDuplicateImageView(subjacentResourceId
+                                         , aRequiredFormat
+                                         , source
+                                         , adjustedArraySliceRange
+                                         , adjustedMipSliceRange
+                                         , mode);
 
-            if(not duplicateViewIdQuery.successful() && not (EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId == duplicateViewIdQuery.result()))
+            if(not duplicateViewIdQuery.successful() && not (EEngineStatus::RenderGraph_PassBuilder_DuplicateTextureViewId == duplicateViewIdQuery.result()))
             {
                 return { duplicateViewIdQuery.result() };
             }
 
-            duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId);
+            duplicateFound = duplicateViewIdQuery.resultEquals(EEngineStatus::RenderGraph_PassBuilder_DuplicateTextureViewId);
             if(duplicateFound)
             {
-                FrameGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
+                RenderGraphResourceId_t const &duplicateViewId = duplicateViewIdQuery.data();
 
-                CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = mResourceData.getResourceMutable<SFrameGraphTextureView>(duplicateViewId);
+                CEngineResult<Shared<SRenderGraphImageView>> const &viewFetch = mResourceData.getResourceMutable<SRenderGraphImageView>(duplicateViewId);
                 if(not viewFetch.successful())
                 {
                     return { viewFetch.result() };
@@ -220,41 +220,41 @@ namespace engine
 
             if(not duplicateFound)
             {
-                auto const &[result, texture] = mResourceData.getResourceMutable<SFrameGraphTexture>(subjacentResourceId);
+                auto const &[result, texture] = mResourceData.getResourceMutable<SRenderGraphImage>(subjacentResourceId);
                 if(CheckEngineError(result))
                 {
                     return { result };
                 }
 
-                SFrameGraphTextureView &view = mResourceData.spawnResource<SFrameGraphTextureView>();
-                view.arraySliceRange       = adjustedArraySliceRange;
-                view.mipSliceRange         = adjustedMipSliceRange;
-                view.format                = aRequiredFormat;
-                view.source                = source;
-                view.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
-                view.assignedPassUID       = mPassUID;
-                view.parentResource        = aTextureView.resourceId;
-                view.subjacentResource     = subjacentResourceId;
-                view.readableName          = CString::format("TextureView ID {} - {} #{}"
-                                                             , view.resourceId
-                                                             , ( mode == EFrameGraphViewAccessMode::Write ? "Write" : "Read" )
-                                                             , aTextureView.resourceId);
-                view.type                  = EFrameGraphResourceType::TextureView;
-                view.mode.set(mode);
+                SRenderGraphImageView &view = mResourceData.spawnResource<SRenderGraphImageView>();
+                view.description.arraySliceRange = adjustedArraySliceRange;
+                view.description.mipSliceRange   = adjustedMipSliceRange;
+                view.description.format          = aRequiredFormat;
+                view.description.source          = source;
+                view.assignedRenderpassUID       = mEnclosingRenderPass->getRenderPassUid();
+                view.assignedPassUID             = mPassUID;
+                view.parentResource              = aTextureView.resourceId;
+                view.subjacentResource           = subjacentResourceId;
+                view.type                        = ERenderGraphResourceType::TextureView;
+                view.readableName                = CString::format("TextureView ID {} - {} #{}"
+                                                                   , view.resourceId
+                                                                   , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
+                                                                   , aTextureView.resourceId);
+                view.description.mode.set(mode);
 
-                switch(view.source)
+                switch(view.description.source)
                 {
-                    case EFrameGraphViewPurpose::InputAttachment:
-                        texture->requestedUsage.set(EFrameGraphResourceUsage::InputAttachment);
+                    case ERenderGraphViewPurpose::InputAttachment:
+                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
                         break;
-                    case EFrameGraphViewPurpose::ColorAttachment:
-                        texture->requestedUsage.set(EFrameGraphResourceUsage::ColorAttachment);
+                    case ERenderGraphViewPurpose::ColorAttachment:
+                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
                         break;
-                    case EFrameGraphViewPurpose::DepthAttachment:
-                        texture->requestedUsage.set(EFrameGraphResourceUsage::DepthAttachment);
+                    case ERenderGraphViewPurpose::DepthAttachment:
+                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
                         break;
-                    case EFrameGraphViewPurpose::ShaderInput:
-                        texture->requestedUsage.set(EFrameGraphResourceUsage::SampledImage);
+                    case ERenderGraphViewPurpose::ShaderInput:
+                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
                         break;
                     default:
                         break;
@@ -267,7 +267,7 @@ namespace engine
 
             if(resource.has_value())
             {
-                SFrameGraphResource &ref = resource->get();
+                SRenderGraphResource &ref = resource->get();
 
                 mPass->registerResource(ref.resourceId);
                 ++(ref.referenceCount);
@@ -282,31 +282,31 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::writeAttachment(
-            SFrameGraphTexture                 &aTexture,
-            SFrameGraphWriteTextureFlags const &aFlags)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::writeAttachment(
+            SRenderGraphImage                   &aImage,
+            SRenderGraphWriteTextureFlags const &aFlags)
         {
-            bool const isColorAttachment = (EFrameGraphWriteTarget::Color == aFlags.writeTarget);
-            bool const isDepthAttachment = (EFrameGraphWriteTarget::Depth == aFlags.writeTarget);
+            bool const isColorAttachment = (ERenderGraphWriteTarget::Color == aFlags.writeTarget);
+            bool const isDepthAttachment = (ERenderGraphWriteTarget::Depth == aFlags.writeTarget);
 
-            EFrameGraphViewPurpose source = isColorAttachment
-                                            ? EFrameGraphViewPurpose::ColorAttachment
+            ERenderGraphViewPurpose source = isColorAttachment
+                                            ? ERenderGraphViewPurpose::ColorAttachment
                                             : isDepthAttachment
-                                              ? EFrameGraphViewPurpose::DepthAttachment
-                                              : EFrameGraphViewPurpose::Undefined;
+                                              ? ERenderGraphViewPurpose::DepthAttachment
+                                              : ERenderGraphViewPurpose::Undefined;
 
-            auto const &[result, data] = useTexture(aTexture
-                                                    , source
-                                                    , aFlags.requiredFormat
-                                                    , aFlags.arraySliceRange
-                                                    , aFlags.mipSliceRange
-                                                    , EFrameGraphViewAccessMode::Write
-                                                    , EEngineStatus::FrameGraph_PassBuilder_WriteResourceFailed);
+            auto const &[result, data] = useImage(aImage
+                                                  , source
+                                                  , aFlags.requiredFormat
+                                                  , aFlags.arraySliceRange
+                                                  , aFlags.mipSliceRange
+                                                  , ERenderGraphViewAccessMode::Write
+                                                  , EEngineStatus::RenderGraph_PassBuilder_WriteResourceFailed);
 
             if(not CheckEngineError(result))
             {
-                FrameGraphResourceId_t const imageId     = data.subjacentResource;
-                FrameGraphResourceId_t const imageViewId = data.resourceId;
+                RenderGraphResourceId_t const imageId     = data.subjacentResource;
+                RenderGraphResourceId_t const imageViewId = data.resourceId;
 
                 if(isColorAttachment)
                 {
@@ -325,31 +325,31 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::writeAttachment(
-                SFrameGraphTextureView             &aTextureView,
-                SFrameGraphWriteTextureFlags const &aFlags)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::writeAttachment(
+            SRenderGraphImageView             &aImageView,
+                SRenderGraphWriteTextureFlags const &aFlags)
         {
-            bool const isColorAttachment = (EFrameGraphWriteTarget::Color == aFlags.writeTarget);
-            bool const isDepthAttachment = (EFrameGraphWriteTarget::Depth == aFlags.writeTarget);
+            bool const isColorAttachment = (ERenderGraphWriteTarget::Color == aFlags.writeTarget);
+            bool const isDepthAttachment = (ERenderGraphWriteTarget::Depth == aFlags.writeTarget);
 
-            EFrameGraphViewPurpose source = isColorAttachment
-                                                ? EFrameGraphViewPurpose::ColorAttachment
+            ERenderGraphViewPurpose source = isColorAttachment
+                                                ? ERenderGraphViewPurpose::ColorAttachment
                                                 : isDepthAttachment
-                                                      ? EFrameGraphViewPurpose::DepthAttachment
-                                                      : EFrameGraphViewPurpose::Undefined;
+                                                      ? ERenderGraphViewPurpose::DepthAttachment
+                                                      : ERenderGraphViewPurpose::Undefined;
 
-            auto const &[result, data] = useTextureView(aTextureView
-                                                        , source
-                                                        , aFlags.requiredFormat
-                                                        , aFlags.arraySliceRange
-                                                        , aFlags.mipSliceRange
-                                                        , EFrameGraphViewAccessMode::Write
-                                                        , EEngineStatus::FrameGraph_PassBuilder_WriteResourceFailed);
+            auto const &[result, data] = useImageView(aImageView
+                                                      , source
+                                                      , aFlags.requiredFormat
+                                                      , aFlags.arraySliceRange
+                                                      , aFlags.mipSliceRange
+                                                      , ERenderGraphViewAccessMode::Write
+                                                      , EEngineStatus::RenderGraph_PassBuilder_WriteResourceFailed);
 
             if(not CheckEngineError(result))
             {
-                FrameGraphResourceId_t const imageId     = data.subjacentResource;
-                FrameGraphResourceId_t const imageViewId = data.resourceId;
+                RenderGraphResourceId_t const imageId     = data.subjacentResource;
+                RenderGraphResourceId_t const imageViewId = data.resourceId;
 
                 if(isColorAttachment)
                 {
@@ -368,24 +368,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::readAttachment(
-                SFrameGraphTexture                &aTexture,
-                SFrameGraphReadTextureFlags const &aFlags)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::readAttachment(
+            SRenderGraphImage                  &aImage,
+            SRenderGraphReadTextureFlags const &aFlags)
         {                        
-            EFrameGraphViewPurpose source = EFrameGraphViewPurpose::InputAttachment;
+            ERenderGraphViewPurpose source = ERenderGraphViewPurpose::InputAttachment;
 
-            auto const &[result, data]  = useTexture(aTexture
-                                                     , source
-                                                     , aFlags.requiredFormat
-                                                     , aFlags.arraySliceRange
-                                                     , aFlags.mipSliceRange
-                                                     , EFrameGraphViewAccessMode::Read
-                                                     , EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed);
+            auto const &[result, data]  = useImage(aImage
+                                                   , source
+                                                   , aFlags.requiredFormat
+                                                   , aFlags.arraySliceRange
+                                                   , aFlags.mipSliceRange
+                                                   , ERenderGraphViewAccessMode::Read
+                                                   , EEngineStatus::RenderGraph_PassBuilder_ReadResourceFailed);
 
             if(not CheckEngineError(result))
             {
-                FrameGraphResourceId_t const imageId     = data.subjacentResource;
-                FrameGraphResourceId_t const imageViewId = data.resourceId;
+                RenderGraphResourceId_t const imageId     = data.subjacentResource;
+                RenderGraphResourceId_t const imageViewId = data.resourceId;
 
                 mAttachmentCollection.addInputAttachment(mPassUID, imageId, imageViewId);
             }
@@ -397,24 +397,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::readAttachment(
-            SFrameGraphTextureView            &aTextureView,
-            SFrameGraphReadTextureFlags const &aFlags)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::readAttachment(
+            SRenderGraphImageView            &aImageView,
+            SRenderGraphReadTextureFlags const &aFlags)
         {
-            EFrameGraphViewPurpose source = EFrameGraphViewPurpose::InputAttachment;
+            ERenderGraphViewPurpose source = ERenderGraphViewPurpose::InputAttachment;
 
-            auto const &[result, data]  = useTextureView(aTextureView
-                                                         , source
-                                                         , aFlags.requiredFormat
-                                                         , aFlags.arraySliceRange
-                                                         , aFlags.mipSliceRange
-                                                         , EFrameGraphViewAccessMode::Read
-                                                         , EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed);
+            auto const &[result, data]  = useImageView(aImageView
+                                                       , source
+                                                       , aFlags.requiredFormat
+                                                       , aFlags.arraySliceRange
+                                                       , aFlags.mipSliceRange
+                                                       , ERenderGraphViewAccessMode::Read
+                                                       , EEngineStatus::RenderGraph_PassBuilder_ReadResourceFailed);
 
             if(not CheckEngineError(result))
             {
-                FrameGraphResourceId_t const imageId     = data.subjacentResource;
-                FrameGraphResourceId_t const imageViewId = data.resourceId;
+                RenderGraphResourceId_t const imageId     = data.subjacentResource;
+                RenderGraphResourceId_t const imageViewId = data.resourceId;
 
                 mAttachmentCollection.addInputAttachment(mPassUID, imageId, imageViewId);
             }
@@ -426,35 +426,37 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphTextureView> CPassBuilder::readTexture(
-                SFrameGraphTexture                    &aSubjacentTargetResource,
-                SFrameGraphTextureResourceFlags const &aFlags)
+        CEngineResult<SRenderGraphImageView> CPassBuilder::readImage(
+            SRenderGraphImage                      &subjacentTargetResource,
+            SRenderGraphTextureResourceFlags const &aFlags)
         {
-            EFrameGraphViewPurpose source = EFrameGraphViewPurpose::ShaderInput;
+            ERenderGraphViewPurpose source = ERenderGraphViewPurpose::ShaderInput;
 
-            return useTexture(aSubjacentTargetResource,
-                              source,
-                              aFlags.requiredFormat,
-                              aFlags.arraySliceRange,
-                              aFlags.mipSliceRange,
-                              EFrameGraphViewAccessMode::Read,
-                              EEngineStatus::FrameGraph_PassBuilder_ReadResourceFailed);
+            return useImage(subjacentTargetResource
+                            , source
+                            , aFlags.requiredFormat
+                            , aFlags.arraySliceRange
+                            , aFlags.mipSliceRange
+                            , ERenderGraphViewAccessMode::Read
+                            , EEngineStatus::RenderGraph_PassBuilder_ReadResourceFailed);
         }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMaterial> CPassBuilder::useMaterial(resources::ResourceId_t const &aMaterialId)
+        CEngineResult<SRenderGraphMaterial> CPassBuilder::useMaterial(SRenderGraphMaterialDescription const &aMaterialDescription)
         {
-            SFrameGraphMaterial &materialResource = mResourceData.spawnResource<SFrameGraphMaterial>();
-            materialResource.readableName       = aMaterialId;
-            materialResource.type               = EFrameGraphResourceType::Material;
-            materialResource.assignedPassUID    = mPassUID;
-            materialResource.isExternalResource = true;
-            materialResource.parentResource     = 0;
-            materialResource.referenceCount     = 0;
-            materialResource.subjacentResource  = 0;
+            SRenderGraphMaterial &materialResource = mResourceData.spawnResource<SRenderGraphMaterial>();
+            materialResource.readableName          = aMaterialDescription.materialResourceId;
+            materialResource.type                  = ERenderGraphResourceType::Material;
+            materialResource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
+            materialResource.assignedPassUID       = mPassUID;
+            materialResource.isExternalResource    = true;
+            materialResource.parentResource        = 0;
+            materialResource.referenceCount        = 0;
+            materialResource.subjacentResource     = 0;
+            materialResource.description           = aMaterialDescription;
 
             return { EEngineStatus::Ok, materialResource };
         }
@@ -463,16 +465,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphMesh> CPassBuilder::useMesh(SFrameGraphMesh const &aMesh)
+        CEngineResult<SRenderGraphMesh> CPassBuilder::useMesh(SRenderGraphMeshDescription const &aMeshDescription)
         {
-            SFrameGraphMesh &meshResource = mResourceData.spawnResource<SFrameGraphMesh>();
-            meshResource.readableName       = aMesh.readableName;
-            meshResource.type               = EFrameGraphResourceType::Mesh;
-            meshResource.assignedPassUID    = mPassUID;
-            meshResource.isExternalResource = true;
-            meshResource.parentResource     = 0;
-            meshResource.referenceCount     = 0;
-            meshResource.subjacentResource  = 0;
+            SRenderGraphMesh &meshResource = mResourceData.spawnResource<SRenderGraphMesh>();
+            meshResource.readableName          = aMeshDescription.meshResourceId;
+            meshResource.type                  = ERenderGraphResourceType::Mesh;
+            meshResource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
+            meshResource.assignedPassUID       = mPassUID;
+            meshResource.isExternalResource    = true;
+            meshResource.parentResource        = 0;
+            meshResource.referenceCount        = 0;
+            meshResource.subjacentResource     = 0;
+            meshResource.description           = aMeshDescription;
 
             return { EEngineStatus::Ok, meshResource };
         }
@@ -481,18 +485,20 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SFrameGraphPipeline> CPassBuilder::usePipeline(resources::ResourceId_t const &aPipelineId, SFrameGraphPipelineConfig const &aConfig)
+        CEngineResult<SRenderGraphPipeline> CPassBuilder::usePipeline(resources::ResourceId_t      const &aSharedMaterialResourceid
+                                                                      , SRenderGraphPipelineConfig const &aPipelineConfig)
         {
-            SFrameGraphPipeline &resource = mResourceData.spawnResource<SFrameGraphPipeline>();
-            resource.readableName       = aPipelineId;
-            resource.type               = EFrameGraphResourceType::Mesh;
-            resource.assignedPassUID    = mPassUID;
-            resource.isExternalResource = true;
-            resource.parentResource     = 0;
-            resource.referenceCount     = 0;
-            resource.subjacentResource  = 0;
-            resource.basePipelineId     = aPipelineId;
-            resource.pipelineConfig     = aConfig;
+            SRenderGraphPipeline &resource = mResourceData.spawnResource<SRenderGraphPipeline>();
+            resource.readableName             = aSharedMaterialResourceid;
+            resource.type                     = ERenderGraphResourceType::Pipeline;
+            resource.assignedRenderpassUID    = mEnclosingRenderPass->getRenderPassUid();
+            resource.assignedPassUID          = mPassUID;
+            resource.isExternalResource       = false;
+            resource.parentResource           = 0;
+            resource.referenceCount           = 0;
+            resource.subjacentResource        = 0;
+            resource.sharedMaterialResourceId = aSharedMaterialResourceid;
+            resource.pipelineConfiguration    = aPipelineConfig;
 
             return { EEngineStatus::Ok, resource };
         }
@@ -501,34 +507,34 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<FrameGraphResourceId_t> CPassBuilder::findDuplicateTextureView(
-            FrameGraphResourceId_t               const &aSubjacentResourceId,
-            FrameGraphFormat_t                   const &aFormat,
-            EFrameGraphViewPurpose                const &aViewSource,
+        CEngineResult<RenderGraphResourceId_t> CPassBuilder::findDuplicateImageView(
+            RenderGraphResourceId_t               const &aSubjacentResourceId,
+            RenderGraphFormat_t                   const &aFormat,
+            ERenderGraphViewPurpose                const &aViewSource,
             CRange                               const &aArrayRange,
             CRange                               const &aMipRange,
-            CBitField<EFrameGraphViewAccessMode> const &aMode)
+            CBitField<ERenderGraphViewAccessMode> const &aMode)
         {
-            for(FrameGraphResourceId_t const &viewId : mResourceData.textureViews())
+            for(RenderGraphResourceId_t const &viewId : mResourceData.textureViews())
             {
-                CEngineResult<Shared<SFrameGraphTextureView>> viewFetch = mResourceData.getResource<SFrameGraphTextureView>(viewId);
+                CEngineResult<Shared<SRenderGraphImageView>> viewFetch = mResourceData.getResource<SRenderGraphImageView>(viewId);
                 if(not viewFetch.successful())
                 {
                     continue;
                 }
 
-                SFrameGraphTextureView const &compareView = *(viewFetch.data());
-                bool const equal =
-                                                 (compareView.arraySliceRange == aArrayRange)
-                                                 and (compareView.mipSliceRange == aMipRange)
-                                                 and ((FrameGraphFormat_t::Automatic == aFormat) or (compareView.format == aFormat))
-                                                 and (compareView.source == aViewSource)
-                                                 and (compareView.mode.check(aMode))
+                SRenderGraphImageView const &compareView = *(viewFetch.data());
+                bool const                  equal        =
+                                                 (compareView.description.arraySliceRange == aArrayRange)
+                                                 and (compareView.description.mipSliceRange == aMipRange)
+                                                 and ((RenderGraphFormat_t::Automatic == aFormat) or (compareView.description.format == aFormat))
+                                                 and (compareView.description.source == aViewSource)
+                                                 and (compareView.description.mode.check(aMode))
                                                  and (compareView.subjacentResource == aSubjacentResourceId);
 
                 if(equal)
                 {
-                    return { EEngineStatus::FrameGraph_PassBuilder_DuplicateTextureViewId, compareView.resourceId };
+                    return { EEngineStatus::RenderGraph_PassBuilder_DuplicateTextureViewId, compareView.resourceId };
                 }
             }
 
@@ -540,8 +546,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CPassBuilder::adjustArrayAndMipSliceRanges(
-            CFrameGraphResources const &aResourceData,
-            SFrameGraphResource  const &aSourceResource,
+            CRenderGraphResources const &aResourceData,
+            SRenderGraphResource  const &aSourceResource,
             CRange               const &aArraySliceRange,
             CRange               const &aMipSliceRange,
             CRange                     &aAdjustedArraySliceRange,
@@ -550,9 +556,9 @@ namespace engine
             aAdjustedArraySliceRange = aArraySliceRange;
             aAdjustedMipSliceRange   = aMipSliceRange;
 
-            if(EFrameGraphResourceType::TextureView == aSourceResource.type)
+            if(ERenderGraphResourceType::TextureView == aSourceResource.type)
             {
-                CEngineResult<Shared<SFrameGraphTexture>> subjacentFetch = aResourceData.getResource<SFrameGraphTexture>(aSourceResource.subjacentResource);
+                CEngineResult<Shared<SRenderGraphImage>> subjacentFetch = aResourceData.getResource<SRenderGraphImage>(aSourceResource.subjacentResource);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(not subjacentFetch.successful())
                 {
@@ -561,7 +567,7 @@ namespace engine
                 }
 #endif
 
-                CEngineResult<Shared<SFrameGraphTextureView>> parentFetch = aResourceData.getResource<SFrameGraphTextureView>(aSourceResource.resourceId);
+                CEngineResult<Shared<SRenderGraphImageView>> parentFetch = aResourceData.getResource<SRenderGraphImageView>(aSourceResource.resourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(not parentFetch.successful())
                 {
@@ -570,20 +576,20 @@ namespace engine
                 }
 #endif
 
-                SFrameGraphTexture     const &subjacent = *(subjacentFetch.data());
-                SFrameGraphTextureView const &parent    = *(parentFetch.data());
+                SRenderGraphImage     const &subjacent = *(subjacentFetch.data());
+                SRenderGraphImageView const &parent    = *(parentFetch.data());
 
-                aAdjustedArraySliceRange.offset = (parent.arraySliceRange.offset + aArraySliceRange.offset);
-                aAdjustedMipSliceRange.offset   = (parent.mipSliceRange.offset   + aMipSliceRange.offset);
+                aAdjustedArraySliceRange.offset = (parent.description.arraySliceRange.offset + aArraySliceRange.offset);
+                aAdjustedMipSliceRange.offset   = (parent.description.mipSliceRange.offset   + aMipSliceRange.offset);
 
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 bool const arraySliceRangeOutOfBounds =
-                               (aAdjustedArraySliceRange.length > parent.arraySliceRange.length)
-                               or ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.arraySize);
+                               (aAdjustedArraySliceRange.length > parent.description.arraySliceRange.length)
+                               or ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.description.arraySize);
 
                 bool const mipSliceRangeOutOfBounds =
-                               (aAdjustedMipSliceRange.length   > parent.mipSliceRange.length)
-                               or ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > subjacent.mipLevels);
+                               (aAdjustedMipSliceRange.length   > parent.description.mipSliceRange.length)
+                               or ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > subjacent.description.mipLevels);
 
                 if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
                 {
@@ -596,17 +602,17 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             else // Texture
             {
-                CEngineResult<Shared<SFrameGraphTexture>> subjacentFetch = aResourceData.getResource<SFrameGraphTexture>(aSourceResource.resourceId);
+                CEngineResult<Shared<SRenderGraphImage>> subjacentFetch = aResourceData.getResource<SRenderGraphImage>(aSourceResource.resourceId);
                 if(not subjacentFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Subjacent resource handle w/ id {} is empty.", aSourceResource.subjacentResource));
                     return { EEngineStatus::Error };
                 }
 
-                SFrameGraphTexture const &subjacent = *(subjacentFetch.data());
+                SRenderGraphImage const &subjacent = *(subjacentFetch.data());
 
-                bool const arraySliceRangeOutOfBounds = ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.arraySize);
-                bool const mipSliceRangeOutOfBounds   = ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length))   > subjacent.mipLevels);
+                bool const arraySliceRangeOutOfBounds = ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.description.arraySize);
+                bool const mipSliceRangeOutOfBounds   = ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length))   > subjacent.description.mipLevels);
 
                 if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
                 {
@@ -624,23 +630,23 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<> CPassBuilder::validateArrayAndMipSliceRanges(
-            CFrameGraphResources const &aResourceData,
-            SFrameGraphResource  const &aSourceResource,
-            CRange               const &aArraySliceRange,
-            CRange               const &aMipSliceRange,
-            bool                        aValidateReads,
-            bool                        aValidateWrites)
+            CRenderGraphResources const &aResourceData,
+            SRenderGraphResource  const &aSourceResource,
+            CRange                const &aArraySliceRange,
+            CRange                const &aMipSliceRange,
+            bool                         aValidateReads,
+            bool                         aValidateWrites)
         {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             if(aValidateReads)
             {
                 CEngineResult<bool> const isBeingReadQuery =
-                                              isTextureBeingReadInSubresourceRange(
-                                                  aResourceData.textureViews(),
-                                                  aResourceData,
-                                                  aSourceResource,
-                                                  aArraySliceRange,
-                                                  aMipSliceRange);
+                                              isImageBeingReadInSubresourceRange(
+                                                  aResourceData.textureViews()
+                                                  , aResourceData
+                                                  , aSourceResource
+                                                  , aArraySliceRange
+                                                  , aMipSliceRange);
 
                 if(not isBeingReadQuery.successful())
                 {
@@ -657,18 +663,19 @@ namespace engine
                             aArraySliceRange.length,
                             aMipSliceRange.offset,
                             aMipSliceRange.length));
-                    return { EEngineStatus::FrameGraph_PassBuilder_TextureIsBeingRead };
+                    return { EEngineStatus::RenderGraph_PassBuilder_TextureIsBeingRead };
                 }
             }
 
             if(aValidateWrites)
             {
                 CEngineResult<bool> const isBeingWrittenQuery =
-                                              isTextureBeingWrittenInSubresourceRange(
-                                                  aResourceData.textureViews(),
-                                                  aResourceData, aSourceResource,
-                                                  aArraySliceRange,
-                                                  aMipSliceRange);
+                                              isImageBeingWrittenInSubresourceRange(
+                                                  aResourceData.textureViews()
+                                                  , aResourceData
+                                                  , aSourceResource
+                                                  , aArraySliceRange
+                                                  , aMipSliceRange);
                 if(not isBeingWrittenQuery.successful())
                 {
                     return { isBeingWrittenQuery.result() };
@@ -684,7 +691,7 @@ namespace engine
                             aArraySliceRange.length,
                             aMipSliceRange.offset,
                             aMipSliceRange.length));
-                    return { EEngineStatus::FrameGraph_PassBuilder_TextureIsBeingWritten };
+                    return { EEngineStatus::RenderGraph_PassBuilder_TextureIsBeingWritten };
                 }
             }
 #endif
@@ -696,12 +703,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<bool> CPassBuilder::isTextureBeingReadInSubresourceRange(
-                RefIndex_t           const &aResourceViews,
-                CFrameGraphResources const &aResources,
-                SFrameGraphResource  const &aSourceResource,
-                CRange               const &aArraySliceRange,
-                CRange               const &aMipSliceRange)
+        CEngineResult<bool> CPassBuilder::isImageBeingReadInSubresourceRange(
+                RefIndex_t            const &aResourceViews,
+                CRenderGraphResources const &aResources,
+                SRenderGraphResource  const &aSourceResource,
+                CRange                const &aArraySliceRange,
+                CRange                const &aMipSliceRange)
         {
             // This test method can check for overlapping regions for array slices and mip slices
             //  given a specific set of options to test against.
@@ -711,15 +718,15 @@ namespace engine
             // The whole operation setup is based on first come first serve.
             for(RefIndex_t::value_type const &viewRef : aResourceViews)
             {
-                CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = aResources.getResource<SFrameGraphTextureView>(viewRef);
+                CEngineResult<Shared<SRenderGraphImageView>> const &viewFetch = aResources.getResource<SRenderGraphImageView>(viewRef);
                 if(not viewFetch.successful())
                 {
                     return { viewFetch.result(), false };
                 }
 
-                SFrameGraphTextureView const &view = *(viewFetch.data());
+                SRenderGraphImageView const &view = *(viewFetch.data());
 
-                bool correctMode = view.mode.check(EFrameGraphViewAccessMode::Read);
+                bool correctMode = view.description.mode.check(ERenderGraphViewAccessMode::Read);
                 if(not correctMode)
                 {
                     continue;
@@ -733,13 +740,13 @@ namespace engine
                     continue;
                 }
 
-                bool const arraySliceOverlap = view.arraySliceRange.overlapsWith(aArraySliceRange);
+                bool const arraySliceOverlap = view.description.arraySliceRange.overlapsWith(aArraySliceRange);
                 if(not arraySliceOverlap)
                 {
                     continue;
                 }
 
-                bool const mipSliceOverlap = view.mipSliceRange.overlapsWith(aMipSliceRange);
+                bool const mipSliceOverlap = view.description.mipSliceRange.overlapsWith(aMipSliceRange);
                 if(mipSliceOverlap)
                 {
                     continue;
@@ -755,10 +762,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<bool> CPassBuilder::isTextureBeingWrittenInSubresourceRange(
+        CEngineResult<bool> CPassBuilder::isImageBeingWrittenInSubresourceRange(
                 RefIndex_t           const &aResourceViews,
-                CFrameGraphResources const &aResources,
-                SFrameGraphResource  const &aSourceResource,
+                CRenderGraphResources const &aResources,
+                SRenderGraphResource  const &aSourceResource,
                 CRange               const &aArraySliceRange,
                 CRange               const &aMipSliceRange)
         {
@@ -770,15 +777,15 @@ namespace engine
             // The whole operation setup is based on first come first serve.
             for(RefIndex_t::value_type const &viewRef : aResourceViews)
             {
-                CEngineResult<Shared<SFrameGraphTextureView>> const &viewFetch = aResources.getResource<SFrameGraphTextureView>(viewRef);
+                CEngineResult<Shared<SRenderGraphImageView>> const &viewFetch = aResources.getResource<SRenderGraphImageView>(viewRef);
                 if(not viewFetch.successful())
                 {
 
                 }
 
-                SFrameGraphTextureView const &view = *(viewFetch.data());
+                SRenderGraphImageView const &view = *(viewFetch.data());
 
-                bool correctMode = view.mode.check(EFrameGraphViewAccessMode::Write);
+                bool correctMode = view.description.mode.check(ERenderGraphViewAccessMode::Write);
                 if(not correctMode)
                 {
                     continue;
@@ -792,14 +799,14 @@ namespace engine
                     continue;
                 }
 
-                bool const arraySliceOverlap = view.arraySliceRange.overlapsWith(aArraySliceRange);
+                bool const arraySliceOverlap = view.description.arraySliceRange.overlapsWith(aArraySliceRange);
                 if(not arraySliceOverlap)
                 {
                     continue;
                 }
                 else
                 {
-                    bool const mipSliceOverlap = view.mipSliceRange.overlapsWith(aMipSliceRange);
+                    bool const mipSliceOverlap = view.description.mipSliceRange.overlapsWith(aMipSliceRange);
                     if(not mipSliceOverlap)
                     {
                         continue;

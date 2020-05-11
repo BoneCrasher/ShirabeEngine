@@ -41,8 +41,8 @@ namespace engine
         {
         public_constructors:
             SHIRABE_INLINE SPassResourceConstraint(
-                    SFrameGraphResource          const &aTarget,
-                    SFrameGraphResource          const &aSource,
+                    SRenderGraphResource          const &aTarget,
+                    SRenderGraphResource          const &aSource,
                     EPassResourceConstraintFlags const &aFlags)
                 : target(aTarget)
                 , source(aSource)
@@ -50,8 +50,8 @@ namespace engine
             {}
 
         public_members:
-            SFrameGraphResource          target;
-            SFrameGraphResource          source;
+            SRenderGraphResource          target;
+            SRenderGraphResource          source;
             EPassResourceConstraintFlags flags;
         };
 
@@ -75,7 +75,7 @@ namespace engine
                     PassUID_t             const &aPassUID,
                     Shared<CPassBase>            aPass,
                     Shared<CRenderPass>          aEnclosingRenderPass,
-                    CFrameGraphMutableResources &aOutResourceData);
+                    CRenderGraphMutableResources &aOutResourceData);
 
         public_methods:
             /**
@@ -97,9 +97,9 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    creation.
              */
-            CEngineResult<SFrameGraphTransientTexture> createTexture(
-                    std::string    const &aName,
-                SFrameGraphTexture const &aDescriptor);
+            CEngineResult<SRenderGraphTransientImage> createImage(
+                std::string                  const &aName,
+                SRenderGraphImageDescription const &aDescriptor);
 
             /**
              * Request the creation of a texture resource in the framegraph.
@@ -109,9 +109,9 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    creation.
              */
-            CEngineResult<SFrameGraphRenderTarget> createRenderTarget(
-                std::string       const &aName,
-                SFrameGraphTexture const &aDescriptor);
+            CEngineResult<SRenderGraphRenderTarget> createRenderTarget(
+                std::string                  const &aName,
+                SRenderGraphImageDescription const &aDescriptor);
 
             /**
              * Request a write operation on a subjacent texture instance.
@@ -121,9 +121,9 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphTextureView> writeAttachment(
-                    SFrameGraphTexture                 &aTexture,
-                    SFrameGraphWriteTextureFlags const &aFlags);
+            CEngineResult<SRenderGraphImageView> writeAttachment(
+                SRenderGraphImage                   &aImage,
+                SRenderGraphWriteTextureFlags const &aFlags);
 
             /**
              * Request a write operation on a subjacent texture instance.
@@ -133,9 +133,9 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphTextureView> writeAttachment(
-                SFrameGraphTextureView             &aTextureView,
-                SFrameGraphWriteTextureFlags const &aFlags);
+            CEngineResult<SRenderGraphImageView> writeAttachment(
+                SRenderGraphImageView             &aImageView,
+                SRenderGraphWriteTextureFlags const &aFlags);
 
             /**
              * Request a read operation on a subjacent texture instance.
@@ -145,9 +145,9 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphTextureView> readAttachment(
-                    SFrameGraphTexture                &aTexture,
-                    SFrameGraphReadTextureFlags const &aFlags);
+            CEngineResult<SRenderGraphImageView> readAttachment(
+                SRenderGraphImage                  &aImage,
+                SRenderGraphReadTextureFlags const &aFlags);
 
             /**
              * Request a read operation on a subjacent texture instance.
@@ -157,9 +157,9 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphTextureView> readAttachment(
-                SFrameGraphTextureView            &aTextureView,
-                SFrameGraphReadTextureFlags const &aFlags);
+            CEngineResult<SRenderGraphImageView> readAttachment(
+                SRenderGraphImageView            &aImageView,
+                SRenderGraphReadTextureFlags const &aFlags);
 
             /**
              * Request a read operation on a subjacent texture instance.
@@ -169,14 +169,16 @@ namespace engine
              * @return                         Return a framegraph resource handle for the texture
              *                                 creation.
              */
-            CEngineResult<SFrameGraphTextureView> readTexture(
-                    SFrameGraphTexture                    &subjacentTargetResource,
-                    SFrameGraphTextureResourceFlags const &aFlags);
+            CEngineResult<SRenderGraphImageView> readImage(
+                SRenderGraphImage                      &subjacentTargetResource,
+                SRenderGraphTextureResourceFlags const &aFlags);
 
-            CEngineResult<SFrameGraphMesh> useMesh(SFrameGraphMesh const &aMesh);
-            CEngineResult<SFrameGraphMaterial> useMaterial(SFrameGraphMaterial const &aMaterial);
+            CEngineResult<SRenderGraphMesh> useMesh(SRenderGraphMeshDescription const &aMeshDescription);
 
-            CEngineResult<SFrameGraphPipeline> usePipeline(SFrameGraphPipeline const &aPipeline, SFrameGraphPipelineConfig const &aConfig);
+            CEngineResult<SRenderGraphMaterial> useMaterial(SRenderGraphMaterialDescription const &aMaterialDescription);
+
+            CEngineResult<SRenderGraphPipeline> usePipeline(resources::ResourceId_t      const &aSharedMaterialResourceid
+                                                            , SRenderGraphPipelineConfig const &aPipelineDescription);
 
             // Buffers?
 
@@ -194,13 +196,13 @@ namespace engine
              * @return                     Returns the resource UID of a possibly duplicate
              *                             view or 0, if no duplication was found.
              */
-            CEngineResult<FrameGraphResourceId_t> findDuplicateTextureView(
-                    FrameGraphResourceId_t               const &aSubjacentResourceId,
-                    FrameGraphFormat_t                   const &aFormat,
-                    EFrameGraphViewPurpose                const &aViewSource,
-                    CRange                               const &aArrayRange,
-                    CRange                               const &aMipRange,
-                    CBitField<EFrameGraphViewAccessMode> const &aMode);
+            CEngineResult<RenderGraphResourceId_t> findDuplicateImageView(
+                    RenderGraphResourceId_t               const &aSubjacentResourceId,
+                    RenderGraphFormat_t                   const &aFormat,
+                    ERenderGraphViewPurpose               const &aViewSource,
+                    CRange                                const &aArrayRange,
+                    CRange                                const &aMipRange,
+                    CBitField<ERenderGraphViewAccessMode> const &aMode);
 
             /**
              * Adjust the array and mipslice ranges on cascading resource read/writes, which all base on the zero-based
@@ -226,12 +228,12 @@ namespace engine
              * @param aAdjustedMipSliceRange   Output handle for the corrected mip range.
              */
             CEngineResult<> adjustArrayAndMipSliceRanges(
-                    CFrameGraphResources const &aResourceData,
-                    SFrameGraphResource  const &aSourceResource,
-                    CRange               const &aArraySliceRange,
-                    CRange               const &aMipSliceRange,
-                    CRange                     &aAdjustedArraySliceRange,
-                    CRange                     &aAdjustedMipSliceRange);
+                    CRenderGraphResources const &aResourceData,
+                    SRenderGraphResource  const &aSourceResource,
+                    CRange                const &aArraySliceRange,
+                    CRange                const &aMipSliceRange,
+                    CRange                      &aAdjustedArraySliceRange,
+                    CRange                      &aAdjustedMipSliceRange);
 
             /**
              * Validate array and mip slice ranges for read and/or write to be in valid bounds with
@@ -246,12 +248,12 @@ namespace engine
              * @param aValidateWrites  Flag indicating, wheter write operations should be validated.
              */
             CEngineResult<> validateArrayAndMipSliceRanges(
-                    CFrameGraphResources const &aResourceData,
-                    SFrameGraphResource  const &aSourceResource,
-                    CRange               const &aArraySliceRange,
-                    CRange               const &aMipSliceRange,
-                    bool                        aValidateReads  = true,
-                    bool                        aValidateWrites = true);
+                    CRenderGraphResources const &aResourceData,
+                    SRenderGraphResource  const &aSourceResource,
+                    CRange                const &aArraySliceRange,
+                    CRange                const &aMipSliceRange,
+                    bool                         aValidateReads  = true,
+                    bool                         aValidateWrites = true);
 
             /**
              * Check, whether a specific resource view is already being read by other
@@ -265,12 +267,12 @@ namespace engine
              * @param aMipSliceRange   The resource mip range to validate.
              * @return                 True, if no simultaneous overlapping reads are performed.
              */
-            CEngineResult<bool> isTextureBeingReadInSubresourceRange(
+            CEngineResult<bool> isImageBeingReadInSubresourceRange(
                     RefIndex_t           const &aResourceViews,
-                    CFrameGraphResources const &aResources,
-                    SFrameGraphResource  const &aSourceResource,
-                    CRange               const &aArraySliceRange,
-                    CRange               const &aMipSliceRange);
+                    CRenderGraphResources const &aResources,
+                    SRenderGraphResource  const &aSourceResource,
+                    CRange                const &aArraySliceRange,
+                    CRange                const &aMipSliceRange);
 
             /**
              * Check, whether a specific resource view is already being written by other
@@ -284,38 +286,38 @@ namespace engine
              * @param aMipSliceRange   The resource mip range to validate.
              * @return                 True, if no simultaneous overlapping writes are performed.
              */
-            CEngineResult<bool> isTextureBeingWrittenInSubresourceRange(
-                    RefIndex_t           const &aResourceViews,
-                    CFrameGraphResources const &aResources,
-                    SFrameGraphResource  const &aSourceResource,
-                    CRange               const &aArraySliceRange,
-                    CRange               const &aMipSliceRange);
+            CEngineResult<bool> isImageBeingWrittenInSubresourceRange(
+                    RefIndex_t            const &aResourceViews,
+                    CRenderGraphResources const &aResources,
+                    SRenderGraphResource  const &aSourceResource,
+                    CRange                const &aArraySliceRange,
+                    CRange                const &aMipSliceRange);
 
         private_methods:
-            CEngineResult<SFrameGraphTextureView> useTexture(
-                    SFrameGraphTexture                 &aTexture,
-                    EFrameGraphViewPurpose       const &aSourceOrTarget,
-                    EFormat                      const &aRequiredFormat,
-                    CRange                       const &aArraySliceRange,
-                    CRange                       const &aMipSliceRange,
-                    EFrameGraphViewAccessMode    const &aMode,
-                    EEngineStatus                const &aFailCode);
+            CEngineResult<SRenderGraphImageView> useImage(
+                SRenderGraphImage                    &aTexture,
+                    ERenderGraphViewPurpose    const &aSourceOrTarget,
+                    EFormat                    const &aRequiredFormat,
+                    CRange                     const &aArraySliceRange,
+                    CRange                     const &aMipSliceRange,
+                    ERenderGraphViewAccessMode const &aMode,
+                    EEngineStatus              const &aFailCode);
 
-            CEngineResult<SFrameGraphTextureView> useTextureView(
-                    SFrameGraphTextureView             &aTextureView,
-                    EFrameGraphViewPurpose       const &aSourceOrTarget,
-                    EFormat                      const &aRequiredFormat,
-                    CRange                       const &aArraySliceRange,
-                    CRange                       const &aMipSliceRange,
-                    EFrameGraphViewAccessMode    const &aMode,
-                    EEngineStatus                const &aFailCode);
+            CEngineResult<SRenderGraphImageView> useImageView(
+                SRenderGraphImageView                &aTextureView,
+                    ERenderGraphViewPurpose    const &aSourceOrTarget,
+                    EFormat                    const &aRequiredFormat,
+                    CRange                     const &aArraySliceRange,
+                    CRange                     const &aMipSliceRange,
+                    ERenderGraphViewAccessMode const &aMode,
+                    EEngineStatus              const &aFailCode);
 
         private_members:
             PassUID_t                        mPassUID;
             Shared<CPassBase>                mPass;
             Shared<CRenderPass>              mEnclosingRenderPass;
-            CFrameGraphMutableResources     &mResourceData;
-            SFrameGraphAttachmentCollection &mAttachmentCollection;
+            CRenderGraphMutableResources     &mResourceData;
+            SRenderGraphAttachmentCollection &mAttachmentCollection;
         };
     }
 }

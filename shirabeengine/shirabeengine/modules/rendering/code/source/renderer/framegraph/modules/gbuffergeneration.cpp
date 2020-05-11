@@ -9,9 +9,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult
         <
-            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
+            CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
         >
-        CFrameGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
+        CRenderGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
                 std::string               const &aPassName,
                 CGraphBuilder                   &aGraphBuilder)
         {
@@ -20,10 +20,10 @@ namespace engine
              */
             struct SState
             {
-                SFrameGraphRenderTarget gbufferTexture0Id;
-                SFrameGraphRenderTarget gbufferTexture1Id;
-                SFrameGraphRenderTarget gbufferTexture2And3Id;
-                SFrameGraphRenderTarget depthStencilTextureId;
+                SRenderGraphRenderTarget gbufferTexture0Id;
+                SRenderGraphRenderTarget gbufferTexture1Id;
+                SRenderGraphRenderTarget gbufferTexture2And3Id;
+                SRenderGraphRenderTarget depthStencilTextureId;
             };
 
             /**
@@ -43,8 +43,8 @@ namespace engine
             auto const setup =
                            [&] (CPassBuilder                       &aBuilder
                                 , SPassData                        &aOutPassData
-                                , SFrameGraphPlatformContext const &aPlatformContext
-                                , SFrameGraphDataSource const      &aDataSource) -> CEngineResult<>
+                                , SRenderGraphPlatformContext const &aPlatformContext
+                                , SRenderGraphDataSource const      &aDataSource) -> CEngineResult<>
                                {
                                    // Default extents.
                                    uint32_t width  = 1920;
@@ -59,47 +59,47 @@ namespace engine
                                        height = displayDesc.bounds.size.y();
                                    }
 
-                                   SFrameGraphRenderTarget gbuffer0Desc ={ };
+                                   SRenderGraphImageDescription gbuffer0Desc ={ };
                                    gbuffer0Desc.width              = width;
                                    gbuffer0Desc.height             = height;
                                    gbuffer0Desc.depth              = 1;
-                                   gbuffer0Desc.format             = FrameGraphFormat_t::R32G32B32A32_FLOAT;
-                                   gbuffer0Desc.initialState       = EFrameGraphResourceInitState::Clear;
+                                   gbuffer0Desc.format             = RenderGraphFormat_t::R32G32B32A32_FLOAT;
+                                   gbuffer0Desc.initialState       = ERenderGraphResourceInitState::Clear;
                                    gbuffer0Desc.arraySize          = 1;
                                    gbuffer0Desc.mipLevels          = 1;
-                                   gbuffer0Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
-                                                                       | EFrameGraphResourceUsage::ColorAttachment;
-                                   SFrameGraphRenderTarget gbuffer1Desc ={ };
+                                   gbuffer0Desc.permittedUsage     =   ERenderGraphResourceUsage::InputAttachment
+                                                                       | ERenderGraphResourceUsage::ColorAttachment;
+                                   SRenderGraphImageDescription gbuffer1Desc ={ };
                                    gbuffer1Desc.width              = width;
                                    gbuffer1Desc.height             = height;
                                    gbuffer1Desc.depth              = 1;
-                                   gbuffer1Desc.format             = FrameGraphFormat_t::R32G32B32A32_FLOAT;
-                                   gbuffer1Desc.initialState       = EFrameGraphResourceInitState::Clear;
+                                   gbuffer1Desc.format             = RenderGraphFormat_t::R32G32B32A32_FLOAT;
+                                   gbuffer1Desc.initialState       = ERenderGraphResourceInitState::Clear;
                                    gbuffer1Desc.arraySize          = 1;
                                    gbuffer1Desc.mipLevels          = 1;
-                                   gbuffer1Desc.permittedUsage     =   EFrameGraphResourceUsage::InputAttachment
-                                                                       | EFrameGraphResourceUsage::ColorAttachment;
-                                   SFrameGraphRenderTarget gbuffer2And3Desc ={ };
+                                   gbuffer1Desc.permittedUsage     =   ERenderGraphResourceUsage::InputAttachment
+                                                                       | ERenderGraphResourceUsage::ColorAttachment;
+                                   SRenderGraphImageDescription gbuffer2And3Desc ={ };
                                    gbuffer2And3Desc.width          = width;
                                    gbuffer2And3Desc.height         = height;
                                    gbuffer2And3Desc.depth          = 1;
-                                   gbuffer2And3Desc.format         = FrameGraphFormat_t::B8G8R8A8_UNORM;
-                                   gbuffer2And3Desc.initialState   = EFrameGraphResourceInitState::Clear;
+                                   gbuffer2And3Desc.format         = RenderGraphFormat_t::B8G8R8A8_UNORM;
+                                   gbuffer2And3Desc.initialState   = ERenderGraphResourceInitState::Clear;
                                    gbuffer2And3Desc.arraySize      = 2;
                                    gbuffer2And3Desc.mipLevels      = 1;
-                                   gbuffer2And3Desc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
-                                                                       | EFrameGraphResourceUsage::ColorAttachment;
+                                   gbuffer2And3Desc.permittedUsage =   ERenderGraphResourceUsage::InputAttachment
+                                                                       | ERenderGraphResourceUsage::ColorAttachment;
 
-                                   SFrameGraphRenderTarget depthStencilDesc ={ };
+                                   SRenderGraphImageDescription depthStencilDesc ={ };
                                    depthStencilDesc.width          = width;
                                    depthStencilDesc.height         = height;
                                    depthStencilDesc.depth          = 1;
-                                   depthStencilDesc.format         = FrameGraphFormat_t::D24_UNORM_S8_UINT;
-                                   depthStencilDesc.initialState   = EFrameGraphResourceInitState::Clear;
+                                   depthStencilDesc.format         = RenderGraphFormat_t::D24_UNORM_S8_UINT;
+                                   depthStencilDesc.initialState   = ERenderGraphResourceInitState::Clear;
                                    depthStencilDesc.arraySize      = 1;
                                    depthStencilDesc.mipLevels      = 1;
-                                   depthStencilDesc.permittedUsage =   EFrameGraphResourceUsage::InputAttachment
-                                                                       | EFrameGraphResourceUsage::DepthAttachment;
+                                   depthStencilDesc.permittedUsage =   ERenderGraphResourceUsage::InputAttachment
+                                                                       | ERenderGraphResourceUsage::DepthAttachment;
 
                                    // Basic underlying output buffer to be linked
                                    aOutPassData.state.gbufferTexture0Id     = aBuilder.createRenderTarget("GBuffer Array Texture - Positions", gbuffer0Desc).data();
@@ -109,13 +109,13 @@ namespace engine
 
                                    // This will create a list of render targets for the texutre array to render to.
                                    // They'll be internally created and managed.
-                                   SFrameGraphWriteTextureFlags baseFlags = {};
+                                   SRenderGraphWriteTextureFlags baseFlags = {};
                                    baseFlags.requiredFormat  = EFormat::Undefined;
-                                   baseFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                                   baseFlags.writeTarget     = ERenderGraphWriteTarget::Color;
                                    baseFlags.arraySliceRange = CRange(0, 1);
                                    baseFlags.mipSliceRange   = CRange(0, 1);
 
-                                   SFrameGraphWriteTextureFlags write0 = baseFlags,
+                                   SRenderGraphWriteTextureFlags write0 = baseFlags,
                                                                 write1 = baseFlags,
                                                                 write2 = baseFlags,
                                                                 write3 = baseFlags;
@@ -129,9 +129,9 @@ namespace engine
                                    write3.arraySliceRange.offset = 1;
                                    write3.requiredFormat         = gbuffer2And3Desc.format;
 
-                                   SFrameGraphWriteTextureFlags depthFlags = {};
+                                   SRenderGraphWriteTextureFlags depthFlags = {};
                                    depthFlags.requiredFormat  = depthStencilDesc.format;
-                                   depthFlags.writeTarget     = EFrameGraphWriteTarget::Depth;
+                                   depthFlags.writeTarget     = ERenderGraphWriteTarget::Depth;
                                    depthFlags.arraySliceRange = CRange(0, 1);
                                    depthFlags.mipSliceRange   = CRange(0, 1);
 
@@ -141,45 +141,43 @@ namespace engine
                                    aOutPassData.exportData.gbuffer3     = aBuilder.writeAttachment(aOutPassData.state.gbufferTexture2And3Id, write3).data();
                                    aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
-                                   std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
-                                   std::vector<SFrameGraphMesh>                validMeshes;
+                                   std::vector<SRenderGraphRenderable> renderables = aDataSource.fetchRenderables({});
+                                   std::vector<SRenderGraphMesh>       validMeshes;
 
                                    // Render-Loop
                                    for(auto const &renderableResources : renderables)
                                    {
-                                       for(auto const &[id, renderableMesh] : renderableResources.meshes)
+                                       auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
+
+                                       auto const materials = renderableResources.materials;
+                                       for(std::size_t k=0; k<materials.size(); ++k)
                                        {
-                                           auto [result, mesh] = aBuilder.useMesh(renderableMesh); // Will trace down the component hierarchies...
+                                           auto const renderableMaterial       = materials[k];
+                                           auto const renderableUniformBuffers = renderableMaterial.buffers;
+                                           auto const renderableImages         = renderableMaterial.images;
 
-                                           auto const materials = renderableMesh.materials;
-                                           for(std::size_t k=0; k<materials.size(); ++k)
+                                           auto [result, material] = aBuilder.useMaterial(renderableMaterial);
+
+                                           for(auto const &buffer : renderableUniformBuffers)
                                            {
-                                               auto const renderableMaterial       = materials[k];
-                                               auto const renderableUniformBuffers = renderableMaterial.uniformBufferIds;
-                                               auto const renderableImages         = renderableMaterial.textureIds;
-
-                                               auto [result, material] = aBuilder.useMaterial(renderableMaterial);
-
-                                               for(auto const &buffer : renderableUniformBuffers)
-                                               {
-                                                   auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
-                                                   material.uniformBuffers.push_back(bufferResource);
-                                               }
-
-                                               for(auto const &texture : renderableImages)
-                                               {
-                                                   SFrameGraphTextureResourceFlags flags;
-                                                   flags.arraySliceRange = CRange(0, 1);
-                                                   flags.mipSliceRange   = CRange(0, 1);
-                                                   flags.requiredFormat  = EFormat::Automatic;
-                                                   auto const [result, textureResource] = aBuilder.readTexture(texture, flags);
-                                                   material.textures.push_back(textureResource);
-                                               }
-
-                                               auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.basePipeline, {});
-
-                                               mesh.materials[k] = material;
+                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
+                                               material.buffers.push_back(bufferResource);
                                            }
+
+                                           for(auto const &imageDesc : renderableImages)
+                                           {
+                                               auto [imageCreationResult, image] = aBuilder.createImage(renderableMaterial.materialResourceId, imageDesc);
+
+                                               SRenderGraphTextureResourceFlags flags;
+                                               flags.arraySliceRange = CRange(0, 1);
+                                               flags.mipSliceRange   = CRange(0, 1);
+                                               flags.requiredFormat  = EFormat::Automatic;
+
+                                               auto const [result, textureResource] = aBuilder.readImage(image, flags);
+                                               material.images.push_back(textureResource);
+                                           }
+
+                                           auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, {});
                                        }
 
                                        validMeshes.push_back(mesh);
@@ -191,21 +189,21 @@ namespace engine
             // Execution
             // ----------------------------------------------------------------------------------
             auto const execute = [=] (SPassData const                    &aPassData
-                                      , SFrameGraphPlatformContext const &aPlatformContext
-                                      , SFrameGraphDataSource const      &aDataSource
-                                      , CFrameGraphResources const       &aFrameGraphResources
-                                      , SFrameGraphRenderContextState    &aRenderContextState
-                                      , SFrameGraphResourceContext       &aResourceContext
-                                      , SFrameGraphRenderContext         &aRenderContext) -> CEngineResult<>
+                                      , SRenderGraphPlatformContext const &aPlatformContext
+                                      , SRenderGraphDataSource const      &aDataSource
+                                      , CRenderGraphResources const       &aRenderGraphResources
+                                      , SRenderGraphRenderContextState    &aRenderContextState
+                                      , SRenderGraphResourceContext       &aResourceContext
+                                      , SRenderGraphRenderContext         &aRenderContext) -> CEngineResult<>
             {
                 using namespace engine::rendering;
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-                std::vector<SFrameGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
+                std::vector<SRenderGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
 
                 // Render-Loop
-                for(SFrameGraphRenderableResources const &renderableResources : renderables)
+                for(SRenderGraphRenderableResources const &renderableResources : renderables)
                 {
                     for(auto const &[id, mesh] : renderableResources.meshes)
                     {
@@ -216,7 +214,7 @@ namespace engine
 
                         aRenderContext.useMesh(aRenderContextState, mesh);
 
-                        for(SFrameGraphMaterial const &material : mesh.materials)
+                        for(SRenderGraphMaterial const &material : mesh.materials)
                         {
 
 

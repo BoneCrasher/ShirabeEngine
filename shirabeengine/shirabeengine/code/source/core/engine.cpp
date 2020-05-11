@@ -286,23 +286,23 @@ namespace engine
 
         auto const fnCreatePlatformRenderer = [&, this] () -> CEngineResult<>
         {
-            using engine::framegraph::SFrameGraphRenderContext;
+            using engine::framegraph::SRenderGraphRenderContext;
 
             // How to decouple?
-            SFrameGraphRenderContext   frameGraphRenderContext {};
-            SFrameGraphResourceContext frameGraphResourceContext {};
+            SRenderGraphRenderContext   renderGraphRenderContext {};
+            SRenderGraphResourceContext renderGraphResourceContext {};
             if(EGFXAPI::Vulkan == gfxApi)
             {
-                frameGraphRenderContext   = vulkan::CreateRenderContextForVulkan  (mVulkanEnvironment, mResourceManager, mAssetStorage);
-                frameGraphResourceContext = vulkan::CreateResourceContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
+                renderGraphRenderContext   = vulkan::CreateRenderContextForVulkan  (mVulkanEnvironment, mResourceManager, mAssetStorage);
+                renderGraphResourceContext = vulkan::CreateResourceContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
             }
 
-            mRenderContext   = makeShared(SFrameGraphRenderContext(frameGraphRenderContext));
-            mResourceContext = makeShared(SFrameGraphResourceContext(frameGraphResourceContext));
+            mRenderContext   = makeShared(SRenderGraphRenderContext(renderGraphRenderContext));
+            mResourceContext = makeShared(SRenderGraphResourceContext(renderGraphResourceContext));
 
             mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration);
-            status    = mRenderer->createDeferredPipeline(frameGraphResourceContext);
+            status    = mRenderer->createDeferredPipeline(renderGraphResourceContext);
 
             return { status };
         };

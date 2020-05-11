@@ -26,7 +26,7 @@ namespace engine
 
         /**
          * The SequenceUIDGene rator class implements IUIDGenerator so that it
-         * increments a FrameGraphResourceId_t linearly on each call to 'generate',
+         * increments a RenderGraphResourceId_t linearly on each call to 'generate',
          * starting at 'aInitialID' provided to the constructor.
          */
         template <typename TID>

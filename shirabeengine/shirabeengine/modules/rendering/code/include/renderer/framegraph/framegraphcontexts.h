@@ -41,15 +41,15 @@ namespace engine
 
         /**
          * Describes the runtime state of render context operations, used
-         * in conjunction with a SFrameGraphRenderContext-instance.
+         * in conjunction with a SRenderGraphRenderContext-instance.
          */
-        struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContextState
+        struct SHIRABE_LIBRARY_EXPORT SRenderGraphRenderContextState
         {
             // std::vector<ResourceId_t> mReferencedResources;
             uint32_t currentSubpassIndex;
 
             SHIRABE_INLINE
-            SFrameGraphRenderContextState()
+            SRenderGraphRenderContextState()
                 : currentSubpassIndex(0)
             {}
         };
@@ -57,7 +57,7 @@ namespace engine
         /**
          *
          */
-        struct SHIRABE_LIBRARY_EXPORT SFrameGraphRenderContext
+        struct SHIRABE_LIBRARY_EXPORT SRenderGraphRenderContext
         {
             /**
              * Copy one image into another.
@@ -67,9 +67,9 @@ namespace engine
              * @returns EEngineStatus::Ok    If successful
              * @returns EEngineStatus::Error On error
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState  &/* aState         */
-                                      , SFrameGraphTexture const&/* aSourceTexture */
-                                      , SFrameGraphTexture const&/* aTargetTexture */)>       copyImage;
+            std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState         */
+                                      , SRenderGraphResource       const&/* aSourceTexture */
+                                      , SRenderGraphResource       const&/* aTargetTexture */)> copyImage;
             /**
              * Copy aTexture to the currently bound back buffer.
              *
@@ -77,112 +77,112 @@ namespace engine
              * @returns EEngineStatus::Ok    If successful
              * @returns EEngineStatus::Error On error
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState  &/* aState */
-                                      , SFrameGraphTexture const&/* aTexture */)>             copyImageToBackBuffer;
+            std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState */
+                                        , SRenderGraphResource     const&/* aTexture */)> copyImageToBackBuffer;
 
             /**
              * Transfers an image from one layout into another.
              * Important: If this call is made within a renderpass, a subpass-self-dependency is required!
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState  &/* aState        */
-                                      , SFrameGraphTexture const&/* aImageHandle  */
-                                      , CRange                    const&/* aArrayRange   */
-                                      , CRange                    const&/* aMipRange     */
-                                      , VkImageAspectFlags        const&/* aAspectFlags  */
-                                      , VkImageLayout             const&/* aSourceLayout */
-                                      , VkImageLayout             const&/* aTargetLayout */)> performImageLayoutTransfer;
+            std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState        */
+                                      , SRenderGraphResource       const&/* aImageHandle  */
+                                      , CRange                     const&/* aArrayRange   */
+                                      , CRange                     const&/* aMipRange     */
+                                      , VkImageAspectFlags         const&/* aAspectFlags  */
+                                      , VkImageLayout              const&/* aSourceLayout */
+                                      , VkImageLayout              const&/* aTargetLayout */)> performImageLayoutTransfer;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> beginGraphicsFrame;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> beginGraphicsFrame;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> endGraphicsFrame;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> endGraphicsFrame;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> beginSubpass;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> beginSubpass;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> nextSubpass;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> nextSubpass;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> beginFrameCommandBuffers;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> beginFrameCommandBuffers;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> endFrameCommandBuffers;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> endFrameCommandBuffers;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */
                                       , std::string             const &)> clearAttachments;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> present;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> present;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState     &/* aState               */
+            std::function<EEngineStatus(SRenderGraphRenderContextState     &/* aState               */
                                       , ResourceId_t                const &/* aRenderPassId        */
                                       , ResourceId_t                const &/* aFrameBufferId       */)> bindRenderPass;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState & /* aState         */
+            std::function<EEngineStatus(SRenderGraphRenderContextState & /* aState         */
                                       , std::string              const& /* aRenderPassId  */
                                       , std::string              const& /* aFrameBufferId */)> unbindRenderPass;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */
-                                      , SFrameGraphMesh          const&/* aMesh */)> useMesh;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */
+                                      , SRenderGraphMesh          const&/* aMesh */)> useMesh;
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */
-                                      , SFrameGraphMaterial     const &/* aMaterial */
-                                      , SFrameGraphPipeline     const &/* aPipeline */)> useMaterialWithPipeline;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */
+                                      , SRenderGraphMaterial     const &/* aMaterial */
+                                      , SRenderGraphPipeline     const &/* aPipeline */)> useMaterialWithPipeline;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */
-                                      , SFrameGraphPipeline     const &/* aPipelineUID */)> bindPipeline;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */
+                                      , SRenderGraphPipeline     const &/* aPipelineUID */)> bindPipeline;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */
                                       , VkDeviceSize            const &/* aIndexCount */)> drawIndexed;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */)> drawQuad;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */)> drawQuad;
 
             /**
              *
              */
-            std::function<EEngineStatus(SFrameGraphRenderContextState &/* aState */, SFrameGraphMaterial const& /* aMaterial */)>  drawFullscreenQuadWithMaterial;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState */, SRenderGraphMaterial const& /* aMaterial */)>  drawFullscreenQuadWithMaterial;
         };
 
-        struct SHIRABE_LIBRARY_EXPORT SFrameGraphResourceContext
+        struct SHIRABE_LIBRARY_EXPORT SRenderGraphResourceContext
         {
             //---------------------------------------------------------------------------------------------------------------
             // RenderPass
@@ -192,8 +192,8 @@ namespace engine
              */
             std::function<EEngineStatus(ResourceId_t                      const& /* aRenderPassId        */
                                         , std::vector<PassUID_t>          const& /* aPassExecutionOrder  */
-                                        , SFrameGraphAttachmentCollection const& /* aAttachmentInfo      */
-                                        , CFrameGraphMutableResources     const& /* aFrameGraphResources */)> createRenderPass;
+                                        , SRenderGraphAttachmentCollection const& /* aAttachmentInfo      */
+                                        , CRenderGraphMutableResources     const& /* aRenderGraphResources */)> createRenderPass;
 
             /**
              *
@@ -217,50 +217,50 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Textures
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphTransientTexture const& /* aTexture */)> createTransientTexture;
-            std::function<EEngineStatus(SFrameGraphTransientTexture const& /* aTexture */)> destroyTransientTexture;
+            std::function<EEngineStatus(SRenderGraphTransientImage const& /* aTexture */)> createTransientTexture;
+            std::function<EEngineStatus(SRenderGraphTransientImage const& /* aTexture */)> destroyTransientTexture;
 
-            std::function<EEngineStatus(SFrameGraphPersistentTexture const &/* aTexture */)> initializePersistentTexture;
-            std::function<EEngineStatus(SFrameGraphPersistentTexture const &/* aTexture */)> updatePersistentTexture;
-            std::function<EEngineStatus(SFrameGraphPersistentTexture const &/* aTexture */)> deinitializePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> initializePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> updatePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> deinitializePersistentTexture;
 
-            std::function<EEngineStatus(SFrameGraphTexture     const& /* aTexture     */
-                                      , SFrameGraphTextureView const& /* aTextureView */)> createTextureView;
-            std::function<EEngineStatus(SFrameGraphTextureView const& /* aTextureView */)> destroyTextureView;
+            std::function<EEngineStatus(std::string             const &/* aTextureName */
+                                        , SRenderGraphImageView const& /* aTextureView */)> createTextureView;
+            std::function<EEngineStatus(SRenderGraphImageView const& /* aTextureView */)>   destroyTextureView;
 
             //---------------------------------------------------------------------------------------------------------------
             // Buffers
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphTransientBuffer const& /* aBuffer */)> createTransientBuffer;
-            std::function<EEngineStatus(SFrameGraphTransientBuffer const& /* aBuffer */)> destroyTransientBuffer;
+            std::function<EEngineStatus(SRenderGraphTransientBuffer const& /* aBuffer */)> createTransientBuffer;
+            std::function<EEngineStatus(SRenderGraphTransientBuffer const& /* aBuffer */)> destroyTransientBuffer;
 
-            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> initializePersistentBuffer;
-            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> updatePersistentBuffer;
-            std::function<EEngineStatus(SFrameGraphPersistentBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> initializePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> updatePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
 
-            std::function<EEngineStatus(SFrameGraphBuffer     const& /* aBuffer     */
-                                      , SFrameGraphBufferView const& /* aBufferView */)> createBufferView;
-            std::function<EEngineStatus(SFrameGraphBufferView const& /* aBufferView */)> destroyBufferView;
+            std::function<EEngineStatus(std::string               const& /* aBufferName */
+                                        , SRenderGraphBufferView  const& /* aBufferView */)> createBufferView;
+            std::function<EEngineStatus(SRenderGraphBufferView const& /* aBufferView */)> destroyBufferView;
 
             //---------------------------------------------------------------------------------------------------------------
             // Meshes
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> initializeMesh;
-            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> updateMesh;
-            std::function<EEngineStatus(SFrameGraphMesh const &/* aMesh */)> deinitializeMesh;
+            std::function<EEngineStatus(SRenderGraphMesh const &/* aMesh */)> initializeMesh;
+            std::function<EEngineStatus(SRenderGraphMesh const &/* aMesh */)> updateMesh;
+            std::function<EEngineStatus(SRenderGraphMesh const &/* aMesh */)> deinitializeMesh;
 
             //---------------------------------------------------------------------------------------------------------------
             // Materials
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> initializeMaterial;
-            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> updateMaterial;
-            std::function<EEngineStatus(SFrameGraphMaterial const &/* aMaterial */)> deinitializeMaterial;
+            std::function<EEngineStatus(SRenderGraphMaterial const &/* aMaterial */)> initializeMaterial;
+            std::function<EEngineStatus(SRenderGraphMaterial const &/* aMaterial */)> updateMaterial;
+            std::function<EEngineStatus(SRenderGraphMaterial const &/* aMaterial */)> deinitializeMaterial;
 
             //---------------------------------------------------------------------------------------------------------------
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> createPipeline;
-            std::function<EEngineStatus(SFrameGraphPipeline const &/* aPipeline */)> destroyPipeline;
+            std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */)> createPipeline;
+            std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */)> destroyPipeline;
         };
 
     }

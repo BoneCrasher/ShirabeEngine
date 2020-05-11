@@ -19,7 +19,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial
+    CEngineResult<> CRenderGraphRenderContext::bindMaterial(SRenderGraphMaterial const &aMaterial
                                                          , std::string       const &aRenderPassHandle)
     {
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
@@ -143,7 +143,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
+    CEngineResult<> CRenderGraphRenderContext::unbindMaterial(SRenderGraphMaterial const &aMaterial)
     {
         Shared<SMaterial> material = std::static_pointer_cast<SMaterial>(getUsedResource(aMaterial.readableName));
 
@@ -170,7 +170,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)
+    CEngineResult<> CRenderGraphRenderContext::unloadMaterialAsset(SRenderGraphMaterial const &aMaterial)
     {
         // CEngineResult<> status = mResourceManager->destroyResource<CPipeline>(aMaterial.readableName);
         // EngineStatusPrintOnError(status.result(), logTag(), "Failed to destroy pipeline.");
@@ -182,13 +182,13 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CFrameGraphRenderContext::render(SFrameGraphMesh     const &aMesh,
-                                                     SFrameGraphMaterial const &aMaterial)
+    CEngineResult<> CRenderGraphRenderContext::render(SRenderGraphMesh     const &aMesh,
+                                                     SRenderGraphMaterial const &aMaterial)
     {
         loadMaterialAsset(aMaterial);
         bindMaterial(aMaterial, mCurrentRenderPassHandle);
 
-        if(EFrameGraphResourceType::Undefined != aMesh.type)
+        if(ERenderGraphResourceType::Undefined != aMesh.type)
         {
             readMeshAsset(aMesh);
             bindMesh     (aMesh);
@@ -209,7 +209,7 @@ namespace engine::framegraph
     //
     //<-----------------------------------------------------------------------------
 
-    CEngineResult<> CFrameGraphRenderContext::drawFullscreenQuadWithMaterial(SFrameGraphMaterial const &aMaterial)
+    CEngineResult<> CRenderGraphRenderContext::drawFullscreenQuadWithMaterial(SRenderGraphMaterial const &aMaterial)
     {
         loadMaterialAsset(aMaterial);
         bindMaterial(aMaterial, mCurrentRenderPassHandle);
@@ -226,7 +226,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    void CFrameGraphRenderContext::registerUsedResource(  std::string                                               const &aResourceId
+    void CRenderGraphRenderContext::registerUsedResource(  std::string                                               const &aResourceId
                                                         , engine::Shared<engine::resources::ILogicalResourceObject> const &aResource)
     {
         mUsedResources[aResourceId] = aResource;
@@ -236,7 +236,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    void CFrameGraphRenderContext::unregisterUsedResource(std::string const &aResourceId)
+    void CRenderGraphRenderContext::unregisterUsedResource(std::string const &aResourceId)
     {
         mUsedResources.erase(aResourceId);
     }
@@ -245,7 +245,7 @@ namespace engine::framegraph
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    Shared<ILogicalResourceObject> CFrameGraphRenderContext::getUsedResource(std::string const &aResourceId)
+    Shared<ILogicalResourceObject> CRenderGraphRenderContext::getUsedResource(std::string const &aResourceId)
     {
         if(mUsedResources.end() == mUsedResources.find(aResourceId))
         {

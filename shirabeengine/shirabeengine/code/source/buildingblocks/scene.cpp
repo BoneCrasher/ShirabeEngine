@@ -214,7 +214,7 @@ namespace engine
         RefIndex_t const &meshReferenceIndex = mResourceData.meshes();
         for(auto const &reference : meshReferenceIndex)
         {
-            auto [fetchSuccessCode, mesh] = mResourceData.getResourceMutable<SFrameGraphMesh>(reference);
+            auto [fetchSuccessCode, mesh] = mResourceData.getResourceMutable<SRenderGraphMesh>(reference);
             if(CheckEngineError(fetchSuccessCode))
             {
                 CLog::Error(logTag(), "Failed to fetch mesh w/ id {}", reference);
@@ -238,7 +238,7 @@ namespace engine
         RefIndex_t const &materialReferenceIndex = mResourceData.materials();
         for(auto const &reference : materialReferenceIndex)
         {
-            auto [fetchSuccessCode, material] = mResourceData.getResourceMutable<SFrameGraphMaterial>(reference);
+            auto [fetchSuccessCode, material] = mResourceData.getResourceMutable<SRenderGraphMaterial>(reference);
             if(CheckEngineError(fetchSuccessCode))
             {
                 CLog::Error(logTag(), "Failed to fetch material w/ id {}", reference);

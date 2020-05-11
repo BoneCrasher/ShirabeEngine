@@ -33,7 +33,7 @@
 
 namespace Test
 {
-    namespace FrameGraph
+    namespace RenderGraph
     {
         using namespace engine;
         using namespace engine::rendering;
@@ -70,7 +70,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        bool Test__FrameGraph::testAll()
+        bool Test__RenderGraph::testAll()
         {
             bool ok = true;
 
@@ -115,7 +115,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool Test__FrameGraph::testGraphBuilder()
+        bool Test__RenderGraph::testGraphBuilder()
         {
             using namespace engine;
             using namespace engine::core;
@@ -170,7 +170,7 @@ namespace Test
             Shared<IRenderContext> renderer = makeShared<CMockRenderContext>();
             // renderer->initialize(*appEnvironment, rendererConfiguration, nullptr);
             //
-            Shared<IFrameGraphRenderContext> renderContext = CFrameGraphRenderContext::create(assetStorage, proxyResourceManager, renderer).data();
+            Shared<IRenderGraphRenderContext> renderContext = CRenderGraphRenderContext::create(assetStorage, proxyResourceManager, renderer).data();
 
             SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
 
@@ -181,17 +181,17 @@ namespace Test
             CGraphBuilder graphBuilder{};
             graphBuilder.initialize(appEnvironment, display);
 
-            SFrameGraphTexture backBufferTextureDesc{};
+            SRenderGraphTexture backBufferTextureDesc{};
             backBufferTextureDesc.width          = width;
             backBufferTextureDesc.height         = height;
             backBufferTextureDesc.depth          = 1;
-            backBufferTextureDesc.format         = FrameGraphFormat_t::R8G8B8A8_UNORM;
-            backBufferTextureDesc.initialState   = EFrameGraphResourceInitState::Clear;
+            backBufferTextureDesc.format         = RenderGraphFormat_t::R8G8B8A8_UNORM;
+            backBufferTextureDesc.initialState   = ERenderGraphResourceInitState::Clear;
             backBufferTextureDesc.arraySize      = 1;
             backBufferTextureDesc.mipLevels      = 1;
-            backBufferTextureDesc.permittedUsage = EFrameGraphResourceUsage::ColorAttachment;
+            backBufferTextureDesc.permittedUsage = ERenderGraphResourceUsage::ColorAttachment;
 
-            SFrameGraphResource backBuffer{ };
+            SRenderGraphResource backBuffer{ };
             backBuffer = graphBuilder.registerTexture("BackBuffer", backBufferTextureDesc);
 
             RenderableList renderableCollection ={
@@ -199,20 +199,20 @@ namespace Test
                 { "Sphere",  0, 0 },
                 { "Pyramid", 0, 0 }
             };
-            SFrameGraphResource renderables{ };
+            SRenderGraphResource renderables{ };
             renderables = graphBuilder.registerRenderables("SceneRenderables", renderableCollection);
 
             // GBuffer
-            CFrameGraphModule<SGBufferModuleTag_t> gbufferModule{};
-            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{};
+            CRenderGraphModule<SGBufferModuleTag_t> gbufferModule{};
+            CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{};
             gbufferExportData = gbufferModule.addGBufferGenerationPass(
                         "GBufferGeneration",
                         graphBuilder,
                         renderables).data();
 
             // Lighting
-            CFrameGraphModule<SLightingModuleTag_t> lightingModule{};
-            CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{};
+            CRenderGraphModule<SLightingModuleTag_t> lightingModule{};
+            CRenderGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{};
             lightingExportData = lightingModule.addLightingPass(
                         "Lighting",
                         graphBuilder,
@@ -222,8 +222,8 @@ namespace Test
                         gbufferExportData.gbuffer3).data();
 
             // Compositing
-            CFrameGraphModule<SCompositingModuleTag_t> compositingModule{ };
-            CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
+            CRenderGraphModule<SCompositingModuleTag_t> compositingModule{ };
+            CRenderGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData = compositingModule.addDefaultCompositingPass(
                         "Compositing",
                         graphBuilder,
@@ -233,30 +233,30 @@ namespace Test
                         gbufferExportData.gbuffer3,
                         lightingExportData.lightAccumulationBuffer).data();
 
-            CEngineResult<Unique<engine::framegraph::CGraph>> frameGraph = graphBuilder.compile();
+            CEngineResult<Unique<engine::framegraph::CGraph>> renderGraph = graphBuilder.compile();
 
-            // Shared<IFrameGraphSerializer> serializer = makeShared<CFrameGraphGraphVizSerializer>();
+            // Shared<IRenderGraphSerializer> serializer = makeShared<CRenderGraphGraphVizSerializer>();
             // serializer->initialize();
 
             // Shared<ISerializer<CGraph>::IResult> result = nullptr;
             //
-            // bool const serialized = serializer->serialize(*frameGraph, result);
+            // bool const serialized = serializer->serialize(*renderGraph, result);
             //
-            // Shared<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
-            //         std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
+            // Shared<CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult> typedResult =
+            //         std::static_pointer_cast<CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult>(result);
             //
             // std::string serializedData {};
             // bool const dataFetched = typedResult->asString(serializedData);
-            // writeFile("FrameGraphTest.gv", serializedData);
+            // writeFile("RenderGraphTest.gv", serializedData);
             //
             // serializer->deinitialize();
             // serializer = nullptr;
             //
-            // system("tools/makeFrameGraphPNG.sh");
+            // system("tools/makeRenderGraphPNG.sh");
             //
             // // Renderer will call.
-            // if(frameGraph)
-            //     frameGraph->execute(renderContext);
+            // if(renderGraph)
+            //     renderGraph->execute(renderContext);
 
             gfxApiResourceTaskBackend->deinitialize();
             proxyResourceManager->deinitialize();

@@ -34,12 +34,12 @@ namespace engine
             , mDisplay                (nullptr                                                                        )
             , mRenderPassUIDGenerator (std::make_shared<CSequenceUIDGenerator<RenderPassUID_t>>(0))
             , mSubpassUIDGenerator    (std::make_shared<CSequenceUIDGenerator<PassUID_t>>(0))
-            , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator<FrameGraphResourceId_t >>(1))
+            , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator<RenderGraphResourceId_t >>(1))
             , mRenderPasses           (                                                                               )
             , mResources              (                                                                               )
             , mResourceData           (                                                                               )
             , mRenderPassTree         (                                                                               )
-            , mFrameGraph             (nullptr                                                                        )
+            , mRenderGraph             (nullptr                                                                        )
     #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             , mResourceAdjacency      (                                          )
             , mPassToResourceAdjacency(                                          )
@@ -68,7 +68,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        FrameGraphResourceId_t CGraphBuilder::generateResourceUID()
+        RenderGraphResourceId_t CGraphBuilder::generateResourceUID()
         {
             return mResourceUIDGenerator->generate();
         }
@@ -79,7 +79,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         Unique<CGraph> &CGraphBuilder::graph()
         {
-            return mFrameGraph;
+            return mRenderGraph;
         }
         //<-----------------------------------------------------------------------------
 
@@ -233,7 +233,7 @@ namespace engine
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
 
             // Fourth: Sort the resources by their relationships and dependencies.
-            bool const topologicalResourceSortSuccessful = topologicalSort<FrameGraphResourceId_t>(accessor->mutableResourceOrder());
+            bool const topologicalResourceSortSuccessful = topologicalSort<RenderGraphResourceId_t>(accessor->mutableResourceOrder());
             if(!topologicalResourceSortSuccessful)
             {
                 CLog::Error(logTag(), "Failed to perform topologicalSort(...) for resources on graph compilation.");
@@ -278,9 +278,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<FrameGraphResourceId_t> CGraphBuilder::findSubjacentResource(
-               SFrameGraphResourceMap const &aResources,
-               SFrameGraphResource    const &aStart)
+        CEngineResult<RenderGraphResourceId_t> CGraphBuilder::findSubjacentResource(
+               SRenderGraphResourceMap const &aResources,
+               SRenderGraphResource    const &aStart)
         {
             if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == aStart.parentResource)
             {
@@ -325,28 +325,28 @@ namespace engine
 
             for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
             {
-                CEngineResult<Shared<SFrameGraphTextureView>> textureViewFetch = mResourceData.getResource<SFrameGraphTextureView>(textureViewRef);
+                CEngineResult<Shared<SRenderGraphImageView>> textureViewFetch = mResourceData.getResource<SRenderGraphImageView>(textureViewRef);
                 if(not textureViewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to getResource texture view to validate.");
                     return { textureViewFetch.result() };
                 }
 
-                SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+                SRenderGraphImageView const &textureView = *(textureViewFetch.data());
 
                 // Adjust resource access flags in the subjacent resource to have the texture creation configure
                 // everything appropriately.
 
-                FrameGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
+                RenderGraphResourceId_t const  subjacentResourceId =  textureView.subjacentResource;
 
-                CEngineResult<Shared<SFrameGraphTexture>> subjacentFetch = mResourceData.getResource<SFrameGraphTexture>(subjacentResourceId);
+                CEngineResult<Shared<SRenderGraphImage>> subjacentFetch = mResourceData.getResource<SRenderGraphImage>(subjacentResourceId);
                 if(not textureViewFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to getResource subjacent texture to validate.");
                     return { textureViewFetch.result() };
                 }
 
-                SFrameGraphTexture const &texture = *(subjacentFetch.data());
+                SRenderGraphImage const &texture = *(subjacentFetch.data());
 
                 bool viewBindingValid = true;
                 viewBindingValid  = validateTextureView(texture, textureView);
@@ -364,8 +364,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureView(
-            SFrameGraphTexture     const &aTexture,
-                SFrameGraphTextureView const &atextureView)
+            SRenderGraphImage     const &aTexture,
+                SRenderGraphImageView const &atextureView)
         {
             bool const usageValid             = validateTextureUsage(aTexture);
             bool const formatValid            = validateTextureFormat(aTexture, atextureView);
@@ -378,7 +378,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraphBuilder::validateTextureUsage(SFrameGraphTexture const &aTexture)
+        bool CGraphBuilder::validateTextureUsage(SRenderGraphImage const &aTexture)
         {
             // Cross both bitsets... permittedUsage should fully contain requestedUsage
             return aTexture.permittedUsage.check(aTexture.requestedUsage);
@@ -389,10 +389,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureFormat(
-            SFrameGraphTexture     const &aTexture,
-                SFrameGraphTextureView const &aTextureView)
+            SRenderGraphImage     const &aTexture,
+                SRenderGraphImageView const &aTextureView)
         {
-            using FormatValue_t = std::underlying_type_t<FrameGraphFormat_t>;
+            using FormatValue_t = std::underlying_type_t<RenderGraphFormat_t>;
 
             auto const nearestPowerOf2Ceil = [] (FormatValue_t value) -> uint64_t
             {
@@ -404,19 +404,19 @@ namespace engine
                 return power;
             };
 
-            FrameGraphFormat_t const &source = aTexture.format;
-            FrameGraphFormat_t const &target = aTextureView.format;
+            RenderGraphFormat_t const &source = aTexture.format;
+            RenderGraphFormat_t const &target = aTextureView.format;
 
             bool formatsCompatible = false;
 
             switch(target)
             {
-            case FrameGraphFormat_t::Undefined:
-            case FrameGraphFormat_t::Structured:
+            case RenderGraphFormat_t::Undefined:
+            case RenderGraphFormat_t::Structured:
                 // Invalid!
                 formatsCompatible = false;
                 break;
-            case FrameGraphFormat_t::Automatic:
+            case RenderGraphFormat_t::Automatic:
                 // Should never be accessed as automatic is resolved beforehand though...
                 break;
             default:
@@ -435,8 +435,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool CGraphBuilder::validateTextureSubresourceAccess(
-            SFrameGraphTexture     const &aTexture,
-                SFrameGraphTextureView const &aTextureView)
+            SRenderGraphImage     const &aTexture,
+                SRenderGraphImageView const &aTextureView)
         {
             CRange const &arraySliceRange = aTextureView.arraySliceRange;
             CRange const &mipSliceRange   = aTextureView.mipSliceRange;

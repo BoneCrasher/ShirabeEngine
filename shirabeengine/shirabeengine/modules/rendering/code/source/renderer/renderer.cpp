@@ -53,7 +53,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SFrameGraphResourceContext &aResourceContext)
+        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SRenderGraphResourceContext &aResourceContext)
         {
             using namespace engine;
             using namespace engine::framegraph;
@@ -69,9 +69,9 @@ namespace engine
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
 
-            CFrameGraphModule<SGBufferModuleTag_t>     gbufferModule          { };
-            CFrameGraphModule<SLightingModuleTag_t>    lightingModule         { };
-            CFrameGraphModule<SCompositingModuleTag_t> compositingModule      { };
+            CRenderGraphModule<SGBufferModuleTag_t>     gbufferModule          { };
+            CRenderGraphModule<SLightingModuleTag_t>    lightingModule         { };
+            CRenderGraphModule<SCompositingModuleTag_t> compositingModule      { };
 
             static std::string const sGBufferGenerationPassID = "GBufferGenerationPass";
             static std::string const sLightingPassID          = "LightingPass";
@@ -80,7 +80,7 @@ namespace engine
             graphBuilder.beginRenderPass("DeferredPipeline");
 
             // GBuffer
-            CFrameGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
+            CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
             gbufferExportData =
                     gbufferModule.addGBufferGenerationPass(
                                          sGBufferGenerationPassID,
@@ -90,7 +90,7 @@ namespace engine
             // graphBuilder.createPassDependency(sPrePassID, sGBufferGenerationPassID);
 
             // Lighting
-            CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
+            CRenderGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
             lightingExportData =
                     lightingModule.addLightingPass(
                                           sLightingPassID,
@@ -102,7 +102,7 @@ namespace engine
                                           gbufferExportData.depthStencil).data();
 
             // Compositing
-            CFrameGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
+            CRenderGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData =
                     compositingModule.addDefaultCompositingPass(
                                              sCompositingPassID,
@@ -119,7 +119,7 @@ namespace engine
             graphBuilder.setOutputTextureResourceId(compositingExportData.output.resourceId);
 
             // Present
-            // CFrameGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
+            // CRenderGraphModule<SGraphicsAPICommonModuleTag_t>::SPresentPassExportData presentPassExportData{};
             // presentPassExportData =
             //         graphicsAPICommonModule.addPresentPass(
             //             sPresentPassID,
@@ -145,23 +145,23 @@ namespace engine
                 {
                     serializedOnce = true;
 
-                    Shared<CFrameGraphGraphVizSerializer::IResult> result     = nullptr;
-                    Shared<CFrameGraphGraphVizSerializer>          serializer = std::make_shared<CFrameGraphGraphVizSerializer>();
+                    Shared<CRenderGraphGraphVizSerializer::IResult> result     = nullptr;
+                    Shared<CRenderGraphGraphVizSerializer>          serializer = std::make_shared<CRenderGraphGraphVizSerializer>();
                     bool const initialized  = serializer>initialize();
                     bool const serialized   = serializer>serialize(*mDeferredGraph, result);
 
 
-                    Shared<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult> typedResult =
-                            std::static_pointer_cast<CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult>(result);
+                    Shared<CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult> typedResult =
+                            std::static_pointer_cast<CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult>(result);
 
                     std::string serializedData {};
                     bool const dataFetched = typedResult>asString(serializedData);
-                    writeFile("FrameGraphTest.gv", serializedData);
+                    writeFile("RenderGraphTest.gv", serializedData);
 
                     bool const deserialized = serializer>deinitialize();
                     serializer = nullptr;
 
-                    system("tools/makeFrameGraphPNG.sah");
+                    system("tools/makeRenderGraphPNG.sah");
                 }
             #endif
 
@@ -248,8 +248,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::renderSceneDeferred(SFrameGraphDataSource    &aDataSource
-                                                   , SFrameGraphRenderContext &aRenderContext)
+        EEngineStatus CRenderer::renderSceneDeferred(SRenderGraphDataSource    &aDataSource
+                                                   , SRenderGraphRenderContext &aRenderContext)
         {
             if(mDeferredGraph)
             {

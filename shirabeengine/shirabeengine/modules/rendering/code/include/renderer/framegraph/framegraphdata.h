@@ -36,18 +36,18 @@ namespace engine
         using engine::CRange;
         using namespace engine::rendering;
 
-        using FrameGraphResourceId_t = uint64_t;
+        using RenderGraphResourceId_t = uint64_t;
         using PassUID_t              = uint64_t;
         using RenderPassUID_t        = uint64_t;
 
 #define SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE 0
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(FrameGraphResourceId_t, FrameGraphResourceId);
+        SHIRABE_DECLARE_LIST_OF_TYPE(RenderGraphResourceId_t, RenderGraphResourceId);
 
         /**
-         * The FrameGraphResourceType enum describes Values that represent top-level frame graph resource types
+         * The RenderGraphResourceType enum describes Values that represent top-level frame graph resource types
          */
-        enum class EFrameGraphResourceType
+        enum class ERenderGraphResourceType
                 : uint8_t
         {
             Undefined = 0,
@@ -57,14 +57,13 @@ namespace engine
             BufferView,
             Mesh,
             Material,
-            RenderableList,
-            RenderableListView // To support renderable filtering...
+            Pipeline
         };
 
         /**
          * Values that represent texture and buffer formats
          */
-        using FrameGraphFormat_t = graphicsapi::EFormat;
+        using RenderGraphFormat_t = graphicsapi::EFormat;
 
         /**
          * Checks, whether two formats are compatible.
@@ -74,14 +73,14 @@ namespace engine
          * @return         True, if compatible. False otherwise.
          */
         SHIRABE_TEST_EXPORT bool validateFormatCompatibility(
-                FrameGraphFormat_t const &aBase,
-                FrameGraphFormat_t const &aDerived);
+                RenderGraphFormat_t const &aBase,
+                RenderGraphFormat_t const &aDerived);
 
         /**
-         * The FrameGraphResourceUsage enum describes how a framegraph resource should be
+         * The RenderGraphResourceUsage enum describes how a framegraph resource should be
          * used within the pipeline.
          */
-        enum class EFrameGraphResourceUsage
+        enum class ERenderGraphResourceUsage
                 : uint8_t
         {
             Undefined        =   0,
@@ -96,9 +95,9 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphWriteTarget enum describes how an image resource output should be processed.
+         * The ERenderGraphWriteTarget enum describes how an image resource output should be processed.
          */
-        enum class EFrameGraphWriteTarget
+        enum class ERenderGraphWriteTarget
                 : uint8_t
         {
             Undefined = 0,
@@ -107,9 +106,9 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphForwardTarget enum describes how an image resource forwarding should be processed.
+         * The ERenderGraphForwardTarget enum describes how an image resource forwarding should be processed.
          */
-        enum class EFrameGraphForwardTarget
+        enum class ERenderGraphForwardTarget
                 : uint8_t
         {
             Undefined = 0,
@@ -118,9 +117,9 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphReadSource enum describes how an image resource should be read from.
+         * The ERenderGraphReadSource enum describes how an image resource should be read from.
          */
-        enum class EFrameGraphReadSource
+        enum class ERenderGraphReadSource
                 : uint8_t
         {
             Undefined = 0,
@@ -129,10 +128,10 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphResourceAccessibility enum describes read/write access possibilities
+         * The ERenderGraphResourceAccessibility enum describes read/write access possibilities
          * to a resource.
          */
-        enum class EFrameGraphResourceAccessibility
+        enum class ERenderGraphResourceAccessibility
                 : uint8_t
         {
             None      = 0,
@@ -141,10 +140,10 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphResourceInitState enum describes the required initial state of a
+         * The ERenderGraphResourceInitState enum describes the required initial state of a
          * freshly created resource.
          */
-        enum class EFrameGraphResourceInitState
+        enum class ERenderGraphResourceInitState
                 : uint8_t
         {
             Undefined = 0,
@@ -152,9 +151,9 @@ namespace engine
         };
 
         /**
-         * The EFrameGraphViewPurpose enum describes the pipeline data source of a texture view.
+         * The ERenderGraphViewPurpose enum describes the pipeline data source of a texture view.
          */
-        enum class EFrameGraphViewPurpose
+        enum class ERenderGraphViewPurpose
                 : uint8_t
         {
             Undefined = 0,
@@ -165,9 +164,9 @@ namespace engine
         };
 
         /**
-         * The FrameGraphViewAccessMode enum describes in which access modes a texture view may operate.
+         * The RenderGraphViewAccessMode enum describes in which access modes a texture view may operate.
          */
-        enum class EFrameGraphViewAccessMode
+        enum class ERenderGraphViewAccessMode
                 : uint8_t
         {
             Undefined = 0,
@@ -178,38 +177,38 @@ namespace engine
         };
 
         /**
-         * Permit printing a FrameGraphFormat_t to outstreams.
+         * Permit printing a RenderGraphFormat_t to outstreams.
          *
          * @param strm
          * @param e
          * @return
          */
-        SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, FrameGraphFormat_t const&e);
+        SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, RenderGraphFormat_t const&e);
         /**
-         * Permit printing a FrameGraphResourceType to outstreams.
+         * Permit printing a RenderGraphResourceType to outstreams.
          *
          * @param strm
          * @param e
          * @return
          */
-        SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, EFrameGraphResourceType const&e);
+        SHIRABE_TEST_EXPORT std::ostream& operator<<(std::ostream &strm, ERenderGraphResourceType const&e);
 
         /**
-         * @brief The SFrameGraphResource struct
+         * @brief The SRenderGraphResource struct
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphResource
+        struct SHIRABE_TEST_EXPORT SRenderGraphResource
         {
         public_constructors:
             /**
              * Default-Construct a framegraph resources.
              */
-            SFrameGraphResource();
+            SRenderGraphResource();
 
         public_operators:
             /**
              * Extract the resource id via implicit conversion.
              */
-            explicit SHIRABE_INLINE operator FrameGraphResourceId_t()
+            explicit SHIRABE_INLINE operator RenderGraphResourceId_t()
             {
                 return resourceId;
             }
@@ -217,7 +216,7 @@ namespace engine
             /**
              * Extract the resource id via implicit conversion in const context.
              */
-            SHIRABE_INLINE operator FrameGraphResourceId_t const() const
+            SHIRABE_INLINE operator RenderGraphResourceId_t const() const
             {
                 return resourceId;
             }
@@ -226,19 +225,19 @@ namespace engine
             uint32_t                       referenceCount;
             RenderPassUID_t                assignedRenderpassUID;
             PassUID_t                      assignedPassUID;
-            FrameGraphResourceId_t         resourceId;
-            FrameGraphResourceId_t         parentResource;
-            FrameGraphResourceId_t         subjacentResource;
+            RenderGraphResourceId_t         resourceId;
+            RenderGraphResourceId_t         parentResource;
+            RenderGraphResourceId_t         subjacentResource;
             std::string                    readableName;
-            EFrameGraphResourceType        type;
+            ERenderGraphResourceType        type;
             bool                           isExternalResource;
         };
 
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphResource, SFrameGraphResource);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource);
 
         SHIRABE_TEST_EXPORT
         SHIRABE_INLINE
-        std::ostream& operator<<(std::ostream &aStream, SFrameGraphResource const &aResource)
+        std::ostream& operator<<(std::ostream &aStream, SRenderGraphResource const &aResource)
         {
             aStream << aResource.resourceId;
 
@@ -253,8 +252,8 @@ namespace engine
          * @return     True if aLHS is ordered to the left of aRHS., False otherwise.
          */
         SHIRABE_TEST_EXPORT bool operator<(
-                SFrameGraphResource const &aLHS,
-                SFrameGraphResource const &aRHS);
+                SRenderGraphResource const &aLHS,
+                SRenderGraphResource const &aRHS);
 
         /**
          * Compare two framegraph resources for inequality.
@@ -264,83 +263,131 @@ namespace engine
          * @return
          */
         SHIRABE_TEST_EXPORT bool operator!=(
-                SFrameGraphResource const &aLHS,
-                SFrameGraphResource const &aRHS);
+                SRenderGraphResource const &aLHS,
+                SRenderGraphResource const &aRHS);
 
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphResource, SFrameGraphResource);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource);
+
+        template <typename T>
+        struct SHIRABE_TEST_EXPORT SRenderGraphTypedResource
+            : public SRenderGraphResource
+        {
+        public_constructors:
+        public_members:
+            T description;
+        };
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentBufferDescription
+        {
+        public_constructors:
+            SRenderGraphPersistentBufferDescription();
+
+        public_members:
+            resources::ResourceId_t bufferResourceId;
+        };
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphTransientBufferDescription
+        {
+        public_constructors:
+            SRenderGraphTransientBufferDescription();
+
+        public_members:
+            VkBufferUsageFlags      bufferUsage;
+            std::size_t             sizeInBytes;
+        };
 
         /**
-         * The SFrameGraphBuffer struct describes any kind of framegraph buffer resources.
+         * The SRenderGraphBuffer struct describes any kind of framegraph buffer resources.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphBuffer
-                : public SFrameGraphResource
+        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentBuffer
+                : public SRenderGraphTypedResource<SRenderGraphPersistentBufferDescription>
         {
         public_constructors:
             /**
              * Default-Construct a framegraph buffer.
              */
-            SFrameGraphBuffer();
-
-        public_members:
-            VkBufferUsageFlags bufferUsage;
-            std::size_t        sizeInBytes;
+            SRenderGraphPersistentBuffer();
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBuffer, SFrameGraphBuffer);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphBuffer, SFrameGraphBuffer);
+        /**
+         * The SRenderGraphBuffer struct describes any kind of framegraph buffer resources.
+         */
+        struct SHIRABE_TEST_EXPORT SRenderGraphTransientBuffer
+            : public SRenderGraphTypedResource<SRenderGraphTransientBufferDescription>
+        {
+        public_constructors:
+            /**
+             * Default-Construct a framegraph buffer.
+             */
+            SRenderGraphTransientBuffer();
+        };
 
-        struct SHIRABE_TEST_EXPORT SFrameGraphTransientBuffer
-            : public SFrameGraphBuffer
-        { };
+        struct SHIRABE_TEST_EXPORT SRenderGraphBufferViewDescription
+        {
+        public_constructors:
+            SRenderGraphBufferViewDescription();
 
-        struct SHIRABE_TEST_EXPORT SFrameGraphPersistentBuffer
-            : public SFrameGraphBuffer
-        { };
+        public_members:
+            CRange                                subrange;
+            RenderGraphFormat_t                   format;
+            CBitField<ERenderGraphViewAccessMode> mode;
+        };
 
         /**
-         * The SFrameGraphBufferView struct describes any kind of buffer view resources in the framegraph.
+         * The SRenderGraphBufferView struct describes any kind of buffer view resources in the framegraph.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphBufferView
-                : public SFrameGraphResource
+        struct SHIRABE_TEST_EXPORT SRenderGraphBufferView
+                : public SRenderGraphTypedResource<SRenderGraphBufferViewDescription>
         {
         public_constructors:
             /**
              * Default-Construct a framegraph buffer view.
              */
-            SFrameGraphBufferView();
+            SRenderGraphBufferView();
 
         public_members:
-            CRange                               subrange;
-            FrameGraphFormat_t                   format;
-            CBitField<EFrameGraphViewAccessMode> mode;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphBufferView, SFrameGraphBufferView);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphBufferView, SFrameGraphBufferView);
+        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphBufferView, SRenderGraphBufferView);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphBufferView, SRenderGraphBufferView);
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphTransientImageDescription
+            : public graphicsapi::STextureInfo
+        {
+        public_constructors:
+            SRenderGraphTransientImageDescription();
+
+        public_members:
+            ERenderGraphResourceInitState        initialState;
+            CBitField<ERenderGraphResourceUsage> permittedUsage;
+            CBitField<ERenderGraphResourceUsage> requestedUsage;
+        };
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentImageDescription
+        {
+        public_constructors:
+            SRenderGraphPersistentImageDescription();
+
+        public_members:
+            resources::ResourceId_t imageId;
+        };
 
         /**
-         * @brief The SFrameGraphTexture struct
+         * @brief The SRenderGraphImage struct
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphTexture
-                : public SFrameGraphResource
-                , public graphicsapi::STextureInfo
+        struct SHIRABE_TEST_EXPORT SRenderGraphTransientImage
+                : public SRenderGraphTypedResource<SRenderGraphTransientImageDescription>
         {
         public_constructors:
             /**
-             * Default-Construt a frame graph texture
+             * Default-Construct a frame graph texture
              */
-            SFrameGraphTexture();
+            SRenderGraphTransientImage();
 
         public_destructors:
-            virtual ~SFrameGraphTexture() = default;
+            virtual ~SRenderGraphTransientImage() = default;
 
         public_methods:
-            /**
-             * Copy-Over the texture info data from another framegraph texture.
-             *
-             * @param aOther The other texture to copy the texture information from.
-             */
-            void assignTextureParameters(SFrameGraphTexture const &aOther);
 
             /**
              * Validate the texture data.
@@ -349,64 +396,54 @@ namespace engine
              */
              [[nodiscard]]
             virtual bool validate() const;
+        };
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentImage
+            : public SRenderGraphTypedResource<SRenderGraphPersistentImageDescription>
+        {};
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphRenderTarget
+            : public SRenderGraphTransientImage
+        {};
+
+        struct SHIRABE_TEST_EXPORT SRenderGraphImageViewDescription
+        {
+        public_constructors:
+            SRenderGraphImageViewDescription();
 
         public_members:
-            EFrameGraphResourceInitState        initialState;
-            CBitField<EFrameGraphResourceUsage> permittedUsage;
-            CBitField<EFrameGraphResourceUsage> requestedUsage;
-        };
-
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTexture, SFrameGraphTexture);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphTexture, SFrameGraphTexture);
-
-        struct SHIRABE_TEST_EXPORT SFrameGraphTransientTexture
-            : public SFrameGraphTexture
-        {
-        };
-
-        struct SHIRABE_TEST_EXPORT SFrameGraphPersistentTexture
-            : public SFrameGraphTexture
-        {
-        };
-
-        struct SHIRABE_TEST_EXPORT SFrameGraphRenderTarget
-            : public SFrameGraphTexture
-        {
+            CRange                               arraySliceRange;
+            CRange                               mipSliceRange;
+            RenderGraphFormat_t                   format;
+            CBitField<ERenderGraphViewAccessMode> mode;
+            ERenderGraphViewPurpose               source;
         };
 
         /**
-         * The SFrameGraphTextureView struct describes any kind of frame graph texture view in the framegraph
+         * The SRenderGraphImageView struct describes any kind of frame graph texture view in the framegraph
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphTextureView
-                : public SFrameGraphResource
+        struct SHIRABE_TEST_EXPORT SRenderGraphImageView
+                : public SRenderGraphTypedResource<SRenderGraphImageViewDescription>
         {
         public_constructors:
             /**
              * Default-Construct a frame graph texture view.
              */
-            SFrameGraphTextureView();
-
-        public_members:
-            CRange                               arraySliceRange;
-            CRange                               mipSliceRange;
-            FrameGraphFormat_t                   format;
-            CBitField<EFrameGraphViewAccessMode> mode;
-            EFrameGraphViewPurpose               source;
+            SRenderGraphImageView();
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SFrameGraphTextureView, SFrameGraphTextureView);
-        SHIRABE_DECLARE_MAP_OF_TYPES(FrameGraphResourceId_t, SFrameGraphTextureView, SFrameGraphTextureView);
-
+        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphImageView, SRenderGraphImageView);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphImageView, SRenderGraphImageView);
 
         /**
-         * @brief The SFrameGraphAttachmentCollection struct
+         * @brief The SRenderGraphAttachmentCollection struct
          */
-        class SFrameGraphAttachmentCollection
+        class SRenderGraphAttachmentCollection
         {
         public_constructors:
-            SFrameGraphAttachmentCollection() = default;
+            SRenderGraphAttachmentCollection() = default;
 
-            explicit SHIRABE_INLINE SFrameGraphAttachmentCollection(SFrameGraphAttachmentCollection const &aOther) = default;
+            explicit SHIRABE_INLINE SRenderGraphAttachmentCollection(SRenderGraphAttachmentCollection const &aOther) = default;
 
         public_methods:
             /**
@@ -419,8 +456,8 @@ namespace engine
              */
             void addInputAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aImageResourceID,
-                    FrameGraphResourceId_t const &aImageViewResourceID);
+                    RenderGraphResourceId_t const &aImageResourceID,
+                    RenderGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Add a color attachment to the collection and register it
@@ -432,8 +469,8 @@ namespace engine
              */
             void addColorAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aImageResourceID,
-                    FrameGraphResourceId_t const &aImageViewResourceID);
+                    RenderGraphResourceId_t const &aImageResourceID,
+                    RenderGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Add a depth attachment to the collection and register it
@@ -445,21 +482,21 @@ namespace engine
              */
             void addDepthAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aImageResourceID,
-                    FrameGraphResourceId_t const &aImageViewResourceID);
+                    RenderGraphResourceId_t const &aImageResourceID,
+                    RenderGraphResourceId_t const &aImageViewResourceID);
 
             /**
              * Return the list of attachment resource ids.
              *
              * @return See brief.
              */
-            Vector<FrameGraphResourceId_t>        const &getAttachmentImageResourceIds()     const { return mAttachmentImageResourceIds;     }
-            Vector<FrameGraphResourceId_t>        const &getAttachmentImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
+            Vector<RenderGraphResourceId_t>        const &getAttachmentImageResourceIds()     const { return mAttachmentImageResourceIds;     }
+            Vector<RenderGraphResourceId_t>        const &getAttachmentImageViewResourceIds() const { return mAttachmentImageViewResourceIds; }
             Vector<uint64_t>                      const &getColorAttachments()                const { return mColorAttachments;               }
             Vector<uint64_t>                      const &getDepthAttachments()                const { return mDepthAttachments;               }
             Vector<uint64_t>                      const &getInputAttachments()                const { return mInputAttachments;               }
             Map<PassUID_t, Vector<uint64_t>>      const &getAttachmentPassToViewAssignment()  const { return mAttachmentPassAssignment;       }
-            Map<FrameGraphResourceId_t, uint64_t> const &getAttachmentViewToImageAssignment() const { return mViewToImageAssignment;          }
+            Map<RenderGraphResourceId_t, uint64_t> const &getAttachmentViewToImageAssignment() const { return mViewToImageAssignment;          }
 
         private_methods:
 
@@ -473,11 +510,11 @@ namespace engine
              */
             uint32_t addAttachment(
                     PassUID_t              const &aPassUID,
-                    FrameGraphResourceId_t const &aImageResourceID,
-                    FrameGraphResourceId_t const &aImageViewResourceID);
+                    RenderGraphResourceId_t const &aImageResourceID,
+                    RenderGraphResourceId_t const &aImageViewResourceID);
 
         private_members:
-            Vector<FrameGraphResourceId_t>
+            Vector<RenderGraphResourceId_t>
                 mAttachmentImageResourceIds,
                 mAttachmentImageViewResourceIds;
             Vector<uint64_t>
@@ -486,30 +523,30 @@ namespace engine
                 mInputAttachments;
             Map<PassUID_t, Vector<uint64_t>>
                 mAttachmentPassAssignment;
-            Map<FrameGraphResourceId_t, uint64_t>
+            Map<RenderGraphResourceId_t, uint64_t>
                 mViewToImageAssignment;
         };
 
         /**
          * Describes common resource flags for read/write operations.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphResourceFlags
+        struct SHIRABE_TEST_EXPORT SRenderGraphResourceFlags
         {
         public_constructors:
             /**
              * Default-Construct resource flags.
              */
-            SFrameGraphResourceFlags();
+            SRenderGraphResourceFlags();
 
         public_members:
-            FrameGraphFormat_t requiredFormat;
+            RenderGraphFormat_t requiredFormat;
         };
 
         /**
          * Describes specialized constraints for texture resouces.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphTextureResourceFlags
-                : public SFrameGraphResourceFlags
+        struct SHIRABE_TEST_EXPORT SRenderGraphTextureResourceFlags
+                : public SRenderGraphResourceFlags
         {
         public_members:
             CRange arraySliceRange;
@@ -519,21 +556,21 @@ namespace engine
         /**
          * Describes flags required for reading textures.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphReadTextureFlags
-                : public SFrameGraphTextureResourceFlags
+        struct SHIRABE_TEST_EXPORT SRenderGraphReadTextureFlags
+                : public SRenderGraphTextureResourceFlags
         {
         public_members:
-            EFrameGraphReadSource readSource;
+            ERenderGraphReadSource readSource;
         };
 
         /**
          * Describes flags required for writing textures.
          */
-        struct SHIRABE_TEST_EXPORT SFrameGraphWriteTextureFlags
-                : public SFrameGraphTextureResourceFlags
+        struct SHIRABE_TEST_EXPORT SRenderGraphWriteTextureFlags
+                : public SRenderGraphTextureResourceFlags
         {
         public_members:
-            EFrameGraphWriteTarget writeTarget;
+            ERenderGraphWriteTarget writeTarget;
         };
 
         /**
@@ -546,77 +583,81 @@ namespace engine
                 >
         using AdjacencyListMap_t = std::unordered_map<TUnderlyingIDFrom, std::vector<TUnderlyingIDTo>>;
 
-        /**
-         * The frame graph pipeline struct encapsulates information on specific fixed function
-         * pipeline configurations and references.
-         */
-        struct SFrameGraphShaderModule
-                : SFrameGraphResource
-        {
-        public_members:
-        };
-
-        struct SFrameGraphPipelineConfig
+        struct SRenderGraphPipelineConfig
         {};
 
         //<-----------------------------------------------------------------------------
         // Renderable structures
         //<-----------------------------------------------------------------------------
-        struct SFrameGraphRenderablePipeline
-            : SFrameGraphResource
+        struct SRenderGraphPipeline
+            : SRenderGraphResource
         {
         public_members:
-            resources::ResourceId_t pipelineResourceId;
+            resources::ResourceId_t    sharedMaterialResourceId;
+            SRenderGraphPipelineConfig pipelineConfiguration;
         };
 
-        struct SFrameGraphRenderableMaterial
-            : SFrameGraphResource
+        struct SRenderGraphMaterialDescription
         {
         public_members:
-            resources::ResourceId_t       materialResourceId;
-            SFrameGraphRenderablePipeline pipeline;
+            resources::ResourceId_t materialResourceId;
+            resources::ResourceId_t sharedMaterialResourceId;
+            std::vector<SRenderGraphPersistentBufferDescription> buffers;
+            std::vector<SRenderGraphPersistentImageDescription>  images;
         };
 
-        struct SFrameGraphRenderableMesh
+        struct SRenderGraphMaterial
+            : SRenderGraphTypedResource<SRenderGraphMaterialDescription>
         {
-        public_members:
-            resources::ResourceId_t                      meshResourceId;
-            std::array<SFrameGraphRenderableMaterial, 4> materials;
+            std::vector<SRenderGraphBufferView> buffers;
+            std::vector<SRenderGraphImageView>  images;
         };
 
-        struct SFrameGraphRenderable
+        struct SRenderGraphMeshDescription
         {
-            SFrameGraphRenderableMesh mesh;
+            resources::ResourceId_t meshResourceId;
         };
 
-        struct SFrameGraphRenderableFetchFilter
+        struct SRenderGraphMesh
+            : SRenderGraphTypedResource<SRenderGraphMeshDescription>
+        { };
+
+        struct SRenderGraphRenderable
+        {
+            SRenderGraphMeshDescription                    mesh;
+            std::array<SRenderGraphMaterialDescription, 4> materials;
+        };
+
+        struct SRenderGraphRenderableFetchFilter
         {};
         //<-----------------------------------------------------------------------------
 
-        struct SFrameGraphDataSource
+        struct SRenderGraphDataSource
         {
-            std::function<std::vector<SFrameGraphRenderable>(SFrameGraphRenderableFetchFilter)> fetchRenderables;
+            std::function<std::vector<SRenderGraphRenderable>(SRenderGraphRenderableFetchFilter)> fetchRenderables;
         };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
-            SFrameGraphTexture                              \
-            , SFrameGraphTextureView                        \
-            , SFrameGraphBuffer                             \
-            , SFrameGraphBufferView                         \
-            , SFrameGraphMesh                               \
-            , SFrameGraphMaterial                           \
-            , SFrameGraphPipeline
+            SRenderGraphTransientImage                      \
+            , SRenderGraphPersistentImage                   \
+            , SRenderGraphImageView                         \
+            , SRenderGraphTransientBuffer                   \
+            , SRenderGraphPersistentBuffer                  \
+            , SRenderGraphBufferView                        \
+            , SRenderGraphMesh                              \
+            , SRenderGraphMaterial                          \
+            , SRenderGraphPipeline
 
 
         /**
          * Describes a list of framegraph resources.
          */
-        using Index_t = Vector<Shared<SFrameGraphResource>>;
+        using Index_t = Vector<Shared<SRenderGraphResource>>;
 
         /**
          * Describes a list of resource ids to index into a list of resources.
          */
-        using RefIndex_t = Vector<FrameGraphResourceId_t>;
+        using RefIndex_t = Vector<RenderGraphResourceId_t>;
 
         /**
          * Wraps a RefIndex_t type for a specific resource type.
@@ -624,7 +665,7 @@ namespace engine
          * @tparam T The internal resource type of the wrapper.
          */
         template <typename T>
-        class CFrameGraphResourcesRef
+        class CRenderGraphResourcesRef
         {
         protected:
             /**
@@ -632,7 +673,7 @@ namespace engine
              *
              * @param aRef
              */
-            void insert(FrameGraphResourceId_t const &aRef)
+            void insert(RenderGraphResourceId_t const &aRef)
             {
                 m_index.push_back(aRef);
             }
@@ -662,27 +703,27 @@ namespace engine
         };
 
         /**
-         * Variadic parameter pack unpacking helper to derive a FrameGraphResourcesRef<T>
+         * Variadic parameter pack unpacking helper to derive a RenderGraphResourcesRef<T>
          * for each type provided in TTypes
          *
-         * @tparam TTypes List of types to implement FrameGraphResourcesRef<T> for.
+         * @tparam TTypes List of types to implement RenderGraphResourcesRef<T> for.
          */
         template <typename... TTypes>
-        class CFrameGraphResourcesRefContainer
-                : public CFrameGraphResourcesRef<TTypes>...
+        class CRenderGraphResourcesRefContainer
+                : public CRenderGraphResourcesRef<TTypes>...
         {};
 
         /**
          * Collection-type to store a list of resources and various resource-ref collections
          * for each supported type.
          */
-        class CFrameGraphResources
-                : public CFrameGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>
+        class CRenderGraphResources
+                : public CRenderGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphResources)
+            SHIRABE_DECLARE_LOG_TAG(CRenderGraphResources)
 
         public_constructors:
-            CFrameGraphResources();
+            CRenderGraphResources();
 
         public_methods:
             /**
@@ -695,7 +736,7 @@ namespace engine
              */
             template <typename T>
             CEngineResult<Shared<T>> const
-            getResource(FrameGraphResourceId_t const &aResourceId) const
+            getResource(RenderGraphResourceId_t const &aResourceId) const
             {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(mResources.size() <= aResourceId)
@@ -705,7 +746,7 @@ namespace engine
                 }
 #endif
 
-                Shared<SFrameGraphResource> resource = mResources.at(aResourceId);
+                Shared<SRenderGraphResource> resource = mResources.at(aResourceId);
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(nullptr == resource)
                 {
@@ -718,24 +759,26 @@ namespace engine
                 return { EEngineStatus::Ok, ptr };
             }
 
-            SHIRABE_INLINE Index_t                         const &resources()           const { return mResources;                                                    }
-            SHIRABE_INLINE RefIndex_t                      const &textures()            const { return CFrameGraphResourcesRef<SFrameGraphTexture>::get();            }
-            SHIRABE_INLINE RefIndex_t                      const &textureViews()        const { return CFrameGraphResourcesRef<SFrameGraphTextureView>::get();        }
-            SHIRABE_INLINE RefIndex_t                      const &buffers()             const { return CFrameGraphResourcesRef<SFrameGraphBuffer>::get();             }
-            SHIRABE_INLINE RefIndex_t                      const &bufferViews()         const { return CFrameGraphResourcesRef<SFrameGraphBufferView>::get();         }
-            SHIRABE_INLINE RefIndex_t                      const &meshes()              const { return CFrameGraphResourcesRef<SFrameGraphMesh>::get();               }
-            SHIRABE_INLINE RefIndex_t                      const &materials()           const { return CFrameGraphResourcesRef<SFrameGraphMaterial>::get();           }
-            SHIRABE_INLINE RefIndex_t                      const &pipelines()           const { return CFrameGraphResourcesRef<SFrameGraphPipeline>::get();           }
+            SHIRABE_INLINE Index_t    const &resources()         const { return mResources;                                                    }
+            SHIRABE_INLINE RefIndex_t const &transientImages()   const { return CRenderGraphResourcesRef<SRenderGraphTransientImage>::get();   }
+            SHIRABE_INLINE RefIndex_t const &persistentImages()  const { return CRenderGraphResourcesRef<SRenderGraphPersistentImage>::get();  }
+            SHIRABE_INLINE RefIndex_t const &imageViews()        const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();        }
+            SHIRABE_INLINE RefIndex_t const &transientBuffers()  const { return CRenderGraphResourcesRef<SRenderGraphTransientBuffer>::get();  }
+            SHIRABE_INLINE RefIndex_t const &persistentBuffers() const { return CRenderGraphResourcesRef<SRenderGraphPersistentBuffer>::get(); }
+            SHIRABE_INLINE RefIndex_t const &bufferViews()       const { return CRenderGraphResourcesRef<SRenderGraphBufferView>::get();       }
+            SHIRABE_INLINE RefIndex_t const &meshes()            const { return CRenderGraphResourcesRef<SRenderGraphMesh>::get();             }
+            SHIRABE_INLINE RefIndex_t const &materials()         const { return CRenderGraphResourcesRef<SRenderGraphMaterial>::get();         }
+            SHIRABE_INLINE RefIndex_t const &pipelines()         const { return CRenderGraphResourcesRef<SRenderGraphPipeline>::get();         }
 
         protected_members:
             Index_t mResources;
         };
 
         /**
-         * Extends CFrameGraphResources so that mutable resource operations become possible. Also permits the creation of a new resource.
+         * Extends CRenderGraphResources so that mutable resource operations become possible. Also permits the creation of a new resource.
          */
-        class CFrameGraphMutableResources
-                : public CFrameGraphResources
+        class CRenderGraphMutableResources
+                : public CRenderGraphResources
         {
         public:
             /**
@@ -744,15 +787,15 @@ namespace engine
              * @tparam T The type of resource to spawn.
              * @return   Returns a mutable reference to the newly created instance.
              */
-            template <typename T> // with T : FrameGraphResource
-            typename std::enable_if_t<std::is_base_of_v<SFrameGraphResource, T>, T> &spawnResource()
+            template <typename T> // with T : RenderGraphResource
+            typename std::enable_if_t<std::is_base_of_v<SRenderGraphResource, T>, T> &spawnResource()
             {
                 Shared<T> ptr = std::make_shared<T>();
                 ptr->resourceId = mResources.size();
 
                 mResources.push_back(ptr);
 
-                CFrameGraphResourcesRef<T>::insert(ptr->resourceId);
+                CRenderGraphResourcesRef<T>::insert(ptr->resourceId);
 
                 return (*ptr);
             }
@@ -765,11 +808,11 @@ namespace engine
              * @return            A pointer to the desired result.
              * @throw             Throws std::runtime_error on error.
              */
-            template <typename T> // with T : FrameGraphResource
+            template <typename T> // with T : RenderGraphResource
             CEngineResult<Shared<T>>
-            getResourceMutable(FrameGraphResourceId_t const &aResourceId)
+            getResourceMutable(RenderGraphResourceId_t const &aResourceId)
             {
-                CEngineResult<Shared<T>> const fetch  = static_cast<CFrameGraphResources *>(this)->getResource<T>(aResourceId);
+                CEngineResult<Shared<T>> const fetch  = static_cast<CRenderGraphResources *>(this)->getResource<T>(aResourceId);
                 CEngineResult<Shared<T>>       result = { EEngineStatus::Ok };
                 if(not fetch.resultEquals(EEngineStatus::ResourceError_NotFound))
                 {
@@ -786,35 +829,41 @@ namespace engine
              * @param aOther Another set of resources to be merged with this one.
              * @return       True, if aOther was successfully merged into this instance. False otherwise.
              */
-            bool mergeIn(CFrameGraphResources const &aOther);
+            bool mergeIn(CRenderGraphResources const &aOther);
         };
 
     }
 
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphResourceType>(framegraph::EFrameGraphResourceType const &aType);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphResourceType>(framegraph::ERenderGraphResourceType const &aType);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::FrameGraphFormat_t>(framegraph::FrameGraphFormat_t const &aFormat);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::RenderGraphFormat_t>(framegraph::RenderGraphFormat_t const &aFormat);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphResourceUsage>(framegraph::EFrameGraphResourceUsage const &aUsage);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphResourceUsage>(framegraph::ERenderGraphResourceUsage const &aUsage);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphWriteTarget>(framegraph::EFrameGraphWriteTarget const &aTarget);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphWriteTarget>(framegraph::ERenderGraphWriteTarget const &aTarget);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphResourceAccessibility>(framegraph::ERenderGraphResourceAccessibility const &aAccessibility);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphResourceInitState>(framegraph::EFrameGraphResourceInitState const &aState);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphResourceInitState>(framegraph::ERenderGraphResourceInitState const &aState);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::EFrameGraphViewAccessMode>(framegraph::EFrameGraphViewAccessMode const &aAccessMode);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphViewAccessMode>(framegraph::ERenderGraphViewAccessMode const &aAccessMode);
 
 
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphTransientImage>(framegraph::SRenderGraphTransientImage const &aTexture);
+
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphTextureView>(framegraph::SFrameGraphTextureView const &aTextureView);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphPersistentImage>(framegraph::SRenderGraphPersistentImage const &aTexture);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SFrameGraphBuffer>(framegraph::SFrameGraphBuffer const &aBuffer);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphImageView>(framegraph::SRenderGraphImageView const &aTextureView);
     template <>
-    SHIRABE_TEST_EXPORT  std::string convert_to_string<framegraph::SFrameGraphBufferView>(framegraph::SFrameGraphBufferView const &aBufferView);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphTransientBuffer>(framegraph::SRenderGraphTransientBuffer const &aBuffer);
+
+    template <>
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphPersistentBuffer>(framegraph::SRenderGraphPersistentBuffer const &aBuffer);
+    template <>
+    SHIRABE_TEST_EXPORT  std::string convert_to_string<framegraph::SRenderGraphBufferView>(framegraph::SRenderGraphBufferView const &aBufferView);
 
 }
 

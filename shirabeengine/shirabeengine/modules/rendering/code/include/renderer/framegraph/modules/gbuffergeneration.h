@@ -17,13 +17,13 @@ namespace engine
         struct SGBufferModuleTag_t {};
 
         /**
-         * The FrameGraphModule<SGBufferModuleTag_t> class implements all gbuffer generation
+         * The RenderGraphModule<SGBufferModuleTag_t> class implements all gbuffer generation
          * related data structs and passes.
          */
         template<>
-        class SHIRABE_TEST_EXPORT CFrameGraphModule<SGBufferModuleTag_t>
+        class SHIRABE_TEST_EXPORT CRenderGraphModule<SGBufferModuleTag_t>
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphModule<SGBufferModuleTag_t>);
+            SHIRABE_DECLARE_LOG_TAG(CRenderGraphModule<SGBufferModuleTag_t>);
 
         public_structs:
 
@@ -40,11 +40,11 @@ namespace engine
              */
             struct SGBufferGenerationExportData
             {
-                SFrameGraphTextureView gbuffer0;
-                SFrameGraphTextureView gbuffer1;
-                SFrameGraphTextureView gbuffer2;
-                SFrameGraphTextureView gbuffer3;
-                SFrameGraphTextureView depthStencil;
+                SRenderGraphImageView gbuffer0;
+                SRenderGraphImageView gbuffer1;
+                SRenderGraphImageView gbuffer2;
+                SRenderGraphImageView gbuffer3;
+                SRenderGraphImageView depthStencil;
             };
 
         public_methods:

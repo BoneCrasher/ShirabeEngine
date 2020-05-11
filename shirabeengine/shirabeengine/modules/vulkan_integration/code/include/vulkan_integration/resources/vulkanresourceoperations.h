@@ -30,7 +30,7 @@ namespace engine::resources
 
     // TODO: Mesh, Material
 
-    //static EEngineStatus createTexture          (Shared<IVkGlobalContext> &aVulkanContext, STexture     const &aTexture);
+    //static EEngineStatus createImage          (Shared<IVkGlobalContext> &aVulkanContext, STexture     const &aTexture);
     //static EEngineStatus createTextureView      (Shared<IVkGlobalContext> &aVulkanContext, STextureView const &aTextureView, STexture const &aTexture);
     //static EEngineStatus createBuffer           (Shared<IVkGlobalContext> &aVulkanContext, SBuffer      const &aBuffer);
     //static EEngineStatus createBufferView       (Shared<IVkGlobalContext> &aVulkanContext, SBufferView  const &aBufferView, SBuffer const &aBuffer);
@@ -79,7 +79,7 @@ namespace engine::resources
     //    CEngineResult<> operator()(TLogicalResource &&aResource, TLogicalResourceDependencies &&...aDependencies)
     //    {
     //        CaseIfResourceTypesMatches(STexture)
-    //        { return createTexture(ForwardResourceTypesInstances(aResource, aDependencies)); }
+    //        { return createImage(ForwardResourceTypesInstances(aResource, aDependencies)); }
     //        CaseIfResourceTypesMatches(STextureView, STexture)
     //        { return createTextureView(ForwardResourceTypesInstances(aResource, aDependencies)); }
     //        CaseIfResourceTypesMatches(SBuffer)

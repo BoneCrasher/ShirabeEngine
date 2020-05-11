@@ -15,7 +15,7 @@
 
 namespace Test
 {
-    namespace FrameGraph
+    namespace RenderGraph
     {
         using namespace engine;
         using namespace engine::rendering;
@@ -58,30 +58,30 @@ namespace Test
         /**
          * Mock implementation of a render context to interface with a dummy render context.
          */
-        class CMockFrameGraphRenderContext
-                : public IFrameGraphRenderContext
+        class CMockRenderGraphRenderContext
+                : public IRenderGraphRenderContext
         {
-            SHIRABE_DECLARE_LOG_TAG(CMockFrameGraphRenderContext);
+            SHIRABE_DECLARE_LOG_TAG(CMockRenderGraphRenderContext);
         public:
-            static Shared<IFrameGraphRenderContext> fromRenderer(Shared<IRenderContext> renderer);
+            static Shared<IRenderGraphRenderContext> fromRenderer(Shared<IRenderContext> renderer);
 
-            CEngineResult<> importTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> importTexture(SRenderGraphTexture const &aTexture);
 
-            CEngineResult<> createTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> createTexture(SRenderGraphTexture const &aTexture);
 
             CEngineResult<> createTextureView(
-                    SFrameGraphTexture      const &aTexture,
-                    SFrameGraphTextureView  const &aView);
+                    SRenderGraphTexture      const &aTexture,
+                    SRenderGraphTextureView  const &aView);
 
             CEngineResult<> createBuffer(
-                    FrameGraphResourceId_t const &aResourceId,
-                    SFrameGraphResource    const &aResource,
-                    SFrameGraphBuffer      const &aBuffer);
+                    RenderGraphResourceId_t const &aResourceId,
+                    SRenderGraphResource    const &aResource,
+                    SRenderGraphBuffer      const &aBuffer);
 
             CEngineResult<> createBufferView(
-                    FrameGraphResourceId_t const &aResourceId,
-                    SFrameGraphResource    const &aResource,
-                    SFrameGraphBufferView  const &aView);
+                    RenderGraphResourceId_t const &aResourceId,
+                    SRenderGraphResource    const &aResource,
+                    SRenderGraphBufferView  const &aView);
 
             CEngineResult<> loadTextureAsset(AssetId_t const &aAssetId);
 
@@ -89,15 +89,15 @@ namespace Test
 
             CEngineResult<> loadMeshAsset(AssetId_t const &aAssetId);
 
-            CEngineResult<> bindTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> bindTextureView(SRenderGraphTextureView const &aView);
 
-            CEngineResult<> bindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> bindBufferView(RenderGraphResourceId_t const &aResourceId);
 
             CEngineResult<> bindMesh(AssetId_t const &aMesh);
 
-            CEngineResult<> unbindTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> unbindTextureView(SRenderGraphTextureView const &aView);
 
-            CEngineResult<> unbindBufferView(FrameGraphResourceId_t const &aResourceId);
+            CEngineResult<> unbindBufferView(RenderGraphResourceId_t const &aResourceId);
 
             CEngineResult<> unbindMesh(AssetId_t const &aAssetId);
 
@@ -107,18 +107,18 @@ namespace Test
 
             CEngineResult<> unloadMeshAsset(AssetId_t  const &aAssetId);
 
-            CEngineResult<> destroyTexture(SFrameGraphTexture const &aTexture);
+            CEngineResult<> destroyTexture(SRenderGraphTexture const &aTexture);
 
-            CEngineResult<> destroyTextureView(SFrameGraphTextureView const &aView);
+            CEngineResult<> destroyTextureView(SRenderGraphTextureView const &aView);
 
-            CEngineResult<> destroyBuffer(FrameGraphResourceId_t      const &aResourceId);
+            CEngineResult<> destroyBuffer(RenderGraphResourceId_t      const &aResourceId);
 
-            CEngineResult<> destroyBufferView(FrameGraphResourceId_t  const &aResourceId);
+            CEngineResult<> destroyBufferView(RenderGraphResourceId_t  const &aResourceId);
 
             CEngineResult<> render(SRenderable const&renderable);
 
         private:
-            CMockFrameGraphRenderContext(Shared<IRenderContext> aRenderer);
+            CMockRenderGraphRenderContext(Shared<IRenderContext> aRenderer);
 
             Shared<IRenderContext> mRenderer;
         };

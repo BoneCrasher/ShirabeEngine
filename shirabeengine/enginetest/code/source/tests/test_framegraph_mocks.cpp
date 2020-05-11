@@ -2,7 +2,7 @@
 
 namespace Test
 {
-    namespace FrameGraph
+    namespace RenderGraph
     {
         //<-----------------------------------------------------------------------------
         //
@@ -49,7 +49,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CMockFrameGraphRenderContext::CMockFrameGraphRenderContext(Shared<IRenderContext> aRenderer)
+        CMockRenderGraphRenderContext::CMockRenderGraphRenderContext(Shared<IRenderContext> aRenderer)
             : mRenderer(aRenderer)
         {}
         //<-----------------------------------------------------------------------------
@@ -57,12 +57,12 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        Shared<IFrameGraphRenderContext> CMockFrameGraphRenderContext::fromRenderer(Shared<IRenderContext> aRenderer)
+        Shared<IRenderGraphRenderContext> CMockRenderGraphRenderContext::fromRenderer(Shared<IRenderContext> aRenderer)
         {
             assert(nullptr != aRenderer);
 
-            Shared<FrameGraph::IFrameGraphRenderContext> context =
-                    Shared<CMockFrameGraphRenderContext>(new CMockFrameGraphRenderContext(aRenderer));
+            Shared<RenderGraph::IRenderGraphRenderContext> context =
+                    Shared<CMockRenderGraphRenderContext>(new CMockRenderGraphRenderContext(aRenderer));
             if(!context)
             {
                 CLog::Error(logTag(), "Failed to create render context from renderer.");
@@ -75,7 +75,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::importTexture(SFrameGraphTexture const &aTexture)
+        CEngineResult<> CMockRenderGraphRenderContext::importTexture(SRenderGraphTexture const &aTexture)
         {
             CLog::Verbose(logTag(), CString::format("ImportTexture(...):\n{}", convert_to_string(aTexture)));
 
@@ -86,7 +86,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::createTexture(SFrameGraphTexture const &aTexture)
+        CEngineResult<> CMockRenderGraphRenderContext::createTexture(SRenderGraphTexture const &aTexture)
         {
             CLog::Verbose(logTag(), CString::format("CreateTexture(...):\n{}", convert_to_string(aTexture)));
 
@@ -97,9 +97,9 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::createTextureView(
-                SFrameGraphTexture      const &aTexture,
-                SFrameGraphTextureView  const &aView)
+        CEngineResult<> CMockRenderGraphRenderContext::createTextureView(
+                SRenderGraphTexture      const &aTexture,
+                SRenderGraphTextureView  const &aView)
         {
             CLog::Verbose(logTag(), CString::format("CreateTextureView(...):\n{}", convert_to_string(aView)));
 
@@ -110,10 +110,10 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::createBuffer(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
-                SFrameGraphBuffer      const &aBuffer)
+        CEngineResult<> CMockRenderGraphRenderContext::createBuffer(
+                RenderGraphResourceId_t const &aResourceId,
+                SRenderGraphResource    const &aResource,
+                SRenderGraphBuffer      const &aBuffer)
         {
             CLog::Verbose(logTag(), CString::format("CreateBuffer(...):\n{}", convert_to_string(aBuffer)));
 
@@ -124,10 +124,10 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::createBufferView(
-                FrameGraphResourceId_t const &aResourceId,
-                SFrameGraphResource    const &aResource,
-                SFrameGraphBufferView  const &aView)
+        CEngineResult<> CMockRenderGraphRenderContext::createBufferView(
+                RenderGraphResourceId_t const &aResourceId,
+                SRenderGraphResource    const &aResource,
+                SRenderGraphBufferView  const &aView)
         {
             CLog::Verbose(logTag(), CString::format("CreateBufferView(...):\n{}", convert_to_string(aView)));
             return EEngineStatus::Ok;
@@ -137,7 +137,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::loadTextureAsset(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -146,7 +146,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::loadBufferAsset(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -155,7 +155,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::loadMeshAsset(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -164,7 +164,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::bindTextureView(SFrameGraphTextureView const &aView)
+        CEngineResult<> CMockRenderGraphRenderContext::bindTextureView(SRenderGraphTextureView const &aView)
         {
             CLog::Verbose(logTag(), CString::format("BindTextureView(...):\n{}", convert_to_string(aView)));
 
@@ -175,7 +175,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::bindBufferView(FrameGraphResourceId_t const &aResourceId)
+        CEngineResult<> CMockRenderGraphRenderContext::bindBufferView(RenderGraphResourceId_t const &aResourceId)
         {
             return EEngineStatus::Ok;
         }
@@ -184,7 +184,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::bindMesh(AssetId_t const &aMesh)
+        CEngineResult<> CMockRenderGraphRenderContext::bindMesh(AssetId_t const &aMesh)
         {
             return EEngineStatus::Ok;
         }
@@ -193,7 +193,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unbindTextureView(SFrameGraphTextureView const &aView)
+        CEngineResult<> CMockRenderGraphRenderContext::unbindTextureView(SRenderGraphTextureView const &aView)
         {
             CLog::Verbose(logTag(), CString::format("UnbindTextureView(...):\n{}", convert_to_string(aView)));
 
@@ -204,7 +204,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceid)
+        CEngineResult<> CMockRenderGraphRenderContext::unbindBufferView(RenderGraphResourceId_t const &aResourceid)
         {
             return EEngineStatus::Ok;
         }
@@ -213,7 +213,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unbindMesh(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::unbindMesh(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -222,7 +222,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::unloadTextureAsset(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -231,7 +231,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unloadBufferAsset(AssetId_t  const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::unloadBufferAsset(AssetId_t  const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -240,7 +240,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetId)
+        CEngineResult<> CMockRenderGraphRenderContext::unloadMeshAsset(AssetId_t const &aAssetId)
         {
             return EEngineStatus::Ok;
         }
@@ -249,7 +249,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::destroyTexture(SFrameGraphTexture const &aTexture)
+        CEngineResult<> CMockRenderGraphRenderContext::destroyTexture(SRenderGraphTexture const &aTexture)
         {
             CLog::Verbose(logTag(), CString::format("DestroyTexture(...):\n{}", convert_to_string(aTexture)));
 
@@ -260,7 +260,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::destroyTextureView(SFrameGraphTextureView const &aView)
+        CEngineResult<> CMockRenderGraphRenderContext::destroyTextureView(SRenderGraphTextureView const &aView)
         {
             CLog::Verbose(logTag(), CString::format("DestroyTextureView(...):\n{}", convert_to_string(aView)));
 
@@ -271,7 +271,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::destroyBuffer(FrameGraphResourceId_t const &aResourceId)
+        CEngineResult<> CMockRenderGraphRenderContext::destroyBuffer(RenderGraphResourceId_t const &aResourceId)
         {
             return EEngineStatus::Ok;
         }
@@ -280,7 +280,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::destroyBufferView(FrameGraphResourceId_t  const &aResourceId)
+        CEngineResult<> CMockRenderGraphRenderContext::destroyBufferView(RenderGraphResourceId_t  const &aResourceId)
         {
             return EEngineStatus::Ok;
         }
@@ -289,7 +289,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CMockFrameGraphRenderContext::render(SRenderable const &aRenderable)
+        CEngineResult<> CMockRenderGraphRenderContext::render(SRenderable const &aRenderable)
         {
             CLog::Verbose(logTag(), CString::format("Render(...):\n", convert_to_string(aRenderable)));
 

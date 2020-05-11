@@ -19,29 +19,29 @@ namespace engine
     {
         class  CGraph;
         class  CPassBase;
-        struct SFrameGraphResource;
+        struct SRenderGraphResource;
     }
 
     namespace serialization
     {
         using framegraph::CGraph;
         using framegraph::CPassBase;
-        using framegraph::SFrameGraphResource;
+        using framegraph::SRenderGraphResource;
         using framegraph::PassUID_t;
-        using framegraph::SFrameGraphTexture;
-        using framegraph::SFrameGraphTextureView;
-        using framegraph::SFrameGraphRenderableList;
-        using framegraph::SFrameGraphRenderableListView;
-        using framegraph::FrameGraphResourceId_t;
+        using framegraph::SRenderGraphTexture;
+        using framegraph::SRenderGraphImageView;
+        using framegraph::SRenderGraphRenderableList;
+        using framegraph::SRenderGraphRenderableListView;
+        using framegraph::RenderGraphResourceId_t;
 
         /**
-         * The IFrameGraphSerializer interface describes the basic requiremets
+         * The IRenderGraphSerializer interface describes the basic requiremets
          * to serialize a framegraph instance.
          */
-        class IFrameGraphSerializer
+        class IRenderGraphSerializer
                 : public ISerializer<CGraph>
         {
-            SHIRABE_DECLARE_INTERFACE(IFrameGraphSerializer);
+            SHIRABE_DECLARE_INTERFACE(IRenderGraphSerializer);
 
         public_api:
             /**
@@ -65,43 +65,43 @@ namespace engine
              * @param aResource The resource to serialize.
              * @return          True, if successful. False otherwise.
              */
-            virtual bool serializeResource(SFrameGraphResource const &aResource) = 0;
+            virtual bool serializeResource(SRenderGraphResource const &aResource) = 0;
         };
 
         /**
-         * The IFrameGraphDeserializer interface describes the basic requirements
+         * The IRenderGraphDeserializer interface describes the basic requirements
          * to deserialize to a framegraph instance.
          */
-        class IFrameGraphDeserializer
+        class IRenderGraphDeserializer
                 : public IDeserializer<CGraph>
         {
-            SHIRABE_DECLARE_INTERFACE(IFrameGraphDeserializer)
+            SHIRABE_DECLARE_INTERFACE(IRenderGraphDeserializer)
 
         public_api:
             virtual bool deserializeGraph(CGraph &aOutGraph) = 0;
             virtual bool deserializePass(CPassBase &aOutPass) = 0;
-            virtual bool deserializeResource(SFrameGraphResource &aOutResource) = 0;
+            virtual bool deserializeResource(SRenderGraphResource &aOutResource) = 0;
         };
 
         /**
-         * The FrameGraphGraphVizSerializer class implements framegraph serialization
+         * The RenderGraphGraphVizSerializer class implements framegraph serialization
          * to the graphviz dot format.
          */
-        class SHIRABE_TEST_EXPORT CFrameGraphGraphVizSerializer
-                : public IFrameGraphSerializer
+        class SHIRABE_TEST_EXPORT CRenderGraphGraphVizSerializer
+                : public IRenderGraphSerializer
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphGraphVizSerializer);
+            SHIRABE_DECLARE_LOG_TAG(CRenderGraphGraphVizSerializer);
 
         public_structs:
             /*!
              * The IResult interface of the ISerializer<T> interface declares required
              * signatures for result retrieval from a serialization process.
              */
-            class CFrameGraphSerializationResult
+            class CRenderGraphSerializationResult
                     : public ISerializer<CGraph>::IResult
             {
             public_constructors:
-                CFrameGraphSerializationResult(std::string const &aResult);
+                CRenderGraphSerializationResult(std::string const &aResult);
 
             public_methods:
                 bool asString      (std::string          &aOutString) const;
@@ -158,7 +158,7 @@ namespace engine
              * @param aResource The resource to serialize.
              * @return          True, if successful. False otherwise.
              */
-            bool serializeResource(SFrameGraphResource const &aResource);
+            bool serializeResource(SRenderGraphResource const &aResource);
 
         private_methods:
             /**
@@ -182,7 +182,7 @@ namespace engine
              * @param aList The list of renderables to write.
              */
             void writeRenderableList(
-                    SFrameGraphRenderableList const &aList);
+                    SRenderGraphRenderableList const &aList);
             /**
              * Write out a renderable list view in dot format.
              *
@@ -190,8 +190,8 @@ namespace engine
              * @param aView           The view instance to write out.
              */
             void writeRenderableListView(
-                    SFrameGraphResource           const &aParentResource,
-                    SFrameGraphRenderableListView const &aView);
+                    SRenderGraphResource           const &aParentResource,
+                    SRenderGraphRenderableListView const &aView);
 
             /**
              * Write a renderable list view edge, either outgoing from a pass or ingoing into a pass.
@@ -200,8 +200,8 @@ namespace engine
              * @param aView           The renderable list view to write.
              */
             void writeRenderableResourceViewEdge(
-                    SFrameGraphResource           const &aParentResource,
-                    SFrameGraphRenderableListView const &aView);
+                    SRenderGraphResource           const &aParentResource,
+                    SRenderGraphRenderableListView const &aView);
 
             /**
              * Write out a texture resource in dot format.
@@ -209,7 +209,7 @@ namespace engine
              * @param aTexture The texture resource to write.
              */
             void writeTextureResource(
-                    SFrameGraphTexture const &aTexture);
+                    SRenderGraphImage const &aTexture);
 
             /**
              * Write out a texture view in dot format.
@@ -218,8 +218,8 @@ namespace engine
              * @param aView           The resource view to write.
              */
             void writeTextureResourceView(
-                    SFrameGraphResource     const &aParentResource,
-                    SFrameGraphTextureView  const &aView);
+                    SRenderGraphResource     const &aParentResource,
+                    SRenderGraphImageView  const &aView);
 
             /**
              * Write a graph edge inbetween two passes.
@@ -235,7 +235,7 @@ namespace engine
              *
              * @param aTexture The texture being created by the pass.
              */
-            void writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture);
+            void writePass2TextureResourceEdge(SRenderGraphImage const &aTexture);
 
             /**
              * Write an edge connecting a pass and a texture view, either in- or outgoing.
@@ -246,20 +246,20 @@ namespace engine
              */
             void writeTextureResourceViewEdge(
                     PassUID_t              const &aPassUID,
-                    SFrameGraphResource    const &aParentResource,
-                    SFrameGraphTextureView const &aView);
+                    SRenderGraphResource    const &aParentResource,
+                    SRenderGraphImageView const &aView);
 
         private_members:
             std::stringstream mStream;
         };
 
         /**
-         * @brief The FrameGraphGraphVizDeserializer class
+         * @brief The RenderGraphGraphVizDeserializer class
          */
-        class SHIRABE_TEST_EXPORT CFrameGraphGraphVizDeserializer
-                : public IFrameGraphDeserializer
+        class SHIRABE_TEST_EXPORT CRenderGraphGraphVizDeserializer
+                : public IRenderGraphDeserializer
         {
-            SHIRABE_DECLARE_LOG_TAG(CFrameGraphGraphVizDeserializer);
+            SHIRABE_DECLARE_LOG_TAG(CRenderGraphGraphVizDeserializer);
 
         public_methods:
             bool initialize();
@@ -267,7 +267,7 @@ namespace engine
 
             bool deserializeGraph(CGraph &aOutGraph);
             bool deserializePass(CPassBase &aOutPass);
-            bool deserializeResource(SFrameGraphResource &aOutResource);
+            bool deserializeResource(SRenderGraphResource &aOutResource);
 
         private_methods:
             std::stringstream m_stream;

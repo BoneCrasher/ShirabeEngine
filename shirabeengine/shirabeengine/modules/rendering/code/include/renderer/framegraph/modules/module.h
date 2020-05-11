@@ -16,7 +16,7 @@ namespace engine
     namespace framegraph
     {
         template <typename TTag>
-        class CFrameGraphModule;
+        class CRenderGraphModule;
 
         // struct SModuleEnvironment
         // {

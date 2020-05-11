@@ -10,23 +10,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult
         <
-            CFrameGraphModule<SLightingModuleTag_t>::SLightingExportData
+            CRenderGraphModule<SLightingModuleTag_t>::SLightingExportData
         >
-        CFrameGraphModule<SLightingModuleTag_t>::addLightingPass(
-                std::string const      &aPassName,
+        CRenderGraphModule<SLightingModuleTag_t>::addLightingPass(
+            std::string const      &aPassName,
                 CGraphBuilder          &aGraphBuilder,
-                SFrameGraphTextureView &aGbuffer0,
-                SFrameGraphTextureView &aGbuffer1,
-                SFrameGraphTextureView &aGbuffer2,
-                SFrameGraphTextureView &aGbuffer3,
-                SFrameGraphTextureView &aDepthStencil)
+                SRenderGraphImageView &aGbuffer0,
+                SRenderGraphImageView &aGbuffer1,
+                SRenderGraphImageView &aGbuffer2,
+                SRenderGraphImageView &aGbuffer3,
+                SRenderGraphImageView &aDepthStencil)
         {
             /**
              * The SState struct is the internal state of the lighting pass.
              */
             struct SState
             {
-                SFrameGraphRenderTarget lightAccumulationBufferTextureId;
+                SRenderGraphRenderTarget lightAccumulationBufferTextureId;
             };
 
             /**
@@ -48,41 +48,41 @@ namespace engine
                            [&] (
                                CPassBuilder                       &aBuilder
                                , SPassData                        &aOutPassData
-                               , SFrameGraphPlatformContext const &aPlatformContext
-                               , SFrameGraphDataSource const      &aDataSource
+                               , SRenderGraphPlatformContext const &aPlatformContext
+                               , SRenderGraphDataSource const      &aDataSource
                                ) -> CEngineResult<>
                                {
                                    auto gbufferTextureFetch = aGraphBuilder.getResources()
-                                                                           .getResource<SFrameGraphTexture>(aGbuffer0.subjacentResource);
+                                                                           .getResource<SRenderGraphImage>(aGbuffer0.subjacentResource);
                                    if(not gbufferTextureFetch.successful())
                                    {
                                        CLog::Error(logTag(), "Failed to fetch gbuffer texture.");
                                        return { EEngineStatus::Error };
                                    }
 
-                                   SFrameGraphTexture gbufferTexture = *(gbufferTextureFetch.data());
+                                   SRenderGraphImage gbufferTexture = *(gbufferTextureFetch.data());
 
-                                   SFrameGraphRenderTarget lightAccBufferDesc ={ };
+                                   SRenderGraphRenderTarget lightAccBufferDesc ={ };
                                    lightAccBufferDesc.width          = gbufferTexture.width;
                                    lightAccBufferDesc.height         = gbufferTexture.height;
                                    lightAccBufferDesc.depth          = 1;
-                                   lightAccBufferDesc.format         = FrameGraphFormat_t::R32G32B32A32_FLOAT;
+                                   lightAccBufferDesc.format         = RenderGraphFormat_t::R32G32B32A32_FLOAT;
                                    lightAccBufferDesc.mipLevels      = 1;
                                    lightAccBufferDesc.arraySize      = 1;
-                                   lightAccBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
-                                   lightAccBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
+                                   lightAccBufferDesc.initialState   = ERenderGraphResourceInitState::Clear;
+                                   lightAccBufferDesc.permittedUsage = ERenderGraphResourceUsage::InputAttachment | ERenderGraphResourceUsage::ColorAttachment;
 
                                    aOutPassData.state.lightAccumulationBufferTextureId = aBuilder.createRenderTarget("Light Accumulation Buffer", lightAccBufferDesc).data();
 
-                                   SFrameGraphReadTextureFlags readFlags{ };
-                                   readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                                   readFlags.readSource      = EFrameGraphReadSource::Color;
+                                   SRenderGraphReadTextureFlags readFlags{ };
+                                   readFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                                   readFlags.readSource      = ERenderGraphReadSource::Color;
                                    readFlags.arraySliceRange = CRange(0, 1);
                                    readFlags.mipSliceRange   = CRange(0, 1);
 
-                                   SFrameGraphReadTextureFlags depthReadFlags{ };
-                                   depthReadFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                                   depthReadFlags.readSource      = EFrameGraphReadSource::Depth;
+                                   SRenderGraphReadTextureFlags depthReadFlags{ };
+                                   depthReadFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                                   depthReadFlags.readSource      = ERenderGraphReadSource::Depth;
                                    depthReadFlags.arraySliceRange = CRange(0, 1);
                                    depthReadFlags.mipSliceRange   = CRange(0, 1);
 
@@ -92,16 +92,16 @@ namespace engine
                                    aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aGbuffer3,     readFlags     ).data();
                                    aOutPassData.importData.depth    = aBuilder.readAttachment(aDepthStencil, depthReadFlags).data();
 
-                                   SFrameGraphWriteTextureFlags writeFlags{ };
-                                   writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                                   writeFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                                   SRenderGraphWriteTextureFlags writeFlags{ };
+                                   writeFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                                   writeFlags.writeTarget     = ERenderGraphWriteTarget::Color;
                                    writeFlags.arraySliceRange = CRange(0, 1);
                                    writeFlags.mipSliceRange   = CRange(0, 1);
 
                                    aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeAttachment(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags).data();
 
-                                   SFrameGraphPipelineConfig pipelineConfig {};
-                                   SFrameGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta"), pipelineConfig).data();
+                                   SRenderGraphPipelineConfig pipelineConfig {};
+                                   SRenderGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta"), pipelineConfig).data();
                                    aOutPassData.importData.material = material;
 
                                    return { EEngineStatus::Ok };
@@ -111,12 +111,12 @@ namespace engine
              * Implement the execute function
              */
             auto const execute = [=] (SPassData const                    &aPassData
-                                      , SFrameGraphPlatformContext const &aPlatformContext
-                                      , SFrameGraphDataSource const      &aDataSource
-                                      , CFrameGraphResources const       &aFrameGraphResources
-                                      , SFrameGraphRenderContextState    &aRenderContextState
-                                      , SFrameGraphResourceContext       &aResourceContext
-                                      , SFrameGraphRenderContext         &aRenderContext)
+                                      , SRenderGraphPlatformContext const &aPlatformContext
+                                      , SRenderGraphDataSource const      &aDataSource
+                                      , CRenderGraphResources const       &aRenderGraphResources
+                                      , SRenderGraphRenderContextState    &aRenderContextState
+                                      , SRenderGraphResourceContext       &aResourceContext
+                                      , SRenderGraphRenderContext         &aRenderContext)
                     -> CEngineResult<>
             {
                 CLog::Verbose(logTag(), "Lighting");

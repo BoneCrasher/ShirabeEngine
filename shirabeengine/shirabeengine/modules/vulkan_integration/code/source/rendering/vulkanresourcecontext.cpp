@@ -25,7 +25,7 @@ namespace engine
 
         namespace local
         {
-            SHIRABE_DECLARE_LOG_TAG(VulkanFrameGraphResourceContext);
+            SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphResourceContext);
         }
         //<-----------------------------------------------------------------------------
 
@@ -43,14 +43,14 @@ namespace engine
                                   , Shared<asset::CAssetStorage>           aAssetStorage
                                   , ResourceId_t                    const &aRenderPassId
                                   , std::vector<PassUID_t>          const &aPassExecutionOrder
-                                  , SFrameGraphAttachmentCollection const &aAttachmentInfo
-                                  , CFrameGraphMutableResources     const &aFrameGraphResources) -> EEngineStatus
+                                  , SRenderGraphAttachmentCollection const &aAttachmentInfo
+                                  , CRenderGraphMutableResources     const &aRenderGraphResources) -> EEngineStatus
             {
                 //<-----------------------------------------------------------------------------
                 // Helper function to find attachment indices in index lists.
                 //<-----------------------------------------------------------------------------
                 auto const findAttachmentRelationFn =
-                               [] (Vector<FrameGraphResourceId_t> const &aResourceIdIndex,
+                               [] (Vector<RenderGraphResourceId_t> const &aResourceIdIndex,
                                    Vector<uint64_t>               const &aRelationIndices,
                                    uint64_t                       const &aIndex)            -> bool
                                    {
@@ -144,18 +144,18 @@ namespace engine
 
                     for(auto const &index : attachmentResourceIndexList)
                     {
-                        FrameGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
+                        RenderGraphResourceId_t const &resourceId = viewResourceIdList.at(index);
 
-                        CEngineResult<Shared<SFrameGraphTextureView>> const textureViewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(resourceId);
+                        CEngineResult<Shared<SRenderGraphImageView>> const textureViewFetch = aRenderGraphResources.getResource<SRenderGraphImageView>(resourceId);
                         if(not textureViewFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
-                        SFrameGraphTextureView const &textureView = *(textureViewFetch.data());
+                        SRenderGraphImageView const &textureView = *(textureViewFetch.data());
 
-                        CEngineResult<Shared<SFrameGraphTextureView>> const parentTextureViewFetch = aFrameGraphResources.getResource<SFrameGraphTextureView>(textureView.parentResource);
+                        CEngineResult<Shared<SRenderGraphImageView>> const parentTextureViewFetch = aRenderGraphResources.getResource<SRenderGraphImageView>(textureView.parentResource);
                         if(not parentTextureViewFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
@@ -163,16 +163,16 @@ namespace engine
                         }
 
                         // If the parent texture view is null, the parent is a texture object.
-                        Shared<SFrameGraphTextureView> const parentTextureView = (parentTextureViewFetch.data());
+                        Shared<SRenderGraphImageView> const parentTextureView = (parentTextureViewFetch.data());
 
-                        CEngineResult<Shared<SFrameGraphTexture>> const textureFetch = aFrameGraphResources.getResource<SFrameGraphTexture>(textureView.subjacentResource);
+                        CEngineResult<Shared<SRenderGraphImage>> const textureFetch = aRenderGraphResources.getResource<SRenderGraphImage>(textureView.subjacentResource);
                         if(not textureFetch.successful())
                         {
                             CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
-                        SFrameGraphTexture const &texture = *(textureFetch.data());
+                        SRenderGraphImage const &texture = *(textureFetch.data());
 
                         // Validation first!
                         bool dimensionsValid = true;
@@ -195,7 +195,7 @@ namespace engine
 
                         if(not dimensionsValid)
                         {
-                            EngineStatusPrintOnError(EEngineStatus::FrameGraph_RenderContext_AttachmentDimensionsInvalid, logTag(), "Invalid image view dimensions for frame buffer creation.");
+                            EngineStatusPrintOnError(EEngineStatus::RenderGraph_RenderContext_AttachmentDimensionsInvalid, logTag(), "Invalid image view dimensions for frame buffer creation.");
                             return EEngineStatus::Error;
                         }
 
@@ -216,7 +216,7 @@ namespace engine
                         bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
                         bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
-                        if(nullptr != parentTextureView && EFrameGraphResourceType::TextureView == parentTextureView->type)
+                        if(nullptr != parentTextureView && ERenderGraphResourceType::TextureView == parentTextureView->type)
                         {
                             bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
                             bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
@@ -252,7 +252,7 @@ namespace engine
                                 }
                             }
                         }
-                        else if(nullptr != parentTextureView && EFrameGraphResourceType::Texture == parentTextureView->type)
+                        else if(nullptr != parentTextureView && ERenderGraphResourceType::Texture == parentTextureView->type)
                         {
                             dependency.srcPass   = VK_SUBPASS_EXTERNAL;
                             dependency.srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -268,7 +268,7 @@ namespace engine
                         }
                         else if(isDepthAttachment)
                         {
-                            if(textureView.mode.check(EFrameGraphViewAccessMode::Read))
+                            if(textureView.mode.check(ERenderGraphViewAccessMode::Read))
                             {
                                 attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
                             }
@@ -432,26 +432,26 @@ namespace engine
             auto createTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                         , Shared<CResourceManager>           aResourceManager
                                         , Shared<asset::CAssetStorage>       aAssetStorage
-                                        , SFrameGraphTransientTexture const &aTexture) -> EEngineStatus
+                                        , SRenderGraphTransientImage const &aTexture) -> EEngineStatus
             {
                 STextureDescription desc = {};
                 desc.name        = aTexture.readableName;
-                desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture);
+                desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture.description);
                 // Always set those...
                 desc.gpuBinding.set(EBufferBinding::CopySource);
                 desc.gpuBinding.set(EBufferBinding::CopyTarget);
 
-                if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::ColorAttachment))
+                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::ColorAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::ColorAttachment);
                 }
 
-                if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::DepthAttachment))
+                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::DepthAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::DepthAttachment);
                 }
 
-                if(aTexture.requestedUsage.check(EFrameGraphResourceUsage::InputAttachment))
+                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::InputAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::InputAttachment);
                 }
@@ -478,7 +478,7 @@ namespace engine
             auto destroyTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                          , Shared<CResourceManager>           aResourceManager
                                          , Shared<asset::CAssetStorage>       aAssetStorage
-                                         , SFrameGraphTransientTexture const &aTexture) -> EEngineStatus
+                                         , SRenderGraphTransientImage const &aTexture) -> EEngineStatus
             {
                 CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy transient texture.");
@@ -494,7 +494,7 @@ namespace engine
             auto initializePersistentTexture(Shared<CVulkanEnvironment>            aVulkanEnvironment
                                              , Shared<CResourceManager>            aResourceManager
                                              , Shared<asset::CAssetStorage>        aAssetStorage
-                                             , SFrameGraphPersistentTexture const &aTexture) -> EEngineStatus
+                                             , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->initializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
@@ -512,7 +512,7 @@ namespace engine
             auto updatePersistentTexture(Shared<CVulkanEnvironment>          aVulkanEnvironment
                                        , Shared<CResourceManager>            aResourceManager
                                        , Shared<asset::CAssetStorage>        aAssetStorage
-                                       , SFrameGraphPersistentTexture const &aTexture) -> EEngineStatus
+                                       , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->updateResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
@@ -530,7 +530,7 @@ namespace engine
             auto deinitializePersistentTexture(Shared<CVulkanEnvironment>          aVulkanEnvironment
                                              , Shared<CResourceManager>            aResourceManager
                                              , Shared<asset::CAssetStorage>        aAssetStorage
-                                             , SFrameGraphPersistentTexture const &aTexture) -> EEngineStatus
+                                             , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->deinitializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
@@ -545,18 +545,18 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto createTextureView(Shared<CVulkanEnvironment>         aVulkanEnvironment
-                                   , Shared<CResourceManager>         aResourceManager
-                                   , Shared<asset::CAssetStorage>     aAssetStorage
-                                   , SFrameGraphTexture        const &aTexture
-                                   , SFrameGraphTextureView    const &aView) -> EEngineStatus
+            auto createTextureView(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                   , Shared<CResourceManager>      aResourceManager
+                                   , Shared<asset::CAssetStorage>  aAssetStorage
+                                   , std::string            const &aTextureName
+                                   , SRenderGraphImageView  const &aView) -> EEngineStatus
             {
                 STextureViewDescription desc = { };
                 desc.name               = aView.readableName;
-                desc.textureFormat      = aView.format;
-                desc.subjacentTextureId = aTexture.readableName;
-                desc.arraySlices        = aView.arraySliceRange;
-                desc.mipMapSlices       = aView.mipSliceRange;
+                desc.textureFormat      = aView.description.format;
+                desc.subjacentTextureId = aTextureName;
+                desc.arraySlices        = aView.description.arraySliceRange;
+                desc.mipMapSlices       = aView.description.mipSliceRange;
 
                 CEngineResult<TextureViewResourceState_t> textureViewObject = aResourceManager->useResource<TextureViewResourceState_t>(desc.name, desc, true);
                 EngineStatusPrintOnError(textureViewObject.result(), logTag(), "Failed to create texture view.");
@@ -572,7 +572,7 @@ namespace engine
             auto destroyTextureView(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                     , Shared<CResourceManager>      aResourceManager
                                     , Shared<asset::CAssetStorage>  aAssetStorage
-                                    , SFrameGraphTextureView const &aTextureView) -> EEngineStatus
+                                    , SRenderGraphImageView const &aTextureView) -> EEngineStatus
             {
                 CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureViewResourceState_t>(aTextureView.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy textureview.");
@@ -588,7 +588,7 @@ namespace engine
             auto createTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
                                      , Shared<CResourceManager>          aResourceManager
                                      , Shared<asset::CAssetStorage>      aAssetStorage
-                                     , SFrameGraphTransientBuffer const &aBuffer) -> EEngineStatus
+                                     , SRenderGraphTransientBuffer const &aBuffer) -> EEngineStatus
             {
                 SBufferDescription desc = { };
                 desc.name = aBuffer.readableName;
@@ -597,8 +597,8 @@ namespace engine
                 createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
                 createInfo.pNext                 = nullptr;
                 createInfo.flags                 = 0;
-                createInfo.usage                 = aBuffer.bufferUsage;
-                createInfo.size                  = aBuffer.sizeInBytes;
+                createInfo.usage                 = aBuffer.description.bufferUsage;
+                createInfo.size                  = aBuffer.description.sizeInBytes;
                 // Determined in backend
                 // createInfo.sharingMode           = ...;
                 // createInfo.queueFamilyIndexCount = ...;
@@ -617,7 +617,7 @@ namespace engine
             auto destroyTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
                                       , Shared<CResourceManager>          aResourceManager
                                       , Shared<asset::CAssetStorage>      aAssetStorage
-                                      , SFrameGraphTransientBuffer const &aBuffer) -> EEngineStatus
+                                      , SRenderGraphTransientBuffer const &aBuffer) -> EEngineStatus
             {
                 CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to destroy buffer.");
@@ -632,10 +632,10 @@ namespace engine
             auto initializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
                                           , Shared<CResourceManager>           aResourceManager
                                           , Shared<asset::CAssetStorage>       aAssetStorage
-                                          , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+                                          , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
             {
                 {
-                    auto const &[successCode] = aResourceManager->deinitializeResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
+                    auto const &[successCode] = aResourceManager->initializeResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                     EngineStatusPrintOnError(successCode, logTag(), "Failed to initialize persistent buffer.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
                 }
@@ -650,7 +650,7 @@ namespace engine
             auto updatePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
                                       , Shared<CResourceManager>           aResourceManager
                                       , Shared<asset::CAssetStorage>       aAssetStorage
-                                      , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+                                      , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
             {
                 CEngineResult<> const bufferTransfer = aResourceManager->uploadResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(bufferTransfer.result(), logTag(), "Buffer initialization failed.");
@@ -666,7 +666,7 @@ namespace engine
             auto deinitializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
                                             , Shared<CResourceManager>           aResourceManager
                                             , Shared<asset::CAssetStorage>       aAssetStorage
-                                            , SFrameGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+                                            , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->deinitializeResource<TextureResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
@@ -684,11 +684,11 @@ namespace engine
             auto createBufferView(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                   , Shared<CResourceManager>      aResourceManager
                                   , Shared<asset::CAssetStorage>  aAssetStorage
-                                  , SFrameGraphBuffer      const &aBuffer
-                                  , SFrameGraphBufferView  const &aView) -> EEngineStatus
+                                  , std::string             const &aBufferName
+                                  , SRenderGraphBufferView  const &aView) -> EEngineStatus
             {
                 SBufferViewDescription desc = { };
-                desc.name = aBuffer.readableName;
+                desc.name = aBufferName;
 
                 VkBufferViewCreateInfo &createInfo = desc.createInfo;
                 createInfo.sType  = VK_STRUCTURE_TYPE_BUFFER_VIEW_CREATE_INFO;
@@ -712,7 +712,7 @@ namespace engine
             auto destroyBufferView(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                    , Shared<CResourceManager>      aResourceManager
                                    , Shared<asset::CAssetStorage>  aAssetStorage
-                                   , SFrameGraphBufferView  const &aView) -> EEngineStatus
+                                   , SRenderGraphBufferView  const &aView) -> EEngineStatus
             {
                 CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferViewResourceState_t>(aView.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize buffer.");
@@ -724,15 +724,24 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto initializeMesh(Shared<CVulkanEnvironment>  aVulkanEnvironment
-                            , Shared<CResourceManager>      aResourceManager
-                            , Shared<asset::CAssetStorage>  aAssetStorage
-                            , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+            auto initializeMesh(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                , Shared<CResourceManager>      aResourceManager
+                                , Shared<asset::CAssetStorage>  aAssetStorage
+                                , SRenderGraphMesh        const &aMesh) -> EEngineStatus
             {
-                EEngineStatus const &attributeBufferOpSuccessCode = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
-                EEngineStatus const &indexBufferOpSuccessCode     = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+                OptRef_t<MeshResourceState_t> meshOpt {};
+                {
+                    auto [success, resource] = aResourceManager->getResource<MeshResourceState_t>(aMesh.description.meshResourceId, aVulkanEnvironment);
+                    if(CheckEngineError(success))
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    meshOpt = resource;
+                }
+                MeshResourceState_t &mesh = *meshOpt;
 
-                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                auto const &[attributeBufferOpSuccessCode] = aResourceManager->initializeResource<BufferResourceState_t>(mesh.description.attributeBufferDesc.name, aVulkanEnvironment);
+                if(CheckEngineError(attributeBufferOpSuccessCode))
                 {
                     return EEngineStatus::InitializationError;
                 }
@@ -749,12 +758,21 @@ namespace engine
             auto updateMesh(Shared<CVulkanEnvironment>      aVulkanEnvironment
                             , Shared<CResourceManager>      aResourceManager
                             , Shared<asset::CAssetStorage>  aAssetStorage
-                            , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+                            , SRenderGraphMesh        const &aMesh) -> EEngineStatus
             {
-                EEngineStatus const &attributeBufferOpSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
-                EEngineStatus const &indexBufferOpSuccessCode     = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+                OptRef_t<MeshResourceState_t> meshOpt {};
+                {
+                    auto [success, resource] = aResourceManager->getResource<MeshResourceState_t>(aMesh.description.meshResourceId, aVulkanEnvironment);
+                    if(CheckEngineError(success))
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    meshOpt = resource;
+                }
+                MeshResourceState_t &mesh = *meshOpt;
 
-                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                auto const &[attributeBufferOpSuccessCode] = aResourceManager->updateResource<BufferResourceState_t>(mesh.description.attributeBufferDesc.name, aVulkanEnvironment);
+                if(CheckEngineError(attributeBufferOpSuccessCode))
                 {
                     return EEngineStatus::InitializationError;
                 }
@@ -771,12 +789,21 @@ namespace engine
             auto deinitializeMesh(Shared<CVulkanEnvironment>    aVulkanEnvironment
                                 , Shared<CResourceManager>      aResourceManager
                                 , Shared<asset::CAssetStorage>  aAssetStorage
-                                , SFrameGraphMesh        const &aMesh) -> EEngineStatus
+                                , SRenderGraphMesh        const &aMesh) -> EEngineStatus
             {
-                EEngineStatus const &attributeBufferOpSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.attributeBuffer);
-                EEngineStatus const &indexBufferOpSuccessCode     = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, aMesh.indexBuffer);
+                OptRef_t<MeshResourceState_t> meshOpt {};
+                {
+                    auto [success, resource] = aResourceManager->getResource<MeshResourceState_t>(aMesh.description.meshResourceId, aVulkanEnvironment);
+                    if(CheckEngineError(success))
+                    {
+                        return EEngineStatus::Ok;
+                    }
+                    meshOpt = resource;
+                }
+                MeshResourceState_t &mesh = *meshOpt;
 
-                if(CheckEngineError(attributeBufferOpSuccessCode) || CheckEngineError(indexBufferOpSuccessCode))
+                auto const &[attributeBufferOpSuccessCode] = aResourceManager->deinitializeResource<BufferResourceState_t>(mesh.description.attributeBufferDesc.name, aVulkanEnvironment);
+                if(CheckEngineError(attributeBufferOpSuccessCode))
                 {
                     return EEngineStatus::InitializationError;
                 }
@@ -793,7 +820,7 @@ namespace engine
             auto initializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                                   , Shared<CResourceManager>      aResourceManager
                                   , Shared<asset::CAssetStorage>  aAssetStorage
-                                  , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
+                                  , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
                 for(auto const &buffer : aMaterial.uniformBuffers)
                 {
@@ -829,7 +856,7 @@ namespace engine
             auto updateMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                               , Shared<CResourceManager>      aResourceManager
                               , Shared<asset::CAssetStorage>  aAssetStorage
-                              , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
+                              , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
                 for(auto const &buffer : aMaterial.uniformBuffers)
                 {
@@ -865,7 +892,7 @@ namespace engine
             auto deinitializeMaterial(Shared<CVulkanEnvironment>    aVulkanEnvironment
                                     , Shared<CResourceManager>      aResourceManager
                                     , Shared<asset::CAssetStorage>  aAssetStorage
-                                    , SFrameGraphMaterial    const &aMaterial) -> EEngineStatus
+                                    , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
                 for(auto const &buffer : aMaterial.uniformBuffers)
                 {
@@ -901,7 +928,7 @@ namespace engine
             auto createPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                 , Shared<CResourceManager>      aResourceManager
                                 , Shared<asset::CAssetStorage>  aAssetStorage
-                                , SFrameGraphPipeline    const &aPipeline) -> EEngineStatus
+                                , SRenderGraphPipeline    const &aPipeline) -> EEngineStatus
             {
                 // Create a pipline descriptor here and invoke creation in the resource manager.
                 // Initialize immediately.
@@ -914,7 +941,7 @@ namespace engine
             auto destroyPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                  , Shared<CResourceManager>      aResourceManager
                                  , Shared<asset::CAssetStorage>  aAssetStorage
-                                 , SFrameGraphPipeline    const &aMesh) -> EEngineStatus
+                                 , SRenderGraphPipeline    const &aMesh) -> EEngineStatus
             {
             }
         }
@@ -923,14 +950,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        framegraph::SFrameGraphResourceContext CreateResourceContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
+        framegraph::SRenderGraphResourceContext CreateResourceContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
                                                                             , Shared<CResourceManager>     aResourceManager
                                                                             , Shared<asset::CAssetStorage> aAssetStorage)
         {
             using namespace local;
             using namespace resources;
 
-            framegraph::SFrameGraphResourceContext context {};
+            framegraph::SRenderGraphResourceContext context {};
 
             // --------------------------------------------------------------------------------------------
             // RenderPass
@@ -938,13 +965,13 @@ namespace engine
             context.createRenderPass =
                 [&] (ResourceId_t                      const &aRenderPassId
                      , std::vector<PassUID_t>          const &aPassExecutionOrder
-                     , SFrameGraphAttachmentCollection const &aAttachmentInfo
-                     , CFrameGraphMutableResources     const &aFrameGraphResources)
+                     , SRenderGraphAttachmentCollection const &aAttachmentInfo
+                     , CRenderGraphMutableResources     const &aRenderGraphResources)
                     { return detail::createRenderPass(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                     , aRenderPassId
                                                     , aPassExecutionOrder
                                                     , aAttachmentInfo
-                                                    , aFrameGraphResources); };
+                                                    , aRenderGraphResources); };
             context.destroyRenderPass =
                 [&] (ResourceId_t const &aRenderPassId)
                     { return detail::destroyRenderPass(aVulkanEnvironment, aResourceManager, aAssetStorage
@@ -968,33 +995,33 @@ namespace engine
             // Textures
             // --------------------------------------------------------------------------------------------
             context.createTransientTexture =
-                [&](SFrameGraphTransientTexture const &aTexture)
+                [&](SRenderGraphTransientImage const &aTexture)
                     { return detail::createTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                             , aTexture); };
             context.destroyTransientTexture =
-                [&](SFrameGraphTransientTexture const &aTexture)
+                [&](SRenderGraphTransientImage const &aTexture)
                     { return detail::destroyTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.initializePersistentTexture =
-                [&](SFrameGraphPersistentTexture const &aTexture)
+                [&](SRenderGraphPersistentImage const &aTexture)
                     { return detail::initializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.updatePersistentTexture =
-                [&](SFrameGraphPersistentTexture const &aTexture)
+                [&](SRenderGraphPersistentImage const &aTexture)
                     { return detail::updatePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.deinitializePersistentTexture =
-                [&](SFrameGraphPersistentTexture const &aTexture)
+                [&](SRenderGraphPersistentImage const &aTexture)
                     { return detail::deinitializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.createTextureView =
-                [&] (SFrameGraphTexture const &aTexture
-                     , SFrameGraphTextureView  const &aView)
+                [&](SRenderGraphImage const &aTexture
+                     , SRenderGraphImageView  const &aView)
                     { return detail::createTextureView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                       , aTexture
                                                       , aView); };
             context.destroyTextureView =
-                [&] (SFrameGraphTextureView const &aTextureView)
+                [&](SRenderGraphImageView const &aTextureView)
                     { return detail::destroyTextureView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                       , aTextureView); };
 
@@ -1002,33 +1029,33 @@ namespace engine
             // Buffers
             // --------------------------------------------------------------------------------------------
             context.createTransientBuffer =
-                [&](SFrameGraphTransientBuffer const &aBuffer)
+                [&](SRenderGraphTransientBuffer const &aBuffer)
                     { return detail::createTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                          , aBuffer); };
             context.destroyTransientBuffer =
-                [&](SFrameGraphTransientBuffer const &aBuffer)
+                [&](SRenderGraphTransientBuffer const &aBuffer)
                     { return detail::destroyTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                           , aBuffer); };
             context.initializePersistentBuffer =
-                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphPersistentBuffer const &aBuffer)
                     { return detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                               , aBuffer); };
             context.updatePersistentBuffer =
-                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphPersistentBuffer const &aBuffer)
                     { return detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                           , aBuffer); };
             context.deinitializePersistentBuffer =
-                [&](SFrameGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphPersistentBuffer const &aBuffer)
                     { return detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                                 , aBuffer); };
             context.createBufferView =
-                [&] (SFrameGraphBuffer const &aBuffer
-                     , SFrameGraphBufferView  const &aView)
+                [&] (SRenderGraphBuffer const &aBuffer
+                     , SRenderGraphBufferView  const &aView)
                     { return detail::createBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                     , aBuffer
                                                     , aView); };
             context.destroyBufferView =
-                [&] (SFrameGraphBufferView const &aBufferView)
+                [&] (SRenderGraphBufferView const &aBufferView)
                     { return detail::destroyBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                      , aBufferView); };
 
@@ -1037,15 +1064,15 @@ namespace engine
             // Meshes
             //---------------------------------------------------------------------------------------------------------------
             context.initializeMesh =
-                [&] (SFrameGraphMesh const &aMesh)
+                [&] (SRenderGraphMesh const &aMesh)
                     { return detail::initializeMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
                                               , aMesh); };
             context.updateMesh =
-                [&] (SFrameGraphMesh const &aMesh)
+                [&] (SRenderGraphMesh const &aMesh)
                     { return detail::updateMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                 , aMesh); };
             context.deinitializeMesh =
-                [&] (SFrameGraphMesh const &aMesh)
+                [&] (SRenderGraphMesh const &aMesh)
                     { return detail::deinitializeMesh(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                     , aMesh); };
 
@@ -1053,15 +1080,15 @@ namespace engine
             // Materials
             //---------------------------------------------------------------------------------------------------------------
             context.initializeMaterial =
-                [&] (SFrameGraphMaterial const &aMaterial)
+                [&] (SRenderGraphMaterial const &aMaterial)
                     { return detail::initializeMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                       , aMaterial); };
             context.updateMaterial =
-                [&] (SFrameGraphMaterial const &aMaterial)
+                [&] (SRenderGraphMaterial const &aMaterial)
                     { return detail::updateMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                   , aMaterial); };
             context.deinitializeMaterial =
-                [&] (SFrameGraphMaterial const &aMaterial)
+                [&] (SRenderGraphMaterial const &aMaterial)
                     { return detail::deinitializeMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                         , aMaterial); };
 
@@ -1069,11 +1096,11 @@ namespace engine
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
             context.createPipeline =
-                [&] (SFrameGraphPipeline const &aPipeline)
+                [&] (SRenderGraphPipeline const &aPipeline)
                     { return detail::createPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                    , aPipeline); };
             context.destroyPipeline =
-                [&] (SFrameGraphPipeline const &aPipeline)
+                [&] (SRenderGraphPipeline const &aPipeline)
                     { return detail::destroyPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                      , aPipeline); };
         }

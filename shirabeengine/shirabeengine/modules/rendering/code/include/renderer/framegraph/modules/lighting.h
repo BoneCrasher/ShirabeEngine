@@ -16,13 +16,13 @@ namespace engine
         struct SLightingModuleTag_t {};
 
         /**
-         * The FrameGraphModule<SLightingModuleTag_t> class implements all lighting
+         * The RenderGraphModule<SLightingModuleTag_t> class implements all lighting
          * related data structs and passes.
          */
         template<>
-        class SHIRABE_TEST_EXPORT CFrameGraphModule<SLightingModuleTag_t>
+        class SHIRABE_TEST_EXPORT CRenderGraphModule<SLightingModuleTag_t>
         {
-            SHIRABE_DECLARE_LOG_TAG(FrameGraphModule<SLightingModuleTag_t>);
+            SHIRABE_DECLARE_LOG_TAG(RenderGraphModule<SLightingModuleTag_t>);
 
         public_structs:
             /**
@@ -31,13 +31,13 @@ namespace engine
              */
             struct SLightingImportData
             {
-                SFrameGraphTextureView gbuffer0;
-                SFrameGraphTextureView gbuffer1;
-                SFrameGraphTextureView gbuffer2;
-                SFrameGraphTextureView gbuffer3;
-                SFrameGraphTextureView depth;
+                SRenderGraphImageView gbuffer0;
+                SRenderGraphImageView gbuffer1;
+                SRenderGraphImageView gbuffer2;
+                SRenderGraphImageView gbuffer3;
+                SRenderGraphImageView depth;
 
-                SFrameGraphMaterial material;
+                SRenderGraphMaterial material;
             };
 
             /**
@@ -46,7 +46,7 @@ namespace engine
              */
             struct SLightingExportData
             {
-                SFrameGraphTextureView lightAccumulationBuffer;
+                SRenderGraphImageView lightAccumulationBuffer;
             };
 
         public_methods:
@@ -62,13 +62,13 @@ namespace engine
              * @return              Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SLightingExportData> addLightingPass(
-                    std::string const      &aPassName,
+                std::string const      &aPassName,
                     CGraphBuilder          &aGraphBuilder,
-                    SFrameGraphTextureView &aGbuffer0,
-                    SFrameGraphTextureView &aGbuffer1,
-                    SFrameGraphTextureView &aGbuffer2,
-                    SFrameGraphTextureView &aGbuffer4,
-                    SFrameGraphTextureView &aDepthStencil);
+                    SRenderGraphImageView &aGbuffer0,
+                    SRenderGraphImageView &aGbuffer1,
+                    SRenderGraphImageView &aGbuffer2,
+                    SRenderGraphImageView &aGbuffer4,
+                    SRenderGraphImageView &aDepthStencil);
 
         };
 

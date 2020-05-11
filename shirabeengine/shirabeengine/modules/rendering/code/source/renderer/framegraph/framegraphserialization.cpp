@@ -14,7 +14,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::CFrameGraphSerializationResult(std::string const &aResult)
+        CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult::CRenderGraphSerializationResult(std::string const &aResult)
             : IResult()
             , mResult(aResult)
         {}
@@ -23,7 +23,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::asString(std::string &aOutString) const
+        bool CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult::asString(std::string &aOutString) const
         {
             aOutString = mResult;
             return true;
@@ -33,7 +33,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::CFrameGraphSerializationResult::asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const
+        bool CRenderGraphGraphVizSerializer::CRenderGraphSerializationResult::asBinaryBuffer(std::vector<uint8_t> &aOutBuffer) const
         {
             aOutBuffer = std::vector<uint8_t>(mResult.begin(), mResult.end());
             return true;
@@ -43,7 +43,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::initialize()
+        bool CRenderGraphGraphVizSerializer::initialize()
         {
             return true;
         }
@@ -52,7 +52,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::deinitialize()
+        bool CRenderGraphGraphVizSerializer::deinitialize()
         {
             mStream.str("");
             return true;
@@ -62,13 +62,13 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        using FilterElementCompareCallbackFunction_t = std::function<bool(SFrameGraphResource const&)>;
+        using FilterElementCompareCallbackFunction_t = std::function<bool(SRenderGraphResource const&)>;
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        using FilterFunction_t = std::function<FrameGraphResourceIdList(FrameGraphResourceIdList const&, FilterElementCompareCallbackFunction_t const&)>;
+        using FilterFunction_t = std::function<RenderGraphResourceIdList(RenderGraphResourceIdList const&, FilterElementCompareCallbackFunction_t const&)>;
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -76,16 +76,16 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::serialize(
+        bool CRenderGraphGraphVizSerializer::serialize(
                 CGraph                   const &aSource,
                 Shared<IResult>       &aOutResult)
         {
-            Shared<CFrameGraphSerializationResult> result = nullptr;
+            Shared<CRenderGraphSerializationResult> result = nullptr;
 
             bool const serialized = serializeGraph(aSource);
             if(serialized)
             {
-                result = makeShared<CFrameGraphSerializationResult>(mStream.str());
+                result = makeShared<CRenderGraphSerializationResult>(mStream.str());
                 mStream.str(std::string());
             }
 
@@ -96,19 +96,19 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::serializeGraph(CGraph const &aGraph)
+        bool CRenderGraphGraphVizSerializer::serializeGraph(CGraph const &aGraph)
         {
 
 
-            Unique<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CFrameGraphGraphVizSerializer>());
+            Unique<CGraph::CAccessor> accessor = aGraph.getAccessor(CPassKey<CRenderGraphGraphVizSerializer>());
 
-            CFrameGraphResources const &resources = accessor->resourceData();
+            CRenderGraphResources const &resources = accessor->resourceData();
 
             FilterFunction_t const filter = [&](
-                    FrameGraphResourceIdList               const &aUIDs,
-                    FilterElementCompareCallbackFunction_t const &aCallback) -> FrameGraphResourceIdList
+                    RenderGraphResourceIdList               const &aUIDs,
+                    FilterElementCompareCallbackFunction_t const &aCallback) -> RenderGraphResourceIdList
             {
-                FrameGraphResourceIdList output{ };
+                RenderGraphResourceIdList output{ };
                 if(aUIDs.empty())
                     return output;
 
@@ -116,13 +116,13 @@ namespace engine
                             aUIDs.begin(),
                             aUIDs.end(),
                             std::back_inserter(output),
-                            [&] (FrameGraphResourceId_t const &aId) -> bool
+                            [&] (RenderGraphResourceId_t const &aId) -> bool
                 {
                     if(resources.resources().size() <= aId)
                         return false;
 
                     if(aCallback)
-                        return aCallback(*resources.get<SFrameGraphResource>(aId));
+                        return aCallback(*resources.get<SRenderGraphResource>(aId));
 
                     return false;
                 });
@@ -135,35 +135,35 @@ namespace engine
             // Write registered resources
             for(RefIndex_t::value_type const &textureRef : resources.textures())
             {
-                SFrameGraphDynamicTexture const &texture = *resources.get<SFrameGraphTexture>(textureRef);
+                SRenderGraphDynamicTexture const &texture = *resources.get<SRenderGraphImage>(textureRef);
                 writeTextureResource(texture);
             }
 
             for(RefIndex_t::value_type const &textureViewRef : resources.textureViews())
             {
-                SFrameGraphTextureView const &view   = *resources.get<SFrameGraphTextureView>(textureViewRef);
-                SFrameGraphResource    const &parent = *resources.get<SFrameGraphResource>(view.parentResource);
+                SRenderGraphImageView const &view   = *resources.get<SRenderGraphImageView>(textureViewRef);
+                SRenderGraphResource    const &parent = *resources.get<SRenderGraphResource>(view.parentResource);
 
                 writeTextureResourceView(parent, view);
             }
 
             for(RefIndex_t::value_type const &renderableListRef : resources.renderablesLists())
             {
-                SFrameGraphRenderableList const &list = *resources.get<SFrameGraphRenderableList>(renderableListRef);
+                SRenderGraphRenderableList const &list = *resources.get<SRenderGraphRenderableList>(renderableListRef);
 
                 writeRenderableList(list);
             }
 
             for(RefIndex_t::value_type const &renderableListViewRef : resources.renderableListViews())
             {
-                SFrameGraphRenderableListView const &view   = *resources.get<SFrameGraphRenderableListView>(renderableListViewRef);
-                SFrameGraphResource           const &parent = *resources.get<SFrameGraphResource>(view.parentResource);
+                SRenderGraphRenderableListView const &view   = *resources.get<SRenderGraphRenderableListView>(renderableListViewRef);
+                SRenderGraphResource           const &parent = *resources.get<SRenderGraphResource>(view.parentResource);
                 writeRenderableListView(parent, view);
             }
 
             // Write passes and adjacent resources
             AdjacencyListMap_t<PassUID_t>                         const &passAdjacency    = accessor->passAdjacency();
-            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> const &passResourcesAdj = accessor->passToResourceAdjacency();
+            AdjacencyListMap_t<PassUID_t, RenderGraphResourceId_t> const &passResourcesAdj = accessor->passToResourceAdjacency();
 
             std::stack<PassUID_t> passOrderCopy = accessor->passExecutionOrder();
 
@@ -185,55 +185,55 @@ namespace engine
                     // Write out the passes' resources
                     if(passResourcesAdj.find(sourceUID) != passResourcesAdj.end())
                     {
-                        FrameGraphResourceIdList const &passResources = passResourcesAdj.at(sourceUID);
+                        RenderGraphResourceIdList const &passResources = passResourcesAdj.at(sourceUID);
 
                         // Create Texture
-                        auto textureCreateFilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        auto textureCreateFilterFn = [] (SRenderGraphResource const &aInput) -> bool
                         {
-                                return (aInput.type == EFrameGraphResourceType::Texture /* && aInput.assignedPassUID != 0 */);
+                                return (aInput.type == ERenderGraphResourceType::Texture /* && aInput.assignedPassUID != 0 */);
                         };
-                        std::vector<FrameGraphResourceId_t> const creations = filter(passResources, textureCreateFilterFn);
+                        std::vector<RenderGraphResourceId_t> const creations = filter(passResources, textureCreateFilterFn);
 
                         if(!creations.empty())
                         {
-                            for(FrameGraphResourceId_t const &id : creations)
+                            for(RenderGraphResourceId_t const &id : creations)
                             {
-                                SFrameGraphTexture const &texture = *resources.get<SFrameGraphTexture>(id);
+                                SRenderGraphImage const &texture = *resources.get<SRenderGraphImage>(id);
                                 writePass2TextureResourceEdge(texture);
                             }
                         }
 
                         // Read/Write Texture
-                        auto const textureViewfilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        auto const textureViewfilterFn = [] (SRenderGraphResource const &aInput) -> bool
                         {
-                            return (aInput.type == EFrameGraphResourceType::TextureView);
+                            return (aInput.type == ERenderGraphResourceType::TextureView);
                         };
-                        std::vector<FrameGraphResourceId_t> readViews = filter(passResources, textureViewfilterFn);
+                        std::vector<RenderGraphResourceId_t> readViews = filter(passResources, textureViewfilterFn);
 
                         if(!readViews.empty())
                         {
-                            for(FrameGraphResourceId_t const &id : readViews)
+                            for(RenderGraphResourceId_t const &id : readViews)
                             {
-                                SFrameGraphTextureView const &view           = *resources.get<SFrameGraphTextureView>(id);
-                                SFrameGraphResource    const &parentResource = *resources.get<SFrameGraphResource>(view.parentResource);
+                                SRenderGraphImageView const &view           = *resources.get<SRenderGraphImageView>(id);
+                                SRenderGraphResource    const &parentResource = *resources.get<SRenderGraphResource>(view.parentResource);
 
                                 writeTextureResourceViewEdge(sourceUID, parentResource, view);
                             }
                         }
 
                         // Use Renderables
-                        auto const renderableFilterFn = [] (SFrameGraphResource const &aInput) -> bool
+                        auto const renderableFilterFn = [] (SRenderGraphResource const &aInput) -> bool
                         {
-                            return (aInput.type == EFrameGraphResourceType::RenderableListView);
+                            return (aInput.type == ERenderGraphResourceType::RenderableListView);
                         };
-                        std::vector<FrameGraphResourceId_t> renderableListViews = filter(passResources, renderableFilterFn);
+                        std::vector<RenderGraphResourceId_t> renderableListViews = filter(passResources, renderableFilterFn);
 
                         if(!renderableListViews.empty())
                         {
-                            for(FrameGraphResourceId_t const &id : renderableListViews)
+                            for(RenderGraphResourceId_t const &id : renderableListViews)
                             {
-                                SFrameGraphRenderableListView const&view           = *resources.get<SFrameGraphRenderableListView>(id);
-                                SFrameGraphResource           const&parentResource = *resources.get<SFrameGraphResource>(view.parentResource);
+                                SRenderGraphRenderableListView const&view           = *resources.get<SRenderGraphRenderableListView>(id);
+                                SRenderGraphResource           const&parentResource = *resources.get<SRenderGraphResource>(view.parentResource);
 
                                 writeRenderableResourceViewEdge(parentResource, view);
                             }
@@ -263,7 +263,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::serializePass(CPassBase const &aPass)
+        bool CRenderGraphGraphVizSerializer::serializePass(CPassBase const &aPass)
         {
             writePass(aPass);
 
@@ -274,7 +274,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizSerializer::serializeResource(SFrameGraphResource const &aResource)
+        bool CRenderGraphGraphVizSerializer::serializeResource(SRenderGraphResource const &aResource)
         {
             return true;
         }
@@ -283,7 +283,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizDeserializer::deserializeGraph(CGraph &aGraph)
+        bool CRenderGraphGraphVizDeserializer::deserializeGraph(CGraph &aGraph)
         {
             return true;
         }
@@ -292,7 +292,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizDeserializer::deserializePass(CPassBase &aPass)
+        bool CRenderGraphGraphVizDeserializer::deserializePass(CPassBase &aPass)
         {
             return true;
         }
@@ -301,7 +301,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphGraphVizDeserializer::deserializeResource(SFrameGraphResource &aResource)
+        bool CRenderGraphGraphVizDeserializer::deserializeResource(SRenderGraphResource &aResource)
         {
             return true;
         }
@@ -310,10 +310,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::beginGraph()
+        void CRenderGraphGraphVizSerializer::beginGraph()
         {
             mStream
-                    << "strict digraph FrameGraph {\n"
+                    << "strict digraph RenderGraph {\n"
                     << "  rankdir=LR;\n"
                     << "  colorscheme=svg;\n"
                     << "  overlap=false;\n"
@@ -328,7 +328,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::endGraph()
+        void CRenderGraphGraphVizSerializer::endGraph()
         {
             mStream << "}";
         }
@@ -337,7 +337,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writePass(CPassBase const &aPass)
+        void CRenderGraphGraphVizSerializer::writePass(CPassBase const &aPass)
         {
             std::string const passLabel = CString::format(
                         "<<table bgcolor=\"#429692\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
@@ -354,7 +354,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writePassEdge(
+        void CRenderGraphGraphVizSerializer::writePassEdge(
                 PassUID_t const &aSource,
                 PassUID_t const &aTarget)
         {
@@ -366,8 +366,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeRenderableList(
-                SFrameGraphRenderableList const &aList)
+        void CRenderGraphGraphVizSerializer::writeRenderableList(
+                SRenderGraphRenderableList const &aList)
         {
             static constexpr char const*listStyle = "shape=none";
             std::string const listLabel =
@@ -387,9 +387,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeRenderableListView(
-                SFrameGraphResource           const &aParentResource,
-                SFrameGraphRenderableListView const &aView)
+        void CRenderGraphGraphVizSerializer::writeRenderableListView(
+                SRenderGraphResource           const &aParentResource,
+                SRenderGraphRenderableListView const &aView)
         {
             std::string viewId = CString::format("RenderableListView{}", aView.resourceId);
 
@@ -411,15 +411,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeRenderableResourceViewEdge(
-                SFrameGraphResource           const &aParentResource,
-                SFrameGraphRenderableListView const &aView)
+        void CRenderGraphGraphVizSerializer::writeRenderableResourceViewEdge(
+                SRenderGraphResource           const &aParentResource,
+                SRenderGraphRenderableListView const &aView)
         {
             std::string const passId   = CString::format("Pass{}", aView.assignedPassUID);
             std::string const viewId   = CString::format("RenderableListView{}", aView.resourceId);
             std::string       parentId = "";
 
-            if(aParentResource.type == EFrameGraphResourceType::RenderableList)
+            if(aParentResource.type == ERenderGraphResourceType::RenderableList)
             {
                 parentId = CString::format("RenderableList{}", aParentResource.resourceId);
             }
@@ -439,7 +439,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeTextureResource(SFrameGraphTexture const &aTexture)
+        void CRenderGraphGraphVizSerializer::writeTextureResource(SRenderGraphImage const &aTexture)
         {
             std::string mode = "create";
             if(aTexture.isExternalResource)
@@ -476,7 +476,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writePass2TextureResourceEdge(SFrameGraphTexture const &aTexture)
+        void CRenderGraphGraphVizSerializer::writePass2TextureResourceEdge(SRenderGraphImage const &aTexture)
         {
             bool const isImported = aTexture.isExternalResource;
 
@@ -498,14 +498,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeTextureResourceView(
-                SFrameGraphResource     const &aParentResource,
-                SFrameGraphTextureView  const &aView)
+        void CRenderGraphGraphVizSerializer::writeTextureResourceView(
+                SRenderGraphResource     const &aParentResource,
+                SRenderGraphImageView  const &aView)
         {
-            bool const viewIsReadMode  = aView.mode.check(EFrameGraphViewAccessMode::Read);
-            bool const viewIsWriteMode = aView.mode.check(EFrameGraphViewAccessMode::Write);
-            bool const viewIsFwdMode   = aView.mode.check(EFrameGraphViewAccessMode::Forward);
-            bool const viewIsAckMode   = aView.mode.check(EFrameGraphViewAccessMode::Accept);
+            bool const viewIsReadMode  = aView.mode.check(ERenderGraphViewAccessMode::Read);
+            bool const viewIsWriteMode = aView.mode.check(ERenderGraphViewAccessMode::Write);
+            bool const viewIsFwdMode   = aView.mode.check(ERenderGraphViewAccessMode::Forward);
+            bool const viewIsAckMode   = aView.mode.check(ERenderGraphViewAccessMode::Accept);
 
             std::string viewId   = CString::format("TextureView{}", aView.resourceId);
 
@@ -549,17 +549,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void CFrameGraphGraphVizSerializer::writeTextureResourceViewEdge(
+        void CRenderGraphGraphVizSerializer::writeTextureResourceViewEdge(
                 PassUID_t               const &aPassUID,
-                SFrameGraphResource     const &aParentResource,
-                SFrameGraphTextureView  const &aView)
+                SRenderGraphResource     const &aParentResource,
+                SRenderGraphImageView  const &aView)
         {
-            bool parentResourceIsTexture     = (aParentResource.type == EFrameGraphResourceType::Texture);
-            bool parentResourceIsTextureView = (aParentResource.type == EFrameGraphResourceType::TextureView);
-            bool viewIsReadMode              = aView.mode.check(EFrameGraphViewAccessMode::Read);
-            bool viewIsWriteMode             = aView.mode.check(EFrameGraphViewAccessMode::Write);
-            bool viewIsFwdMode               = aView.mode.check(EFrameGraphViewAccessMode::Forward);
-            bool viewIsAckMode               = aView.mode.check(EFrameGraphViewAccessMode::Accept);
+            bool parentResourceIsTexture     = (aParentResource.type == ERenderGraphResourceType::Texture);
+            bool parentResourceIsTextureView = (aParentResource.type == ERenderGraphResourceType::TextureView);
+            bool viewIsReadMode              = aView.mode.check(ERenderGraphViewAccessMode::Read);
+            bool viewIsWriteMode             = aView.mode.check(ERenderGraphViewAccessMode::Write);
+            bool viewIsFwdMode               = aView.mode.check(ERenderGraphViewAccessMode::Forward);
+            bool viewIsAckMode               = aView.mode.check(ERenderGraphViewAccessMode::Accept);
 
             std::string const passId   = CString::format("Pass{}", aPassUID);
             std::string const viewId   = CString::format("TextureView{}", aView.resourceId);

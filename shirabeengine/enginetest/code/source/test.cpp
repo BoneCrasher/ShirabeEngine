@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
 	thread.join();*/
 
-  Test::FrameGraph::Test__FrameGraph test_framegraph{};
+  Test::RenderGraph::Test__RenderGraph test_framegraph{};
   test_framegraph.testAll();
   
   // using namespace Engine::Documents;

@@ -10,24 +10,24 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult
         <
-            CFrameGraphModule<SCompositingModuleTag_t>::SExportData
+            CRenderGraphModule<SCompositingModuleTag_t>::SExportData
         >
-        CFrameGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
-                std::string const      &aPassName,
+        CRenderGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
+            std::string const      &aPassName,
                 CGraphBuilder          &aGraphBuilder,
-                SFrameGraphTextureView &aGbuffer0,
-                SFrameGraphTextureView &aGbuffer1,
-                SFrameGraphTextureView &aGbuffer2,
-                SFrameGraphTextureView &aGbuffer3,
-                SFrameGraphTextureView &aDepthStencil,
-                SFrameGraphTextureView &aLightAccumulationBuffer)
+                SRenderGraphImageView &aGbuffer0,
+                SRenderGraphImageView &aGbuffer1,
+                SRenderGraphImageView &aGbuffer2,
+                SRenderGraphImageView &aGbuffer3,
+                SRenderGraphImageView &aDepthStencil,
+                SRenderGraphImageView &aLightAccumulationBuffer)
         {
             /**
              * The SState struct is the internal state of the compositing pass.
              */
             struct SState
             {
-                SFrameGraphRenderTarget compositingBufferId;
+                SRenderGraphRenderTarget compositingBufferId;
             };
 
             /**
@@ -44,41 +44,41 @@ namespace engine
 
             auto const setup = [&] (CPassBuilder                       &aBuilder
                                     , SPassData                        &aOutPassData
-                                    , SFrameGraphPlatformContext const &aPlatformContext
-                                    , SFrameGraphDataSource const      &aDataSource)
+                                    , SRenderGraphPlatformContext const &aPlatformContext
+                                    , SRenderGraphDataSource const      &aDataSource)
                     -> CEngineResult<>
             {
                 auto gbufferTextureFetch = aGraphBuilder.getResources()
-                                                        .getResource<SFrameGraphTexture>(aGbuffer0.subjacentResource);
+                                                        .getResource<SRenderGraphImage>(aGbuffer0.subjacentResource);
                 if(not gbufferTextureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch gbuffer texure.");
                     return { EEngineStatus::Error };
                 }
 
-                SFrameGraphTexture gbufferTexture = *(gbufferTextureFetch.data());
+                SRenderGraphImage gbufferTexture = *(gbufferTextureFetch.data());
 
-                SFrameGraphRenderTarget compositingBufferDesc ={ };
+                SRenderGraphRenderTarget compositingBufferDesc ={ };
                 compositingBufferDesc.width          = gbufferTexture.width;
                 compositingBufferDesc.height         = gbufferTexture.height;
                 compositingBufferDesc.depth          = 1;
-                compositingBufferDesc.format         = FrameGraphFormat_t::B8G8R8A8_UNORM;
+                compositingBufferDesc.format         = RenderGraphFormat_t::B8G8R8A8_UNORM;
                 compositingBufferDesc.mipLevels      = 1;
                 compositingBufferDesc.arraySize      = 1;
-                compositingBufferDesc.initialState   = EFrameGraphResourceInitState::Clear;
-                compositingBufferDesc.permittedUsage = EFrameGraphResourceUsage::InputAttachment | EFrameGraphResourceUsage::ColorAttachment;
+                compositingBufferDesc.initialState   = ERenderGraphResourceInitState::Clear;
+                compositingBufferDesc.permittedUsage = ERenderGraphResourceUsage::InputAttachment | ERenderGraphResourceUsage::ColorAttachment;
 
                 aOutPassData.state.compositingBufferId = aBuilder.createRenderTarget("Compositing Buffer", compositingBufferDesc).data();
 
-                SFrameGraphReadTextureFlags readFlags{ };
-                readFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                readFlags.readSource      = EFrameGraphReadSource::Color;
+                SRenderGraphReadTextureFlags readFlags{ };
+                readFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                readFlags.readSource      = ERenderGraphReadSource::Color;
                 readFlags.arraySliceRange = CRange(0, 1);
                 readFlags.mipSliceRange   = CRange(0, 1);
 
-                SFrameGraphReadTextureFlags depthReadFlags{ };
-                depthReadFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                depthReadFlags.readSource      = EFrameGraphReadSource::Depth;
+                SRenderGraphReadTextureFlags depthReadFlags{ };
+                depthReadFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                depthReadFlags.readSource      = ERenderGraphReadSource::Depth;
                 depthReadFlags.arraySliceRange = CRange(0, 1);
                 depthReadFlags.mipSliceRange   = CRange(0, 1);
 
@@ -89,28 +89,28 @@ namespace engine
                 aOutPassData.importData.depth                   = aBuilder.readAttachment(aDepthStencil,            depthReadFlags).data();
                 aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aLightAccumulationBuffer, readFlags     ).data();
 
-                SFrameGraphWriteTextureFlags writeFlags{ };
-                writeFlags.requiredFormat  = FrameGraphFormat_t::Automatic;
-                writeFlags.writeTarget     = EFrameGraphWriteTarget::Color;
+                SRenderGraphWriteTextureFlags writeFlags{ };
+                writeFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
+                writeFlags.writeTarget     = ERenderGraphWriteTarget::Color;
                 writeFlags.arraySliceRange = CRange(0, 1);
                 writeFlags.mipSliceRange   = CRange(0, 1);
 
                 aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
-                SFrameGraphPipelineConfig pipelineConfig {};
-                SFrameGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta"), pipelineConfig).data();
+                SRenderGraphPipelineConfig pipelineConfig {};
+                SRenderGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta"), pipelineConfig).data();
                 aOutPassData.importData.material = material;
 
                 return { EEngineStatus::Ok };
             };
 
             auto const execute = [=] (SPassData const                    &aPassData
-                                      , SFrameGraphPlatformContext const &aPlatformContext
-                                      , SFrameGraphDataSource const      &aDataSource
-                                      , CFrameGraphResources const       &aFrameGraphResources
-                                      , SFrameGraphRenderContextState    &aRenderContextState
-                                      , SFrameGraphResourceContext       &aResourceContext
-                                      , SFrameGraphRenderContext         &aRenderContext)
+                                      , SRenderGraphPlatformContext const &aPlatformContext
+                                      , SRenderGraphDataSource const      &aDataSource
+                                      , CRenderGraphResources const       &aRenderGraphResources
+                                      , SRenderGraphRenderContextState    &aRenderContextState
+                                      , SRenderGraphResourceContext       &aResourceContext
+                                      , SRenderGraphRenderContext         &aRenderContext)
                     -> CEngineResult<>
             {
                 CLog::Verbose(logTag(), "Compositing");

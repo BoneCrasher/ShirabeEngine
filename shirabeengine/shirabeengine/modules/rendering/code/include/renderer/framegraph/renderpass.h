@@ -21,8 +21,8 @@ namespace engine::framegraph
     public_constructors:
         CRenderPass(RenderPassUID_t const         &aRenderPassUid
                     , std::string const           &aRenderPassName
-                    , FrameGraphResourceIdList    &aAccumulatedResourceReferences
-                    , CFrameGraphMutableResources &aAccumulatedResourceData)
+                    , RenderGraphResourceIdList    &aAccumulatedResourceReferences
+                    , CRenderGraphMutableResources &aAccumulatedResourceData)
             : mRenderPassUid(aRenderPassUid)
             , mRenderPassName(aRenderPassName)
             , mSubpassAdjacency()
@@ -37,8 +37,8 @@ namespace engine::framegraph
         SHIRABE_INLINE RenderPassUID_t const &getRenderPassUid() const { return mRenderPassUid; }
         SHIRABE_INLINE std::string     const &getRenderPassName() const { return mRenderPassName; }
 
-        SHIRABE_INLINE SFrameGraphAttachmentCollection const &attachments() const { return mAttachments; }
-        SHIRABE_INLINE SFrameGraphAttachmentCollection &attachments() { return mAttachments; }
+        SHIRABE_INLINE SRenderGraphAttachmentCollection const &attachments() const { return mAttachments; }
+        SHIRABE_INLINE SRenderGraphAttachmentCollection &attachments() { return mAttachments; }
 
         void addSubpass(Shared<CPassBase> const &aPass);
 
@@ -53,10 +53,10 @@ namespace engine::framegraph
         PassMap                   mSubpasses;
         CAdjacencyTree<PassUID_t> mSubpassAdjacency;
 
-        CFrameGraphMutableResources &mAccumulatedResourceData;
-        FrameGraphResourceIdList    &mAccumulatedResourceReferences;
+        CRenderGraphMutableResources &mAccumulatedResourceData;
+        RenderGraphResourceIdList    &mAccumulatedResourceReferences;
 
-        SFrameGraphAttachmentCollection mAttachments;
+        SRenderGraphAttachmentCollection mAttachments;
     };
 
     SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CRenderPass>, CRenderPassPass);

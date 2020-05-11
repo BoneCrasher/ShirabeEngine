@@ -12,7 +12,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-        bool CGraph::acceptSerializer(IFrameGraphSerializer &aSerializer) const
+        bool CGraph::acceptSerializer(IRenderGraphSerializer &aSerializer) const
         {
             aSerializer.serializeGraph(*this);
         }
@@ -21,7 +21,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CGraph::acceptDeserializer(IFrameGraphDeserializer &aDeserializer)
+        bool CGraph::acceptDeserializer(IRenderGraphDeserializer &aDeserializer)
         {
             aDeserializer.deserializeGraph(*this);
         }
@@ -56,11 +56,11 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::execute(SFrameGraphDataSource    const &aDataSource
-                                      , SFrameGraphResourceContext     &aResourceContext
-                                      , SFrameGraphRenderContext       &aRenderContext)
+        CEngineResult<> CGraph::execute(SRenderGraphDataSource    const &aDataSource
+                                      , SRenderGraphResourceContext     &aResourceContext
+                                      , SRenderGraphRenderContext       &aRenderContext)
         {
-            SFrameGraphRenderContextState renderContextState {};
+            SRenderGraphRenderContextState renderContextState {};
 
             if(EGraphMode::Graphics == mGraphMode)
             {
@@ -119,15 +119,15 @@ namespace engine
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
             {
-                CEngineResult<Shared<SFrameGraphTextureView>> const sourceResourceFetch = mResourceData.getResource<SFrameGraphTextureView>(mOutputTextureResourceId);
+                CEngineResult<Shared<SRenderGraphImageView>> const sourceResourceFetch = mResourceData.getResource<SRenderGraphImageView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture view."));
                     return {sourceResourceFetch.result()};
                 }
 
-                CEngineResult<Shared<SFrameGraphTexture>> const parentResourceFetch = mResourceData.getResource<SFrameGraphTexture>(sourceResourceFetch.data()
-                    ->subjacentResource);
+                CEngineResult<Shared<SRenderGraphImage>> const parentResourceFetch = mResourceData.getResource<SRenderGraphImage>(sourceResourceFetch.data()
+                                                                                                                                                   ->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
                     CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));

@@ -11,13 +11,13 @@ namespace engine
 {
     namespace framegraph
     {
-        struct SFrameGraphRenderContext;
-        struct SFrameGraphResourceContext;
+        struct SRenderGraphRenderContext;
+        struct SRenderGraphResourceContext;
     }
 
     namespace vulkan
     {
-        static framegraph::SFrameGraphResourceContext
+        static framegraph::SRenderGraphResourceContext
             CreateResourceContextForVulkan(Shared<CVulkanEnvironment>   aVulkanEnvironment
                                          , Shared<CResourceManager>     aResourceManager
                                          , Shared<asset::CAssetStorage> aAssetStorage);

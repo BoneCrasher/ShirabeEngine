@@ -41,8 +41,8 @@ namespace engine
     using material::CMaterialLoader;
     using mesh::CMeshLoader;
     using textures::CTextureLoader;
-    using framegraph::SFrameGraphRenderContext;
-    using framegraph::SFrameGraphResourceContext;
+    using framegraph::SRenderGraphRenderContext;
+    using framegraph::SRenderGraphResourceContext;
 
     /**
      * @brief The CEngineInstance class
@@ -103,8 +103,8 @@ namespace engine
 
         // Rendering
         Shared<CVulkanEnvironment>         mVulkanEnvironment;
-        Shared<SFrameGraphRenderContext>   mRenderContext;
-        Shared<SFrameGraphResourceContext> mResourceContext;
+        Shared<SRenderGraphRenderContext>   mRenderContext;
+        Shared<SRenderGraphResourceContext> mResourceContext;
         Shared<CRenderer>                  mRenderer;
 
         // Internals

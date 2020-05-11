@@ -19,7 +19,7 @@ namespace engine
         using engine::serialization::IDeserializer;
         using engine::serialization::IDeserializable;
         /**
-         * The IFrameGraphSerializer interface describes the basic requiremets
+         * The IRenderGraphSerializer interface describes the basic requiremets
          * to serialize a material instance.
          */
         template <typename T>
@@ -80,7 +80,7 @@ namespace engine
         };
 
         /**
-         * The IFrameGraphSerializer interface describes the basic requiremets
+         * The IRenderGraphSerializer interface describes the basic requiremets
          * to deserialize a material instance.
          */
         template <typename T>

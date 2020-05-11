@@ -9,16 +9,16 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<EFrameGraphResourceType>(EFrameGraphResourceType const&type)
+    std::string convert_to_string<ERenderGraphResourceType>(ERenderGraphResourceType const&type)
     {
         switch(type)
         {
         default:
-        case EFrameGraphResourceType::Undefined:   return "Undefined";
-        case EFrameGraphResourceType::Texture:     return "Texture";
-        case EFrameGraphResourceType::Buffer:      return "Buffer";
-        case EFrameGraphResourceType::TextureView: return "TextureView";
-        case EFrameGraphResourceType::BufferView:  return "BufferView";
+        case ERenderGraphResourceType::Undefined:   return "Undefined";
+        case ERenderGraphResourceType::Texture:     return "Texture";
+        case ERenderGraphResourceType::Buffer:      return "Buffer";
+        case ERenderGraphResourceType::TextureView: return "TextureView";
+        case ERenderGraphResourceType::BufferView:  return "BufferView";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -27,59 +27,59 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<FrameGraphFormat_t>(FrameGraphFormat_t const &aFormat)
+    std::string convert_to_string<RenderGraphFormat_t>(RenderGraphFormat_t const &aFormat)
     {
         switch(aFormat)
         {
         default:
-        case FrameGraphFormat_t::Undefined:                return "Undefined";
-        case FrameGraphFormat_t::Automatic:                return "Automatic";
-        case FrameGraphFormat_t::Structured:               return "Structured";
-        case FrameGraphFormat_t::R8_TYPELESS:              return "R8_TYPELESS";
-        case FrameGraphFormat_t::R8_SINT:                  return "R8_SINT";
-        case FrameGraphFormat_t::R8_UINT:                  return "R8_UINT";
-        case FrameGraphFormat_t::R8_SNORM:                 return "R8_SNORM";
-        case FrameGraphFormat_t::R8_UNORM:                 return "R8_UNORM";
-        case FrameGraphFormat_t::R8G8B8A8_TYPELESS:        return "R8G8B8A8_TYPELESS";
-        case FrameGraphFormat_t::R8G8B8A8_SINT:            return "R8G8B8A8_SINT";
-        case FrameGraphFormat_t::R8G8B8A8_UINT:            return "R8G8B8A8_UINT";
-        case FrameGraphFormat_t::R8G8B8A8_SNORM:           return "R8G8B8A8_SNORM";
-        case FrameGraphFormat_t::R8G8B8A8_UNORM:           return "R8G8B8A8_UNORM";
-        case FrameGraphFormat_t::R8G8B8A8_UNORM_SRGB:      return "R8G8B8A8_UNORM_SRGB";
-        case FrameGraphFormat_t::R8G8B8A8_FLOAT:           return "R8G8B8A8_FLOAT";
-        case FrameGraphFormat_t::B8G8R8A8_TYPELESS:        return "B8G8R8A8_TYPELESS";
-        case FrameGraphFormat_t::B8G8R8A8_SINT:            return "B8G8R8A8_SINT";
-        case FrameGraphFormat_t::B8G8R8A8_UINT:            return "B8G8R8A8_UINT";
-        case FrameGraphFormat_t::B8G8R8A8_SNORM:           return "B8G8R8A8_SNORM";
-        case FrameGraphFormat_t::B8G8R8A8_UNORM:           return "B8G8R8A8_UNORM";
-        case FrameGraphFormat_t::B8G8R8A8_UNORM_SRGB:      return "B8G8R8A8_UNORM_SRGB";
-        case FrameGraphFormat_t::B8G8R8A8_FLOAT:           return "B8G8R8A8_FLOAT";
-        case FrameGraphFormat_t::R16_TYPELESS:             return "R16_TYPELESS";
-        case FrameGraphFormat_t::R16_SINT:                 return "R16_SINT";
-        case FrameGraphFormat_t::R16_UINT:                 return "R16_UINT";
-        case FrameGraphFormat_t::R16_SNORM:                return "R16_SNORM";
-        case FrameGraphFormat_t::R16_UNORM:                return "R16_UNORM";
-        case FrameGraphFormat_t::R16_FLOAT:                return "R16_FLOAT";
-        case FrameGraphFormat_t::R16G16B16A16_TYPELESS:    return "R16G16B16A16_TYPELESS";
-        case FrameGraphFormat_t::R16G16B16A16_SINT:        return "R16G16B16A16_SINT";
-        case FrameGraphFormat_t::R16G16B16A16_UINT:        return "R16G16B16A16_UINT";
-        case FrameGraphFormat_t::R16G16B16A16_SNORM:       return "R16G16B16A16_SNORM";
-        case FrameGraphFormat_t::R16G16B16A16_UNORM:       return "R16G16B16A16_UNORM";
-        case FrameGraphFormat_t::R16G16B16A16_FLOAT:       return "R16G16B16A16_FLOAT";
-        case FrameGraphFormat_t::R24_UNORM_X8_TYPELESS:    return "R24_UNORM_X8_TYPELESS";
-        case FrameGraphFormat_t::R32_TYPELESS:             return "R32_TYPELESS";
-        case FrameGraphFormat_t::R32_SINT:                 return "R32_SINT";
-        case FrameGraphFormat_t::R32_UINT:                 return "R32_UINT";
-        case FrameGraphFormat_t::R32_SNORM:                return "R32_SNORM";
-        case FrameGraphFormat_t::R32_UNORM:                return "R32_UNORM";
-        case FrameGraphFormat_t::R32_FLOAT:                return "R32_FLOAT";
-        case FrameGraphFormat_t::R32_FLOAT_S8X24_TYPELESS: return "R32_FLOAT_S8X24_TYPELESS";
-        case FrameGraphFormat_t::R32G32B32A32_TYPELESS:    return "R32G32B32A32_TYPELESS";
-        case FrameGraphFormat_t::R32G32B32A32_SINT:        return "R32G32B32A32_SINT";
-        case FrameGraphFormat_t::R32G32B32A32_UINT:        return "R32G32B32A32_UINT";
-        case FrameGraphFormat_t::D24_UNORM_S8_UINT:        return "D24_UNORM_S8_UINT";
-        case FrameGraphFormat_t::D32_FLOAT:                return "D32_FLOAT";
-        case FrameGraphFormat_t::D32_FLOAT_S8X24_UINT:     return "D32_FLOAT_S8X24_UINT";
+        case RenderGraphFormat_t::Undefined:                return "Undefined";
+        case RenderGraphFormat_t::Automatic:                return "Automatic";
+        case RenderGraphFormat_t::Structured:               return "Structured";
+        case RenderGraphFormat_t::R8_TYPELESS:              return "R8_TYPELESS";
+        case RenderGraphFormat_t::R8_SINT:                  return "R8_SINT";
+        case RenderGraphFormat_t::R8_UINT:                  return "R8_UINT";
+        case RenderGraphFormat_t::R8_SNORM:                 return "R8_SNORM";
+        case RenderGraphFormat_t::R8_UNORM:                 return "R8_UNORM";
+        case RenderGraphFormat_t::R8G8B8A8_TYPELESS:        return "R8G8B8A8_TYPELESS";
+        case RenderGraphFormat_t::R8G8B8A8_SINT:            return "R8G8B8A8_SINT";
+        case RenderGraphFormat_t::R8G8B8A8_UINT:            return "R8G8B8A8_UINT";
+        case RenderGraphFormat_t::R8G8B8A8_SNORM:           return "R8G8B8A8_SNORM";
+        case RenderGraphFormat_t::R8G8B8A8_UNORM:           return "R8G8B8A8_UNORM";
+        case RenderGraphFormat_t::R8G8B8A8_UNORM_SRGB:      return "R8G8B8A8_UNORM_SRGB";
+        case RenderGraphFormat_t::R8G8B8A8_FLOAT:           return "R8G8B8A8_FLOAT";
+        case RenderGraphFormat_t::B8G8R8A8_TYPELESS:        return "B8G8R8A8_TYPELESS";
+        case RenderGraphFormat_t::B8G8R8A8_SINT:            return "B8G8R8A8_SINT";
+        case RenderGraphFormat_t::B8G8R8A8_UINT:            return "B8G8R8A8_UINT";
+        case RenderGraphFormat_t::B8G8R8A8_SNORM:           return "B8G8R8A8_SNORM";
+        case RenderGraphFormat_t::B8G8R8A8_UNORM:           return "B8G8R8A8_UNORM";
+        case RenderGraphFormat_t::B8G8R8A8_UNORM_SRGB:      return "B8G8R8A8_UNORM_SRGB";
+        case RenderGraphFormat_t::B8G8R8A8_FLOAT:           return "B8G8R8A8_FLOAT";
+        case RenderGraphFormat_t::R16_TYPELESS:             return "R16_TYPELESS";
+        case RenderGraphFormat_t::R16_SINT:                 return "R16_SINT";
+        case RenderGraphFormat_t::R16_UINT:                 return "R16_UINT";
+        case RenderGraphFormat_t::R16_SNORM:                return "R16_SNORM";
+        case RenderGraphFormat_t::R16_UNORM:                return "R16_UNORM";
+        case RenderGraphFormat_t::R16_FLOAT:                return "R16_FLOAT";
+        case RenderGraphFormat_t::R16G16B16A16_TYPELESS:    return "R16G16B16A16_TYPELESS";
+        case RenderGraphFormat_t::R16G16B16A16_SINT:        return "R16G16B16A16_SINT";
+        case RenderGraphFormat_t::R16G16B16A16_UINT:        return "R16G16B16A16_UINT";
+        case RenderGraphFormat_t::R16G16B16A16_SNORM:       return "R16G16B16A16_SNORM";
+        case RenderGraphFormat_t::R16G16B16A16_UNORM:       return "R16G16B16A16_UNORM";
+        case RenderGraphFormat_t::R16G16B16A16_FLOAT:       return "R16G16B16A16_FLOAT";
+        case RenderGraphFormat_t::R24_UNORM_X8_TYPELESS:    return "R24_UNORM_X8_TYPELESS";
+        case RenderGraphFormat_t::R32_TYPELESS:             return "R32_TYPELESS";
+        case RenderGraphFormat_t::R32_SINT:                 return "R32_SINT";
+        case RenderGraphFormat_t::R32_UINT:                 return "R32_UINT";
+        case RenderGraphFormat_t::R32_SNORM:                return "R32_SNORM";
+        case RenderGraphFormat_t::R32_UNORM:                return "R32_UNORM";
+        case RenderGraphFormat_t::R32_FLOAT:                return "R32_FLOAT";
+        case RenderGraphFormat_t::R32_FLOAT_S8X24_TYPELESS: return "R32_FLOAT_S8X24_TYPELESS";
+        case RenderGraphFormat_t::R32G32B32A32_TYPELESS:    return "R32G32B32A32_TYPELESS";
+        case RenderGraphFormat_t::R32G32B32A32_SINT:        return "R32G32B32A32_SINT";
+        case RenderGraphFormat_t::R32G32B32A32_UINT:        return "R32G32B32A32_UINT";
+        case RenderGraphFormat_t::D24_UNORM_S8_UINT:        return "D24_UNORM_S8_UINT";
+        case RenderGraphFormat_t::D32_FLOAT:                return "D32_FLOAT";
+        case RenderGraphFormat_t::D32_FLOAT_S8X24_UINT:     return "D32_FLOAT_S8X24_UINT";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -88,19 +88,19 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::EFrameGraphResourceUsage>(framegraph::EFrameGraphResourceUsage const &aUsage)
+    std::string convert_to_string<framegraph::ERenderGraphResourceUsage>(framegraph::ERenderGraphResourceUsage const &aUsage)
     {
         switch(aUsage)
         {
-            case EFrameGraphResourceUsage::Undefined      : return "Undefined";
-            case EFrameGraphResourceUsage::InputAttachment: return "InputAttachment";
-            case EFrameGraphResourceUsage::ColorAttachment: return "ColorAttachment";
-            case EFrameGraphResourceUsage::DepthAttachment: return "DepthAttachment";
-            case EFrameGraphResourceUsage::SampledImage   : return "SampledImage";
-            case EFrameGraphResourceUsage::StorageImage   : return "StorageImage";
-            case EFrameGraphResourceUsage::BufferResource : return "BufferResource";
-            case EFrameGraphResourceUsage::BufferTarget   : return "BufferTarget";
-            case EFrameGraphResourceUsage::Unused         : return "Unused";
+            case ERenderGraphResourceUsage::Undefined      : return "Undefined";
+            case ERenderGraphResourceUsage::InputAttachment: return "InputAttachment";
+            case ERenderGraphResourceUsage::ColorAttachment: return "ColorAttachment";
+            case ERenderGraphResourceUsage::DepthAttachment: return "DepthAttachment";
+            case ERenderGraphResourceUsage::SampledImage   : return "SampledImage";
+            case ERenderGraphResourceUsage::StorageImage   : return "StorageImage";
+            case ERenderGraphResourceUsage::BufferResource : return "BufferResource";
+            case ERenderGraphResourceUsage::BufferTarget   : return "BufferTarget";
+            case ERenderGraphResourceUsage::Unused         : return "Unused";
             default                                       : return "Unknown";
         }
     }
@@ -110,7 +110,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::EFrameGraphWriteTarget>(framegraph::EFrameGraphWriteTarget const &aTarget)
+    std::string convert_to_string<framegraph::ERenderGraphWriteTarget>(framegraph::ERenderGraphWriteTarget const &aTarget)
     {
         SHIRABE_UNUSED(aTarget);
 
@@ -122,7 +122,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::EFrameGraphResourceAccessibility>(framegraph::EFrameGraphResourceAccessibility const &aAccessibility)
+    std::string convert_to_string<framegraph::ERenderGraphResourceAccessibility>(framegraph::ERenderGraphResourceAccessibility const &aAccessibility)
     {
         SHIRABE_UNUSED(aAccessibility);
 
@@ -134,13 +134,13 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::EFrameGraphResourceInitState>(framegraph::EFrameGraphResourceInitState const &aState)
+    std::string convert_to_string<framegraph::ERenderGraphResourceInitState>(framegraph::ERenderGraphResourceInitState const &aState)
     {
         switch(aState)
         {
             default:
-            case EFrameGraphResourceInitState::Undefined: return "Undefined";
-            case EFrameGraphResourceInitState::Clear:     return "Clear";
+            case ERenderGraphResourceInitState::Undefined: return "Undefined";
+            case ERenderGraphResourceInitState::Clear:     return "Clear";
         }
     }
     //<-----------------------------------------------------------------------------
@@ -149,7 +149,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::EFrameGraphViewAccessMode>(framegraph::EFrameGraphViewAccessMode const &aAccessMode)
+    std::string convert_to_string<framegraph::ERenderGraphViewAccessMode>(framegraph::ERenderGraphViewAccessMode const &aAccessMode)
     {
         SHIRABE_UNUSED(aAccessMode);
 
@@ -165,7 +165,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        std::ostream& operator<<(std::ostream &strm, EFrameGraphResourceType const&e)
+        std::ostream& operator<<(std::ostream &strm, ERenderGraphResourceType const&e)
         {
             strm << convert_to_string(e).c_str();
             return strm;
@@ -175,7 +175,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        std::ostream& operator<<(std::ostream &strm, FrameGraphFormat_t const&e)
+        std::ostream& operator<<(std::ostream &strm, RenderGraphFormat_t const&e)
         {
             strm << convert_to_string(e).c_str();
             return strm;
@@ -186,8 +186,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool validateFormatCompatibility(
-                FrameGraphFormat_t const &aBase,
-                FrameGraphFormat_t const &aDerived)
+                RenderGraphFormat_t const &aBase,
+                RenderGraphFormat_t const &aDerived)
         {
             SHIRABE_UNUSED(aBase);
             SHIRABE_UNUSED(aDerived);
@@ -199,14 +199,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResource::SFrameGraphResource()
+        SRenderGraphResource::SRenderGraphResource()
             : referenceCount(0)
             , assignedPassUID(0)
-            , resourceId(FrameGraphResourceId_t{ })
+            , resourceId(RenderGraphResourceId_t{ })
             , parentResource(0)
             , subjacentResource(0)
             , readableName("")
-            , type(EFrameGraphResourceType::Undefined)
+            , type(ERenderGraphResourceType::Undefined)
             , isExternalResource(false)
         {}
         //<-----------------------------------------------------------------------------
@@ -214,57 +214,89 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphBuffer::SFrameGraphBuffer()
-            : SFrameGraphResource()
-            , bufferUsage(VkBufferUsageFlagBits::VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM)
-            , sizeInBytes(0)
+        SRenderGraphTransientBufferDescription::SRenderGraphTransientBufferDescription()
+            : bufferUsage(VkBufferUsageFlagBits::VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM)
+              , sizeInBytes(0)
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphBufferView::SFrameGraphBufferView()
-            : SFrameGraphResource()
-            , subrange(CRange(0, 0))
-            , format(FrameGraphFormat_t::Undefined)
-            , mode(EFrameGraphViewAccessMode::Undefined)
+        SRenderGraphPersistentBufferDescription::SRenderGraphPersistentBufferDescription()
+            : bufferResourceId()
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphTexture::SFrameGraphTexture()
-            : SFrameGraphResource()
-            , STextureInfo()
-            , initialState(EFrameGraphResourceInitState::Undefined)
-            , permittedUsage(EFrameGraphResourceUsage::Undefined)
-            , requestedUsage(EFrameGraphResourceUsage::Undefined)
+        SRenderGraphTransientBuffer::SRenderGraphTransientBuffer()
+            : SRenderGraphTypedResource<SRenderGraphTransientBufferDescription>()
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void SFrameGraphTexture::assignTextureParameters(SFrameGraphTexture const &aOther)
+        SRenderGraphPersistentBuffer::SRenderGraphPersistentBuffer()
+            : SRenderGraphTypedResource<SRenderGraphPersistentBufferDescription>()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SRenderGraphBufferViewDescription::SRenderGraphBufferViewDescription()
+            : subrange(CRange(0, 0))
+              , format(RenderGraphFormat_t::Undefined)
+              , mode(ERenderGraphViewAccessMode::Undefined)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SRenderGraphBufferView::SRenderGraphBufferView()
+            : SRenderGraphTypedResource<SRenderGraphBufferViewDescription>()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SRenderGraphTransientImageDescription::SRenderGraphTransientImageDescription()
+            : STextureInfo()
+              , initialState(ERenderGraphResourceInitState::Undefined)
+              , permittedUsage(ERenderGraphResourceUsage::Undefined)
+              , requestedUsage(ERenderGraphResourceUsage::Undefined)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SRenderGraphPersistentImageDescription::SRenderGraphPersistentImageDescription()
+            : imageId()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SRenderGraphTransientImage::SRenderGraphTransientImage()
+            : SRenderGraphTypedResource<SRenderGraphTransientImageDescription>()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        bool SRenderGraphTransientImage::validate() const
         {
-            graphicsapi::STextureInfo::operator=(aOther); // Use implicitly defined assignment op
-
-            initialState   = aOther.initialState;
-            permittedUsage = aOther.permittedUsage;
-            requestedUsage = aOther.requestedUsage;
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        bool SFrameGraphTexture::validate() const
-        {
-            bool const dimensionsValid = (0 == width || not (0 == width || 0 == height || 0 == depth));
-            bool const mipLevelsValid  = (1 <= mipLevels);
-            bool const arraySizeValid  = (1 <= arraySize);
+            bool const dimensionsValid = (0 == description.width || not (0 == description.width || 0 == description.height || 0 == description.depth));
+            bool const mipLevelsValid  = (1 <= description.mipLevels);
+            bool const arraySizeValid  = (1 <= description.arraySize);
 
             return (dimensionsValid && mipLevelsValid && arraySizeValid);
         }
@@ -273,22 +305,29 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphTextureView::SFrameGraphTextureView()
-            : SFrameGraphResource()
-            , arraySliceRange(CRange(0, 0))
-            , mipSliceRange(CRange(0, 0))
-            , format(FrameGraphFormat_t::Undefined)
-            , mode(EFrameGraphViewAccessMode::Undefined)
+        SRenderGraphImageViewDescription::SRenderGraphImageViewDescription()
+            : arraySliceRange(CRange(0, 0))
+              , mipSliceRange(CRange(0, 0))
+              , format(RenderGraphFormat_t::Undefined)
+              , mode(ERenderGraphViewAccessMode::Undefined)
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        uint32_t SFrameGraphAttachmentCollection::addAttachment(
+        SRenderGraphImageView::SRenderGraphImageView()
+            : SRenderGraphTypedResource<SRenderGraphImageViewDescription>()
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        uint32_t SRenderGraphAttachmentCollection::addAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aImageResourceID,
-                FrameGraphResourceId_t const &aImageViewResourceID)
+                RenderGraphResourceId_t const &aImageResourceID,
+                RenderGraphResourceId_t const &aImageViewResourceID)
         {
             uint64_t imageViewIndex = 0;
 
@@ -318,10 +357,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        void SFrameGraphAttachmentCollection::addInputAttachment(
+        void SRenderGraphAttachmentCollection::addInputAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aImageResourceID,
-                FrameGraphResourceId_t const &aImageViewResourceID)
+                RenderGraphResourceId_t const &aImageResourceID,
+                RenderGraphResourceId_t const &aImageViewResourceID)
         {
             uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
             mInputAttachments.push_back(imageViewIndex);
@@ -331,10 +370,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void SFrameGraphAttachmentCollection::addColorAttachment(
+        void SRenderGraphAttachmentCollection::addColorAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aImageResourceID,
-                FrameGraphResourceId_t const &aImageViewResourceID)
+                RenderGraphResourceId_t const &aImageResourceID,
+                RenderGraphResourceId_t const &aImageViewResourceID)
         {
             uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
             mColorAttachments.push_back(imageViewIndex);
@@ -344,10 +383,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        void SFrameGraphAttachmentCollection::addDepthAttachment(
+        void SRenderGraphAttachmentCollection::addDepthAttachment(
                 PassUID_t              const &aPassUID,
-                FrameGraphResourceId_t const &aImageResourceID,
-                FrameGraphResourceId_t const &aImageViewResourceID)
+                RenderGraphResourceId_t const &aImageResourceID,
+                RenderGraphResourceId_t const &aImageViewResourceID)
         {
             uint32_t const imageViewIndex = addAttachment(aPassUID, aImageResourceID, aImageViewResourceID);
             mDepthAttachments.push_back(imageViewIndex);
@@ -357,8 +396,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SFrameGraphResourceFlags::SFrameGraphResourceFlags()
-            : requiredFormat(FrameGraphFormat_t::Undefined)
+        SRenderGraphResourceFlags::SRenderGraphResourceFlags()
+            : requiredFormat(RenderGraphFormat_t::Undefined)
         {}
         //<-----------------------------------------------------------------------------
 
@@ -366,8 +405,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool operator<(
-                SFrameGraphResource const &aLHS,
-                SFrameGraphResource const &aRHS)
+                SRenderGraphResource const &aLHS,
+                SRenderGraphResource const &aRHS)
         {
             return (aLHS.resourceId < aRHS.resourceId);
         }
@@ -377,8 +416,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         bool operator!=(
-                SFrameGraphResource const &aLHS,
-                SFrameGraphResource const &aRHS)
+                SRenderGraphResource const &aLHS,
+                SRenderGraphResource const &aRHS)
         {
             return (aLHS.resourceId != aRHS.resourceId);
         }
@@ -387,9 +426,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CFrameGraphResources::CFrameGraphResources()
+        CRenderGraphResources::CRenderGraphResources()
         {
-            mResources.push_back(std::make_shared<SFrameGraphResource>());
+            mResources.push_back(std::make_shared<SRenderGraphResource>());
         }
         //<-----------------------------------------------------------------------------
 
@@ -397,9 +436,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename T>
-        void appendToVector(
-                std::vector<T>       &aOutTarget,
-                std::vector<T> const &aSource)
+        void appendToVector(std::vector<T>       &aOutTarget,
+                            std::vector<T> const &aSource)
         {
             aSource.resize(aOutTarget.size() + aSource.size());
 
@@ -413,41 +451,51 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool CFrameGraphMutableResources::mergeIn(CFrameGraphResources const &aOther)
+        bool CRenderGraphMutableResources::mergeIn(CRenderGraphResources const &aOther)
         {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
             try {
 #endif
                 mResources = aOther.resources();
 
-                for(RefIndex_t::value_type const&id : aOther.textures())
+                for(RefIndex_t::value_type const&id : aOther.transientImages())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphTexture>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphTransientImage>::insert(id);
                 }
 
-                for(RefIndex_t::value_type const&id : aOther.textureViews())
+                for(RefIndex_t::value_type const&id : aOther.persistentImages())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphTextureView>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphPersistentImage>::insert(id);
                 }
 
-                for(RefIndex_t::value_type const&id : aOther.buffers())
+                for(RefIndex_t::value_type const&id : aOther.imageViews())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphBuffer>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphImageView>::insert(id);
+                }
+
+                for(RefIndex_t::value_type const&id : aOther.transientBuffers())
+                {
+                    CRenderGraphResourcesRef<SRenderGraphTransientBuffer>::insert(id);
+                }
+
+                for(RefIndex_t::value_type const&id : aOther.persistentBuffers())
+                {
+                    CRenderGraphResourcesRef<SRenderGraphPersistentBuffer>::insert(id);
                 }
 
                 for(RefIndex_t::value_type const&id : aOther.bufferViews())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphBufferView>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphBufferView>::insert(id);
                 }
 
                 for(RefIndex_t::value_type const &id : aOther.meshes())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphMesh>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphMesh>::insert(id);
                 }
 
                 for(RefIndex_t::value_type const &id : aOther.materials())
                 {
-                    CFrameGraphResourcesRef<SFrameGraphMaterial>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphMaterial>::insert(id);
                 }
 
                 return true;
@@ -472,7 +520,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SFrameGraphTexture>(framegraph::SFrameGraphTexture const &aTexture)
+    std::string convert_to_string<framegraph::SRenderGraphTransientImage>(framegraph::SRenderGraphTransientImage const &aTexture)
     {
         std::string s =
                 CString::format(
@@ -483,15 +531,15 @@ namespace engine
                     "\n    Array-Levels:    {}"
                     "\n    Mip-Levels:      {}"
                     "\n    Initial-State:   {}"
-                    "\n    Reference-Count: {}0",
+                    "\n    Reference-Count: {}",
                     "Texture",
                     aTexture.resourceId,
                     aTexture.readableName,
-                    aTexture.width, aTexture.height, aTexture.depth,
-                    convert_to_string(aTexture.format),
-                    aTexture.arraySize,
-                    aTexture.mipLevels,
-                    convert_to_string(aTexture.initialState),
+                    aTexture.description.width, aTexture.description.height, aTexture.description.depth,
+                    convert_to_string(aTexture.description.format),
+                    aTexture.description.arraySize,
+                    aTexture.description.mipLevels,
+                    convert_to_string(aTexture.description.initialState),
                     aTexture.referenceCount);
         return s;
     }
@@ -501,9 +549,28 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SFrameGraphTextureView>(framegraph::SFrameGraphTextureView const &aTextureView)
+    std::string convert_to_string<framegraph::SRenderGraphPersistentImage>(framegraph::SRenderGraphPersistentImage const &aTexture)
     {
-        bool viewIsReadMode  = aTextureView.mode.check(EFrameGraphViewAccessMode::Read);
+        std::string s =
+                        CString::format(
+                            "  {} (RID: {})"
+                            "\n    Name:            {}"
+                            "\n    Reference-Count: {}",
+                            "Texture",
+                            aTexture.resourceId,
+                            aTexture.readableName,
+                            aTexture.referenceCount);
+        return s;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <>
+    std::string convert_to_string<framegraph::SRenderGraphImageView>(framegraph::SRenderGraphImageView const &aTextureView)
+    {
+        bool viewIsReadMode  = aTextureView.description.mode.check(ERenderGraphViewAccessMode::Read);
 
         std::string s =
                 CString::format(
@@ -518,9 +585,9 @@ namespace engine
                     aTextureView.resourceId,
                     aTextureView.subjacentResource,
                     (viewIsReadMode ? "Read" : "Write"),
-                    convert_to_string(aTextureView.format),
-                    convert_to_string(aTextureView.arraySliceRange),
-                    convert_to_string(aTextureView.mipSliceRange),
+                    convert_to_string(aTextureView.description.format),
+                    convert_to_string(aTextureView.description.arraySliceRange),
+                    convert_to_string(aTextureView.description.mipSliceRange),
                     aTextureView.referenceCount);
         return s;
     }
@@ -530,7 +597,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SFrameGraphBuffer>(framegraph::SFrameGraphBuffer const &aBuffer)
+    std::string convert_to_string<framegraph::SRenderGraphTransientBuffer>(framegraph::SRenderGraphTransientBuffer const &aBuffer)
     {
         std::string s =
                 CString::format(
@@ -545,7 +612,22 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SFrameGraphBufferView>(framegraph::SFrameGraphBufferView const &aBufferView)
+    std::string convert_to_string<framegraph::SRenderGraphPersistentBuffer>(framegraph::SRenderGraphPersistentBuffer const &aBuffer)
+    {
+        std::string s =
+                        CString::format(
+                            "  {} (RID: {})",
+                            "Buffer",
+                            aBuffer.resourceId);
+        return s;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //<
+    //<-----------------------------------------------------------------------------
+    template <>
+    std::string convert_to_string<framegraph::SRenderGraphBufferView>(framegraph::SRenderGraphBufferView const &aBufferView)
     {
         std::string s =
                 CString::format(

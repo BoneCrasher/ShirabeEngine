@@ -9,7 +9,7 @@
 
 namespace engine::framegraph
 {
-    struct SFrameGraphPlatformContext
+    struct SRenderGraphPlatformContext
     {
         Shared<os::SApplicationEnvironment> applicationEnvironment;
         Shared<wsi::CWSIDisplay>            display;

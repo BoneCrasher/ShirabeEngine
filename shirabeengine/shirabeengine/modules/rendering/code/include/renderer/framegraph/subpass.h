@@ -39,7 +39,7 @@ namespace engine
          */
         class CPassBase
         #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+                : public ISerializable<IRenderGraphSerializer, IRenderGraphDeserializer>
         #endif
         {
             SHIRABE_DECLARE_LOG_TAG(CPassBase);
@@ -78,18 +78,18 @@ namespace engine
              *
              * @param aSerializer Serializer to accept for pass serialization.
              */
-            virtual bool acceptSerializer(IFrameGraphSerializer &aSerializer) const;
+            virtual bool acceptSerializer(IRenderGraphSerializer &aSerializer) const;
 
             /**
              * Double-Dispatch serialization integration to deserialize this pass.
              *
              * @param aDeserializer Deserializer to accept for pass serialization.
              */
-            virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
+            virtual bool acceptDeserializer(IRenderGraphDeserializer &aDeserializer);
 #endif
 
-            FrameGraphResourceIdList const &resourceReferences() const { return mResourceReferences; }
-            FrameGraphResourceIdList       &mutableResourceReferences() { return mResourceReferences; }
+            RenderGraphResourceIdList const &resourceReferences() const { return mResourceReferences; }
+            RenderGraphResourceIdList       &mutableResourceReferences() { return mResourceReferences; }
 
             /**
              * Register a resource in this pass instance.
@@ -97,7 +97,7 @@ namespace engine
              * @param aResourceUID The resource uid of the resource to register.
              * @return             True, if successful. False otherwise.
              */
-            CEngineResult<> registerResource(FrameGraphResourceId_t const &aResourceUID);
+            CEngineResult<> registerResource(RenderGraphResourceId_t const &aResourceUID);
 
             /**
              * Interface method for all passes' setup.
@@ -107,31 +107,31 @@ namespace engine
              * @return             True, if successful. False otherwise.
              */
             virtual CEngineResult<> setup(
-                SFrameGraphPlatformContext const &aPlatformContext,
-                SFrameGraphDataSource const      &aDataSource,
+                SRenderGraphPlatformContext const &aPlatformContext,
+                SRenderGraphDataSource const      &aDataSource,
                 CPassBuilder                     &aPassBuilder) = 0;
 
             /**
              * Interface method for all passes' execution.
              * To be implemented by specific pass classes.
              *
-             * @param aFrameGraphResources A collection of resolved and loaded resources requested during
+             * @param aRenderGraphResources A collection of resolved and loaded resources requested during
              *                             setup for use during exeuction.
              * @param aContext             The render context of the framegraph interfacing with all subsystems.
              * @return                     True, if successful. False otherwise.
              */
             virtual CEngineResult<> execute(
-                SFrameGraphPlatformContext const &aPlatformContext,
-                SFrameGraphDataSource const      &aDataSource,
-                CFrameGraphResources const       &aFrameGraphResources,
-                SFrameGraphRenderContextState    &aContextState,
-                SFrameGraphResourceContext       &aResourceContext,
-                SFrameGraphRenderContext         &aRenderContext) = 0;
+                SRenderGraphPlatformContext const &aPlatformContext,
+                SRenderGraphDataSource const      &aDataSource,
+                CRenderGraphResources const       &aRenderGraphResources,
+                SRenderGraphRenderContextState    &aContextState,
+                SRenderGraphResourceContext       &aResourceContext,
+                SRenderGraphRenderContext         &aRenderContext) = 0;
 
         private_members:
             PassUID_t                mPassUID;
             std::string              mPassName;
-            FrameGraphResourceIdList mResourceReferences;
+            RenderGraphResourceIdList mResourceReferences;
         };
 
         SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CPassBase>, CPassBase);
@@ -154,15 +154,15 @@ namespace engine
         public_typedefs:
             using SetupCallback_t = std::function<CEngineResult<>(CPassBuilder&
                                                                 , TPassData&
-                                                                , SFrameGraphPlatformContext const &
-                                                                , SFrameGraphDataSource const &)>;
+                                                                , SRenderGraphPlatformContext const &
+                                                                , SRenderGraphDataSource const &)>;
             using ExecCallback_t  = std::function<CEngineResult<>(TPassData const&
-                                                                  , SFrameGraphPlatformContext const &
-                                                                  , SFrameGraphDataSource const &
-                                                                  , CFrameGraphResources const &
-                                                                  , SFrameGraphRenderContextState &
-                                                                  , SFrameGraphResourceContext &
-                                                                  , SFrameGraphRenderContext &)>;
+                                                                  , SRenderGraphPlatformContext const &
+                                                                  , SRenderGraphDataSource const &
+                                                                  , CRenderGraphResources const &
+                                                                  , SRenderGraphRenderContextState &
+                                                                  , SRenderGraphResourceContext &
+                                                                  , SRenderGraphRenderContext &)>;
 
         public_constructors:
             /**
@@ -186,24 +186,24 @@ namespace engine
              * @return         True, if successful. False otherwise.
              */
             CEngineResult<> setup(CPassBuilder                       &aBuilder
-                                  , SFrameGraphPlatformContext const &aPlatformContext
-                                  , SFrameGraphDataSource const      &aDataSource);
+                                  , SRenderGraphPlatformContext const &aPlatformContext
+                                  , SRenderGraphDataSource const      &aDataSource);
 
             /**
              * Execute implementation, invoking the execute callback.
              *
-             * @param aFrameGraphResources A collection of resolved and loaded resources requested during
+             * @param aRenderGraphResources A collection of resolved and loaded resources requested during
              *                             setup for use during exeuction.
              * @param aContext             The render context of the framegraph interfacing with all subsystems.
              * @return                     True, if successful. False otherwise.
              */
             CEngineResult<> execute(
-                    SFrameGraphPlatformContext const &aPlatformContext
-                    , SFrameGraphDataSource const    &aDataSource
-                    , CFrameGraphResources const     &aFrameGraphResources
-                    , SFrameGraphRenderContextState  &aContextState
-                    , SFrameGraphResourceContext     &aResourceContext
-                    , SFrameGraphRenderContext       &aRenderContext);
+                    SRenderGraphPlatformContext const &aPlatformContext
+                    , SRenderGraphDataSource const    &aDataSource
+                    , CRenderGraphResources const     &aRenderGraphResources
+                    , SRenderGraphRenderContextState  &aContextState
+                    , SRenderGraphResourceContext     &aResourceContext
+                    , SRenderGraphRenderContext       &aRenderContext);
 
             /**
              * Return the pass data struct associated with this callback pass.
@@ -218,7 +218,7 @@ namespace engine
         private_members:
             SetupCallback_t          mSetupCallback;
             ExecCallback_t           mExecCallback;
-            FrameGraphResourceIdList mResources;
+            RenderGraphResourceIdList mResources;
             TPassData                mPassData;
         };
         //<-----------------------------------------------------------------------------
@@ -247,8 +247,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
         CEngineResult<> CallbackPass<TPassData>::setup(CPassBuilder                       &aPassBuilder
-                                                       , SFrameGraphPlatformContext const &aPlatformContext
-                                                       , SFrameGraphDataSource const      &aDataSource)
+                                                       , SRenderGraphPlatformContext const &aPlatformContext
+                                                       , SRenderGraphDataSource const      &aDataSource)
         {
             TPassData passData{ };
 
@@ -266,16 +266,16 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         template <typename TPassData>
-        CEngineResult<> CallbackPass<TPassData>::execute(SFrameGraphPlatformContext const &aPlatformContext
-                                                         , SFrameGraphDataSource const    &aDataSource
-                                                         , CFrameGraphResources const     &aFrameGraphResources
-                                                         , SFrameGraphRenderContextState  &aContextState
-                                                         , SFrameGraphResourceContext     &aResourceContext
-                                                         , SFrameGraphRenderContext       &aRenderContext)
+        CEngineResult<> CallbackPass<TPassData>::execute(SRenderGraphPlatformContext const &aPlatformContext
+                                                         , SRenderGraphDataSource const    &aDataSource
+                                                         , CRenderGraphResources const     &aRenderGraphResources
+                                                         , SRenderGraphRenderContextState  &aContextState
+                                                         , SRenderGraphResourceContext     &aResourceContext
+                                                         , SRenderGraphRenderContext       &aRenderContext)
         {
             try
             {
-                CEngineResult<> execution = mExecCallback(mPassData, aPlatformContext, aDataSource, aFrameGraphResources, aContextState, aResourceContext, aRenderContext);
+                CEngineResult<> execution = mExecCallback(mPassData, aPlatformContext, aDataSource, aRenderGraphResources, aContextState, aResourceContext, aRenderContext);
                 return execution;
             }
             catch(std::runtime_error const &e)

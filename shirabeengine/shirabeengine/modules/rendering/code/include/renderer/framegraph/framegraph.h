@@ -30,7 +30,7 @@ namespace engine
          */
         class SHIRABE_TEST_EXPORT CGraph
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                : public ISerializable<IFrameGraphSerializer, IFrameGraphDeserializer>
+                : public ISerializable<IRenderGraphSerializer, IRenderGraphDeserializer>
 #endif
         {
             SHIRABE_DECLARE_LOG_TAG(CGraph)
@@ -62,7 +62,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            Unique<CAccessor> getAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey) const
+            Unique<CAccessor> getAccessor(CPassKey<CRenderGraphGraphVizSerializer> &&aKey) const
             {
                 return std::move(std::make_unique<CAccessor>(this));
             }
@@ -73,7 +73,7 @@ namespace engine
              * @param aKey PassKey creatable only by graphvizserializer instances.
              * @return     A CAccessor instance to access the graph's data.
              */
-            Unique<CMutableAccessor> getMutableAccessor(CPassKey<CFrameGraphGraphVizSerializer> &&aKey)
+            Unique<CMutableAccessor> getMutableAccessor(CPassKey<CRenderGraphGraphVizSerializer> &&aKey)
             {
                 return std::move(std::make_unique<CMutableAccessor>(this));
             }
@@ -85,9 +85,9 @@ namespace engine
              *
              * @return True, if successfully executed. False otherwise.
              */
-            CEngineResult<> execute(SFrameGraphDataSource      const &aDataSource
-                                    , SFrameGraphResourceContext     &aResourceContext
-                                    , SFrameGraphRenderContext       &aRenderContext);
+            CEngineResult<> execute(SRenderGraphDataSource      const &aDataSource
+                                    , SRenderGraphResourceContext     &aResourceContext
+                                    , SRenderGraphRenderContext       &aRenderContext);
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
             /**
@@ -96,7 +96,7 @@ namespace engine
              * @param aSerializer The serializer instance to accept.
              * @return            True, if successful. False otherwise.
              */
-            virtual bool acceptSerializer(IFrameGraphSerializer &aSerializer) const;
+            virtual bool acceptSerializer(IRenderGraphSerializer &aSerializer) const;
 
             /**
              * Double-Dispatch accept for the graph to accept any kind of frame graph deserializer instance.
@@ -104,7 +104,7 @@ namespace engine
              * @param aDeserializer The deserializer instance to accept.
              * @return            True, if successful. False otherwise.
              */
-            virtual bool acceptDeserializer(IFrameGraphDeserializer &aDeserializer);
+            virtual bool acceptDeserializer(IRenderGraphDeserializer &aDeserializer);
 #endif
 
             /**
@@ -116,11 +116,11 @@ namespace engine
             SHIRABE_INLINE CGraph &operator=(CGraph const &aOther);
 
         private_methods:
-            bool initializeAttachments(SFrameGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
-            bool deinitializeAttachments(SFrameGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+            bool initializeAttachments(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+            bool deinitializeAttachments(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
 
-            bool initializeSubpassResources(SFrameGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
-            bool deinitializeSubpassResources(SFrameGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
+            bool initializeSubpassResources(SRenderGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
+            bool deinitializeSubpassResources(SRenderGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
 
         public_methods:
             PassMap const &subpasses() const { return mSubpasses; }
@@ -130,12 +130,12 @@ namespace engine
             RenderPassMap       &renderPasses()       { return mRenderPasses; }
 
             std::vector<PassUID_t>      const &renderpassExecutionOrder() const  { return mRenderpassExecutionOrder; }
-            FrameGraphResourceIdList    const &resources()                const  { return mResources; }
-            CFrameGraphMutableResources       &resourceData()                    { return mResourceData; }
+            RenderGraphResourceIdList    const &resources()                const  { return mResources; }
+            CRenderGraphMutableResources       &resourceData()                    { return mResourceData; }
 
             EGraphMode             const &graphMode()                const { return mGraphMode; }
             bool                   const &renderToBackBuffer()       const { return mRenderToBackBuffer; };
-            FrameGraphResourceId_t const &outputTextureResourceId()  const { return mOutputTextureResourceId; }
+            RenderGraphResourceId_t const &outputTextureResourceId()  const { return mOutputTextureResourceId; }
 
             /**
              * Create a new pass of type TPass with TPassCreationArgs and set it up.
@@ -162,18 +162,18 @@ namespace engine
             RenderPassMap                mRenderPasses;
             std::vector<RenderPassUID_t> mRenderpassExecutionOrder;
 
-            FrameGraphResourceIdList    mResources;
-            CFrameGraphMutableResources mResourceData;
-            FrameGraphResourceIdList    mInstantiatedResources;
+            RenderGraphResourceIdList    mResources;
+            CRenderGraphMutableResources mResourceData;
+            RenderGraphResourceIdList    mInstantiatedResources;
 
             EGraphMode                  mGraphMode;
             bool                        mRenderToBackBuffer;
-            FrameGraphResourceId_t      mOutputTextureResourceId;
+            RenderGraphResourceId_t      mOutputTextureResourceId;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-            AdjacencyListMap_t<FrameGraphResourceId_t>            mResourceAdjacency;
-            std::stack<FrameGraphResourceId_t>                    mResourceOrder;
-            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t> mPassToResourceAdjacency;
+            AdjacencyListMap_t<RenderGraphResourceId_t>            mResourceAdjacency;
+            std::stack<RenderGraphResourceId_t>                    mResourceOrder;
+            AdjacencyListMap_t<PassUID_t, RenderGraphResourceId_t> mPassToResourceAdjacency;
 #endif
 
         };

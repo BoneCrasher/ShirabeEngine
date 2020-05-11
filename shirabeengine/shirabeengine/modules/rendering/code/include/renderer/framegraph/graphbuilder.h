@@ -72,7 +72,7 @@ namespace engine
              * @return See brief.
              *
              */
-            SHIRABE_INLINE CFrameGraphResources const &getResources() const
+            SHIRABE_INLINE CRenderGraphResources const &getResources() const
             {
                 return mResourceData;
             }
@@ -101,7 +101,7 @@ namespace engine
             }
 
             SHIRABE_INLINE
-            void setOutputTextureResourceId(FrameGraphResourceId_t const &aOutputResourceId)
+            void setOutputTextureResourceId(RenderGraphResourceId_t const &aOutputResourceId)
             {
                 mOutputResourceId = aOutputResourceId;
             }
@@ -180,7 +180,7 @@ namespace engine
              *
              * @return See brief.
              */
-            FrameGraphResourceId_t generateResourceUID();
+            RenderGraphResourceId_t generateResourceUID();
 
             /**
              * Return the current internal graph state.
@@ -206,12 +206,12 @@ namespace engine
              * @param aResourceMap          A map of resources containing all resources in the path from
              *                              aResourceToSearchFrom and the subjacent resource.
              * @param aResourceToSearchFrom Starting point of the path towards the subjacent resource.
-             * @return                      The FrameGraphResourceId_t of the subjacent resource or 0 if not found.
+             * @return                      The RenderGraphResourceId_t of the subjacent resource or 0 if not found.
 EST_EXPORT CGraphBuilder
         {*/
-            CEngineResult<FrameGraphResourceId_t> findSubjacentResource(
-                    SFrameGraphResourceMap const &aResourceMap,
-                    SFrameGraphResource    const &aResourceToSearchFrom);
+            CEngineResult<RenderGraphResourceId_t> findSubjacentResource(
+                    SRenderGraphResourceMap const &aResourceMap,
+                    SRenderGraphResource    const &aResourceToSearchFrom);
 
             /**
              * Collect a fully set-up pass, performing quite a lot of validation and resource work.
@@ -239,8 +239,8 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureView(
-                SFrameGraphTexture     const &aTexture,
-                    SFrameGraphTextureView const &aTextureView);
+                SRenderGraphImage     const &aTexture,
+                    SRenderGraphImageView const &aTextureView);
 
             /**
              * Validate, whether the texture's requested usages from all views based on the texture
@@ -249,7 +249,7 @@ EST_EXPORT CGraphBuilder
              * @param aTexture The texture to validate.
              * @return         True, if valid. False otherwise.
              */
-            bool validateTextureUsage(SFrameGraphTexture const &aTexture);
+            bool validateTextureUsage(SRenderGraphImage const &aTexture);
 
             /**
              * Validate the formats of a texture and a texture view, i.e. check, whether
@@ -261,8 +261,8 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureFormat(
-                SFrameGraphTexture     const &aTexture,
-                    SFrameGraphTextureView const &aTextureView);
+                SRenderGraphImage     const &aTexture,
+                    SRenderGraphImageView const &aTextureView);
 
             /**
              * Validate the array range and mip slice access of a texture view, relative
@@ -274,8 +274,8 @@ EST_EXPORT CGraphBuilder
              * @return             True, if valid. False otherwise.
              */
             bool validateTextureSubresourceAccess(
-                SFrameGraphTexture     const &aTexture,
-                    SFrameGraphTextureView const &aTextureView);
+                SRenderGraphImage     const &aTexture,
+                    SRenderGraphImageView const &aTextureView);
 
             /**
              * To be implemented.
@@ -285,35 +285,35 @@ EST_EXPORT CGraphBuilder
              * @return
              */
             bool validateBufferView(
-                    SFrameGraphBuffer     const &aBuffer,
-                    SFrameGraphBufferView const &aBufferView);
+                    SRenderGraphBuffer     const &aBuffer,
+                    SRenderGraphBufferView const &aBufferView);
 
         private_members:
 
             framegraph::CGraph::EGraphMode                  mGraphMode;
             bool                                            mRenderToBackBuffer;
-            FrameGraphResourceId_t                          mOutputResourceId;
+            RenderGraphResourceId_t                          mOutputResourceId;
 
             Shared<os::SApplicationEnvironment>             mApplicationEnvironment;
             Shared<wsi::CWSIDisplay>                        mDisplay;
 
             Shared<IUIDGenerator<RenderPassUID_t>>          mRenderPassUIDGenerator;
             Shared<IUIDGenerator<PassUID_t>>                mSubpassUIDGenerator;
-            Shared<IUIDGenerator<FrameGraphResourceId_t>>   mResourceUIDGenerator;
+            Shared<IUIDGenerator<RenderGraphResourceId_t>>   mResourceUIDGenerator;
 
-            FrameGraphResourceIdList                        mResources;
-            CFrameGraphMutableResources                     mResourceData;
+            RenderGraphResourceIdList                        mResources;
+            CRenderGraphMutableResources                     mResourceData;
 
             Shared<CRenderPass>                             mRenderPassUnderConstruction;
             RenderPassMap                                   mRenderPasses;
             datastructures::CAdjacencyTree<RenderPassUID_t> mRenderPassTree;
             PassMap                                         mSubpasses;
 
-            Unique<CGraph>                                  mFrameGraph;
+            Unique<CGraph>                                  mRenderGraph;
 
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-            AdjacencyListMap_t<FrameGraphResourceId_t>             mResourceAdjacency;
-            AdjacencyListMap_t<PassUID_t, FrameGraphResourceId_t>  mPassToResourceAdjacency;
+            AdjacencyListMap_t<RenderGraphResourceId_t>             mResourceAdjacency;
+            AdjacencyListMap_t<PassUID_t, RenderGraphResourceId_t>  mPassToResourceAdjacency;
 #endif
 
         };

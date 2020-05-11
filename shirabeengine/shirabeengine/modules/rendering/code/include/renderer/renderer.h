@@ -12,8 +12,8 @@ namespace engine
 {
     namespace rendering
     {
-        using engine::framegraph::SFrameGraphRenderContext;
-        using engine::framegraph::SFrameGraphDataSource;
+        using engine::framegraph::SRenderGraphRenderContext;
+        using engine::framegraph::SRenderGraphDataSource;
         using engine::framegraph::CGraph;
 
         /**
@@ -37,7 +37,7 @@ namespace engine
              * @param aDisplay                 WSI display instance to bind against the currently selected monitor config.
              * @param aConfiguration           Renderer configuration as provided from the engine default config
              *                                 and dynamic engine configuration.
-             * @param aFrameGraphRenderContext Rendercontext for the framegraph.
+             * @param aRenderGraphRenderContext Rendercontext for the framegraph.
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus initialize(
@@ -45,7 +45,7 @@ namespace engine
                     Shared<wsi::CWSIDisplay>            const &aDisplay,
                     SRendererConfiguration              const &aConfig);
 
-            EEngineStatus createDeferredPipeline(framegraph::SFrameGraphResourceContext &aResourceContext);
+            EEngineStatus createDeferredPipeline(framegraph::SRenderGraphResourceContext &aResourceContext);
 
             /**
              * Deinitialize and clear the renderer.
@@ -87,8 +87,8 @@ namespace engine
              * Render an entire scene... (format not specified yet..)
              * @return
              */
-            EEngineStatus renderSceneDeferred(SFrameGraphDataSource    &aDataSource
-                                            , SFrameGraphRenderContext &aRenderContext);
+            EEngineStatus renderSceneDeferred(SRenderGraphDataSource    &aDataSource
+                                            , SRenderGraphRenderContext &aRenderContext);
 
         private_members:
             Shared<os::SApplicationEnvironment> mAppEnvironment;

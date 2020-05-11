@@ -1239,15 +1239,15 @@ Parsing file /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/mo
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/patterns/observer.h:2: warning: the name `sr_observer.h' supplied as the second argument in the \file statement is not an input file
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/serialization/serialization.h:2: warning: the name `sr_serialization.h' supplied as the second argument in the \file statement is not an input file
 /home/dotti/workspaces/shirabeengine/shirabeengine/crc32generator/code/source/applicationmain.cpp:81: warning: documented symbol `std::for_each' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/enginetest/code/source/tests/test_framegraph.cpp:73: warning: documented symbol `bool Test::FrameGraph::Test__FrameGraph::testAll' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/enginetest/code/source/tests/test_framegraph.cpp:73: warning: documented symbol `bool Test::RenderGraph::Test__RenderGraph::testAll' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/enginetest/code/source/tests/test_framegraph_mocks.cpp:10: warning: no uniquely matching class member found for 
-  CEngineResult Test::FrameGraph::CMockRenderContext::bindResource(PublicResourceId_t const &aResourceId)
+  CEngineResult Test::RenderGraph::CMockRenderContext::bindResource(PublicResourceId_t const &aResourceId)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/enginetest/code/source/tests/test_framegraph_mocks.cpp:32: warning: no uniquely matching class member found for 
-  CEngineResult Test::FrameGraph::MockRenderContext::render(SRenderable const &aRenderable)
+  CEngineResult Test::RenderGraph::MockRenderContext::render(SRenderable const &aRenderable)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/enginetest/code/source/tests/test_framegraph_mocks.cpp:339: warning: no uniquely matching class member found for 
-  CEngineResult Test::FrameGraph::CMockGFXAPIResourceTaskBackend::initialize()
+  CEngineResult Test::RenderGraph::CMockGFXAPIResourceTaskBackend::initialize()
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/game/code/source/applicationmain.cpp:27: warning: no uniquely matching class member found for 
   CLog::Status(Main::logTag(), "Shirabe Engine Game")
@@ -1421,7 +1421,7 @@ bool engine::operator<(const std::shared_ptr< T >< engine::ITimespan > &aLHS, co
 Possible candidates:
  'static bool operator<(Shared< ITimespan > const &aLHS, Shared< ITimespan > const &aRHS)' at line 254 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/itimespan.h
  'static bool operator<(ETimespanUnit l, ETimespanUnit r)' at line 63 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/timespanunit.h
- 'SHIRABE_TEST_EXPORT bool operator<(SFrameGraphResource const &aLHS, SFrameGraphResource const &aRHS)' at line 236 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h
+ 'SHIRABE_TEST_EXPORT bool operator<(SRenderGraphResource const &aLHS, SRenderGraphResource const &aRHS)' at line 236 of file/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphdata.h
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/source/benchmarking/timer/itimespan.cpp:54: warning: no matching file member found for 
 bool engine::operator>(const std::shared_ptr< T >< engine::ITimespan > &aLHS, const std::shared_ptr< T >< engine::ITimespan > &aRHS)
@@ -1734,10 +1734,10 @@ Possible candidates:
   std::stack< PassUID_t > const  & engine::framegraph::CGraph::CAccessor::passExecutionOrder() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:39: warning: no uniquely matching class member found for 
-  FrameGraphResourceIdList const  & engine::framegraph::CGraph::CAccessor::resources() const
+  RenderGraphResourceIdList const  & engine::framegraph::CGraph::CAccessor::resources() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:48: warning: no matching class member found for 
-  CFrameGraphMutableResources const  & engine::framegraph::CGraph::CAccessor::resourceData() const
+  CRenderGraphMutableResources const  & engine::framegraph::CGraph::CAccessor::resourceData() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:89: warning: no matching class member found for 
   CGraph::EGraphMode engine::framegraph::CGraph::CAccessor::graphMode() const
@@ -1746,35 +1746,35 @@ Possible candidates:
   bool engine::framegraph::CGraph::CAccessor::renderToBackBuffer() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:107: warning: no matching class member found for 
-  FrameGraphResourceId_t const  & engine::framegraph::CGraph::CAccessor::outputTextureResourceId() const
+  RenderGraphResourceId_t const  & engine::framegraph::CGraph::CAccessor::outputTextureResourceId() const
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:116: warning: documented symbol `engine::framegraph::CGraph::CMutableAccessor::CMutableAccessor' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:125: warning: documented symbol `AdjacencyListMap_t< PassUID_t > & engine::framegraph::CGraph::CMutableAccessor::mutablePassAdjacency' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraph.cpp:354: warning: documented symbol `CEngineResult engine::framegraph::CGraph::initializeResources' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:192: warning: documented symbol `engine::framegraph::SFrameGraphResource::SFrameGraphResource' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:207: warning: documented symbol `engine::framegraph::SFrameGraphBuffer::SFrameGraphBuffer' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:217: warning: documented symbol `engine::framegraph::SFrameGraphBufferView::SFrameGraphBufferView' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:228: warning: documented symbol `engine::framegraph::SFrameGraphTexture::SFrameGraphTexture' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:240: warning: documented symbol `void engine::framegraph::SFrameGraphTexture::assignTextureParameters' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:266: warning: documented symbol `engine::framegraph::SFrameGraphTextureView::SFrameGraphTextureView' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:278: warning: documented symbol `void engine::framegraph::SFrameGraphAttachmentCollection::addInputAttachment' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:323: warning: documented symbol `engine::framegraph::SFrameGraphResourceFlags::SFrameGraphResourceFlags' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:353: warning: documented symbol `engine::framegraph::CFrameGraphResources::CFrameGraphResources' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp:56: warning: documented symbol `engine::framegraph::CFrameGraphRenderContext::CFrameGraphRenderContext' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp:71: warning: documented symbol `CEngineResult engine::framegraph::CFrameGraphRenderContext::mapFrameGraphToInternalResource' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:192: warning: documented symbol `engine::framegraph::SRenderGraphResource::SRenderGraphResource' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:207: warning: documented symbol `engine::framegraph::SRenderGraphBuffer::SRenderGraphBuffer' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:217: warning: documented symbol `engine::framegraph::SRenderGraphBufferView::SRenderGraphBufferView' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:228: warning: documented symbol `engine::framegraph::SRenderGraphImage::SRenderGraphImage' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:240: warning: documented symbol `void engine::framegraph::SRenderGraphImage::assignImageParameters' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:266: warning: documented symbol `engine::framegraph::SRenderGraphImageView::SRenderGraphImageView' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:278: warning: documented symbol `void engine::framegraph::SRenderGraphAttachmentCollection::addInputAttachment' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:323: warning: documented symbol `engine::framegraph::SRenderGraphResourceFlags::SRenderGraphResourceFlags' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphdata.cpp:353: warning: documented symbol `engine::framegraph::CRenderGraphResources::CRenderGraphResources' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp:56: warning: documented symbol `engine::framegraph::CRenderGraphRenderContext::CRenderGraphRenderContext' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/framegraphrendercontext.cpp:71: warning: documented symbol `CEngineResult engine::framegraph::CRenderGraphRenderContext::mapRenderGraphToInternalResource' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:61: warning: documented symbol `engine::framegraph::CGraphBuilder::CGraphBuilder' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:94: warning: documented symbol `FrameGraphResourceId_t engine::framegraph::CGraphBuilder::generatePassUID' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:94: warning: documented symbol `RenderGraphResourceId_t engine::framegraph::CGraphBuilder::generatePassUID' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/graphbuilder.cpp:130: warning: no uniquely matching class member found for 
   CEngineResult engine::framegraph::CGraphBuilder::initialize(Shared< SApplicationEnvironment > const &aApplicationEnvironment, Shared< wsi::CWSIDisplay > const &aDisplay)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SCompositingModuleTag_t >::SExportData > engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >::addDefaultCompositingPass' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData > engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::addGBufferGenerationPass' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData > engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::addPrePass' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp:14: warning: documented symbol `CEngineResult< CFrameGraphModule< SLightingModuleTag_t >::SLightingExportData > engine::framegraph::CFrameGraphModule< SLightingModuleTag_t >::addLightingPass' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/compositing.cpp:14: warning: documented symbol `CEngineResult< CRenderGraphModule< SCompositingModuleTag_t >::SExportData > engine::framegraph::CRenderGraphModule< SCompositingModuleTag_t >::addDefaultCompositingPass' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gbuffergeneration.cpp:14: warning: documented symbol `CEngineResult< CRenderGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData > engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >::addGBufferGenerationPass' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/gfxapicommon.cpp:14: warning: documented symbol `CEngineResult< CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData > engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::addPrePass' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/modules/lighting.cpp:14: warning: documented symbol `CEngineResult< CRenderGraphModule< SLightingModuleTag_t >::SLightingExportData > engine::framegraph::CRenderGraphModule< SLightingModuleTag_t >::addLightingPass' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:10: warning: documented symbol `engine::framegraph::CPassBase::CAccessor::CAccessor' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:18: warning: documented symbol `FrameGraphResourceIdList const  & engine::framegraph::CPassBase::CAccessor::resourceReferences' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:18: warning: documented symbol `RenderGraphResourceIdList const  & engine::framegraph::CPassBase::CAccessor::resourceReferences' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:27: warning: documented symbol `engine::framegraph::CPassBase::CMutableAccessor::CMutableAccessor' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:36: warning: documented symbol `FrameGraphResourceIdList & engine::framegraph::CPassBase::CMutableAccessor::mutableResourceReferences' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:36: warning: documented symbol `RenderGraphResourceIdList & engine::framegraph::CPassBase::CMutableAccessor::mutableResourceReferences' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:54: warning: no matching class member found for 
   Unique< CPassBase::CAccessor > engine::framegraph::CPassBase::getAccessor(engine::CPassKey< engine::framegraph::CGraphBuilder > &&aPassKey) const
 Possible candidates:
@@ -1785,15 +1785,15 @@ Possible candidates:
   engine::framegraph::CPassBase::CPassBase(PassUID_t const &aPassUID, std::string const &aPassName)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/pass.cpp:160: warning: no uniquely matching class member found for 
-  CEngineResult engine::framegraph::CPassBase::registerResource(FrameGraphResourceId_t const &aResourceUID)
+  CEngineResult engine::framegraph::CPassBase::registerResource(RenderGraphResourceId_t const &aResourceUID)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp:14: warning: documented symbol `engine::framegraph::CPassBuilder::CPassBuilder' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp:74: warning: documented symbol `CEngineResult< FrameGraphResourceId_t > engine::framegraph::CPassBuilder::findDuplicateTextureView' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp:480: warning: documented symbol `CEngineResult< SFrameGraphResource > engine::framegraph::CPassBuilder::useTexture' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp:74: warning: documented symbol `CEngineResult< RenderGraphResourceId_t > engine::framegraph::CPassBuilder::findDuplicateImageView' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/framegraph/passbuilder.cpp:480: warning: documented symbol `CEngineResult< SRenderGraphResource > engine::framegraph::CPassBuilder::useImage' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:19: warning: documented symbol `engine::rendering::CRenderer::CRenderer' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:31: warning: documented symbol `engine::rendering::CRenderer::~CRenderer' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/source/renderer/renderer.cpp:39: warning: no uniquely matching class member found for 
-  EEngineStatus engine::rendering::CRenderer::initialize(Shared< SApplicationEnvironment > const &aApplicationEnvironment, Shared< wsi::CWSIDisplay > const &aDisplay, SRendererConfiguration const &aConfiguration, Shared< IFrameGraphRenderContext > &aFrameGraphRenderContext)
+  EEngineStatus engine::rendering::CRenderer::initialize(Shared< SApplicationEnvironment > const &aApplicationEnvironment, Shared< wsi::CWSIDisplay > const &aDisplay, SRendererConfiguration const &aConfiguration, Shared< IRenderGraphRenderContext > &aRenderGraphRenderContext)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:707: warning: no matching class member found for 
   template < TResource >
@@ -2898,23 +2898,23 @@ Generating docs for compound Engine::DX::_11::DX11ResourceTaskBackend...
 Generating docs for compound Engine::DX::_11::DxResourceDeleter...
 Generating docs for namespace engine::framegraph
 Generating docs for compound engine::framegraph::CallbackPass...
-Generating docs for compound engine::framegraph::CFrameGraphModule...
-Generating docs for compound engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >::SExportData...
-Generating docs for compound engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationImportData...
-Generating docs for compound engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassExportData...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassImportData...
-Generating docs for compound engine::framegraph::CFrameGraphModule< SLightingModuleTag_t >...
-Generating docs for nested compound engine::framegraph::CFrameGraphModule< SLightingModuleTag_t >::SLightingExportData...
-Generating docs for compound engine::framegraph::CFrameGraphMutableResources...
-Generating docs for compound engine::framegraph::CFrameGraphRenderContext...
-Generating docs for compound engine::framegraph::CFrameGraphResources...
-Generating docs for compound engine::framegraph::CFrameGraphResourcesRef...
-Generating docs for compound engine::framegraph::CFrameGraphResourcesRefContainer...
+Generating docs for compound engine::framegraph::CRenderGraphModule...
+Generating docs for compound engine::framegraph::CRenderGraphModule< SCompositingModuleTag_t >...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SCompositingModuleTag_t >::SExportData...
+Generating docs for compound engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >::SGBufferGenerationImportData...
+Generating docs for compound engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassExportData...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassImportData...
+Generating docs for compound engine::framegraph::CRenderGraphModule< SLightingModuleTag_t >...
+Generating docs for nested compound engine::framegraph::CRenderGraphModule< SLightingModuleTag_t >::SLightingExportData...
+Generating docs for compound engine::framegraph::CRenderGraphMutableResources...
+Generating docs for compound engine::framegraph::CRenderGraphRenderContext...
+Generating docs for compound engine::framegraph::CRenderGraphResources...
+Generating docs for compound engine::framegraph::CRenderGraphResourcesRef...
+Generating docs for compound engine::framegraph::CRenderGraphResourcesRefContainer...
 Generating docs for compound engine::framegraph::CGraph...
 Generating docs for nested compound engine::framegraph::CGraph::CMutableAccessor...
 Generating docs for compound engine::framegraph::CGraphBuilder...
@@ -2922,22 +2922,22 @@ Generating docs for compound engine::framegraph::CPassBase...
 Generating docs for nested compound engine::framegraph::CPassBase::CMutableAccessor...
 Generating docs for compound engine::framegraph::CPassBuilder...
 Generating docs for compound engine::framegraph::CSequenceUIDGenerator...
-Generating docs for compound engine::framegraph::IFrameGraphRenderContext...
+Generating docs for compound engine::framegraph::IRenderGraphRenderContext...
 Generating docs for compound engine::framegraph::SCompositingModuleTag_t...
-Generating docs for compound engine::framegraph::SFrameGraphAttachmentCollection...
-Generating docs for compound engine::framegraph::SFrameGraphBuffer...
-Generating docs for compound engine::framegraph::SFrameGraphBufferView...
-Generating docs for compound engine::framegraph::SFrameGraphMaterial...
-Generating docs for compound engine::framegraph::SFrameGraphMesh...
-Generating docs for compound engine::framegraph::SFrameGraphReadTextureFlags...
-Generating docs for compound engine::framegraph::SFrameGraphRenderableList...
-Generating docs for compound engine::framegraph::SFrameGraphRenderableListView...
-Generating docs for compound engine::framegraph::SFrameGraphResource...
-Generating docs for compound engine::framegraph::SFrameGraphResourceFlags...
-Generating docs for compound engine::framegraph::SFrameGraphTexture...
-Generating docs for compound engine::framegraph::SFrameGraphTextureResourceFlags...
-Generating docs for compound engine::framegraph::SFrameGraphTextureView...
-Generating docs for compound engine::framegraph::SFrameGraphWriteTextureFlags...
+Generating docs for compound engine::framegraph::SRenderGraphAttachmentCollection...
+Generating docs for compound engine::framegraph::SRenderGraphBuffer...
+Generating docs for compound engine::framegraph::SRenderGraphBufferView...
+Generating docs for compound engine::framegraph::SRenderGraphMaterial...
+Generating docs for compound engine::framegraph::SRenderGraphMesh...
+Generating docs for compound engine::framegraph::SRenderGraphReadTextureFlags...
+Generating docs for compound engine::framegraph::SRenderGraphRenderableList...
+Generating docs for compound engine::framegraph::SRenderGraphRenderableListView...
+Generating docs for compound engine::framegraph::SRenderGraphResource...
+Generating docs for compound engine::framegraph::SRenderGraphResourceFlags...
+Generating docs for compound engine::framegraph::SRenderGraphImage...
+Generating docs for compound engine::framegraph::SRenderGraphTextureResourceFlags...
+Generating docs for compound engine::framegraph::SRenderGraphImageView...
+Generating docs for compound engine::framegraph::SRenderGraphWriteTextureFlags...
 Generating docs for compound engine::framegraph::SGBufferModuleTag_t...
 Generating docs for compound engine::framegraph::SGraphicsAPICommonModuleTag_t...
 Generating docs for compound engine::framegraph::SLightingModuleTag_t...
@@ -3368,12 +3368,12 @@ Generating docs for compound test::BaseTestCase...
 Generating docs for compound test::BlogTestCase...
 Generating docs for compound test::MinimalTestCase...
 Generating docs for compound test::PageTestCase...
-Generating docs for namespace Test::FrameGraph
-Generating docs for compound Test::FrameGraph::CMockFrameGraphRenderContext...
-Generating docs for compound Test::FrameGraph::CMockGFXAPIResourceTaskBackend...
-Generating docs for compound Test::FrameGraph::CMockRenderContext...
-Generating docs for compound Test::FrameGraph::SSpawnProxy...
-Generating docs for compound Test::FrameGraph::Test__FrameGraph...
+Generating docs for namespace Test::RenderGraph
+Generating docs for compound Test::RenderGraph::CMockRenderGraphRenderContext...
+Generating docs for compound Test::RenderGraph::CMockGFXAPIResourceTaskBackend...
+Generating docs for compound Test::RenderGraph::CMockRenderContext...
+Generating docs for compound Test::RenderGraph::SSpawnProxy...
+Generating docs for compound Test::RenderGraph::Test__RenderGraph...
 Generating docs for namespace test::test_blog
 Generating docs for compound test::test_blog::ArchivedArticle...
 Generating docs for compound test::test_blog::AuthorList...
@@ -3547,91 +3547,91 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:129: warning: argument 'aOther' of command @param is not found in the argument list of engine::math::CField< T, TByteSize, TN, TStride >::operator-=(ClassType_t const &aRight)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:133: warning: The following parameters of engine::math::CField::operator-=(ClassType_t const &aRight) are not documented:
   parameter 'aRight'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::create(Shared< IAssetStorage > aAssetStorage, Shared< CMaterialLoader > aMaterialLoader, Shared< CResourceManagerBase > aResourceManager, Shared< IRenderContext > aRenderer) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::create(Shared< IAssetStorage > aAssetStorage, Shared< CMaterialLoader > aMaterialLoader, Shared< CResourceManagerBase > aResourceManager, Shared< IRenderContext > aRenderer) are not documented:
   parameter 'aMaterialLoader'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aSourceImage' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceTexture, SFrameGraphTexture const &aTargetTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aTargetImage' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceTexture, SFrameGraphTexture const &aTargetTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:83: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::copyImage(SFrameGraphTexture const &aSourceTexture, SFrameGraphTexture const &aTargetTexture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aSourceImage' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::copyImage(SRenderGraphImage const &aSourceTexture, SRenderGraphImage const &aTargetTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:76: warning: argument 'aTargetImage' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::copyImage(SRenderGraphImage const &aSourceTexture, SRenderGraphImage const &aTargetTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:83: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::copyImage(SRenderGraphImage const &aSourceTexture, SRenderGraphImage const &aTargetTexture) are not documented:
   parameter 'aSourceTexture'
   parameter 'aTargetTexture'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:87: warning: argument 'aImageId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:93: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::copyImageToBackBuffer(SFrameGraphTexture const &aSourceImageId) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:87: warning: argument 'aImageId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::copyImageToBackBuffer(SRenderGraphImage const &aSourceImageId)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:93: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::copyImageToBackBuffer(SRenderGraphImage const &aSourceImageId) are not documented:
   parameter 'aSourceImageId'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:96: warning: argument 'aSwapChainResource' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:102: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:96: warning: argument 'aSwapChainResource' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:102: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::bindSwapChain(std::string const &aSwapChainId) are not documented:
   parameter 'aSwapChainId'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:208: warning: argument 'aTexture' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::createTexture(SFrameGraphTexture const &texture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:214: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::createTexture(SFrameGraphTexture const &texture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:208: warning: argument 'aTexture' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::createImage(SRenderGraphImage const &texture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:214: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::createImage(SRenderGraphImage const &texture) are not documented:
   parameter 'texture'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:329: warning: argument 'aResource' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:335: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unbindBufferView(FrameGraphResourceId_t const &aResourceId) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:329: warning: argument 'aResource' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::unbindBufferView(RenderGraphResourceId_t const &aResourceId)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:335: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::unbindBufferView(RenderGraphResourceId_t const &aResourceId) are not documented:
   parameter 'aResourceId'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:347: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:353: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:347: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::loadMeshAsset(SRenderGraphMesh const &aMesh)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:353: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::loadMeshAsset(SRenderGraphMesh const &aMesh) are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:356: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:362: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:356: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::unloadMeshAsset(SRenderGraphMesh const &aMesh)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:362: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::unloadMeshAsset(SRenderGraphMesh const &aMesh) are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:365: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:371: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:365: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::bindMesh(SRenderGraphMesh const &aMesh)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:371: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::bindMesh(SRenderGraphMesh const &aMesh) are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:374: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unbindMesh(SFrameGraphMesh const &aMesh)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:380: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unbindMesh(SFrameGraphMesh const &aMesh) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:374: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::unbindMesh(SRenderGraphMesh const &aMesh)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:380: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::unbindMesh(SRenderGraphMesh const &aMesh) are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:383: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:389: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:383: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::loadMaterialAsset(SRenderGraphMaterial const &aMaterial)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:389: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::loadMaterialAsset(SRenderGraphMaterial const &aMaterial) are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:392: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:398: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:392: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::unloadMaterialAsset(SRenderGraphMaterial const &aMaterial)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:398: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::unloadMaterialAsset(SRenderGraphMaterial const &aMaterial) are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:401: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:407: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:401: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::bindMaterial(SRenderGraphMaterial const &aMaterial)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:407: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::bindMaterial(SRenderGraphMaterial const &aMaterial) are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:410: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:416: warning: The following parameters of engine::framegraph::CFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:410: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::unbindMaterial(SRenderGraphMaterial const &aMaterial)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraphrendercontext.h:416: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::unbindMaterial(SRenderGraphMaterial const &aMaterial) are not documented:
   parameter 'aMaterial'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/gfxapiresourcebackend.h:144: warning: The following parameters of engine::gfxapi::CGFXAPIResourceBackend::registerResource(PublicResourceId_t const &aId, Shared< void > const &aResource, EImportStorageMode const &aImportStorageMode=EImportStorageMode::NoOverwrite) are not documented:
   parameter 'aImportStorageMode'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/graphicsapi/code/include/graphicsapi/resources/gfxapiresourcetaskbackend.h:248: warning: The following parameters of engine::gfxapi::CGFXAPIResourceTaskBackend::queryTask(typename TResource::CQuery const &aRequest, SGFXAPIResourceHandleAssignment const &aAssignment, ResourceTaskFn_t &aOutTask) are not documented:
   parameter 'aOutTask'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:257: warning: The following parameters of engine::framegraph::CGraph::bindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:251: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::bindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:257: warning: The following parameters of engine::framegraph::CGraph::bindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:268: warning: The following parameters of engine::framegraph::CGraph::unbindResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:262: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::unbindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:268: warning: The following parameters of engine::framegraph::CGraph::unbindResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:292: warning: The following parameters of engine::framegraph::CGraph::deinitializeResources(Shared< IFrameGraphRenderContext > &aRenderContext, FrameGraphResourceIdList const &aResourceIds) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:286: warning: argument 'resourceIds' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:292: warning: The following parameters of engine::framegraph::CGraph::deinitializeResources(Shared< IRenderGraphRenderContext > &aRenderContext, RenderGraphResourceIdList const &aResourceIds) are not documented:
   parameter 'aRenderContext'
   parameter 'aResourceIds'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:297: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:303: warning: The following parameters of engine::framegraph::CGraph::initializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:297: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTexture(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:303: warning: The following parameters of engine::framegraph::CGraph::initializeTexture(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:308: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:315: warning: The following parameters of engine::framegraph::CGraph::initializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:308: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeTextureView(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture, Shared< SRenderGraphImageView > const &aTextureView)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:315: warning: The following parameters of engine::framegraph::CGraph::initializeTextureView(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture, Shared< SRenderGraphImageView > const &aTextureView) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:320: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:325: warning: The following parameters of engine::framegraph::CGraph::initializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:320: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBuffer(Shared< IRenderGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:325: warning: The following parameters of engine::framegraph::CGraph::initializeBuffer(Shared< IRenderGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:329: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:333: warning: The following parameters of engine::framegraph::CGraph::initializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:329: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::initializeBufferView(Shared< IRenderGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:333: warning: The following parameters of engine::framegraph::CGraph::initializeBufferView(Shared< IRenderGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:337: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:343: warning: The following parameters of engine::framegraph::CGraph::deinitializeTexture(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:337: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTexture(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:343: warning: The following parameters of engine::framegraph::CGraph::deinitializeTexture(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:348: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:355: warning: The following parameters of engine::framegraph::CGraph::deinitializeTextureView(Shared< IFrameGraphRenderContext > &aRenderContext, Shared< SFrameGraphTexture > const &aTexture, Shared< SFrameGraphTextureView > const &aTextureView) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:348: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeTextureView(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture, Shared< SRenderGraphImageView > const &aTextureView)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:355: warning: The following parameters of engine::framegraph::CGraph::deinitializeTextureView(Shared< IRenderGraphRenderContext > &aRenderContext, Shared< SRenderGraphImage > const &aTexture, Shared< SRenderGraphImageView > const &aTextureView) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:361: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:366: warning: The following parameters of engine::framegraph::CGraph::deinitializeBufferView(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:361: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBufferView(Shared< IRenderGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:366: warning: The following parameters of engine::framegraph::CGraph::deinitializeBufferView(Shared< IRenderGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:369: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:374: warning: The following parameters of engine::framegraph::CGraph::deinitializeBuffer(Shared< IFrameGraphRenderContext > &aRenderContext) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:369: warning: argument 'renderContext' of command @param is not found in the argument list of engine::framegraph::CGraph::deinitializeBuffer(Shared< IRenderGraphRenderContext > &aRenderContext)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/framegraph.h:374: warning: The following parameters of engine::framegraph::CGraph::deinitializeBuffer(Shared< IRenderGraphRenderContext > &aRenderContext) are not documented:
   parameter 'aRenderContext'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h:171: warning: argument 'readableIdentifier' of command @param is not found in the argument list of engine::framegraph::CGraphBuilder::registerRenderables(std::string const &aReadableIdentifier, rendering::RenderableList const &aRenderables)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/graphbuilder.h:171: warning: argument 'renderables' of command @param is not found in the argument list of engine::framegraph::CGraphBuilder::registerRenderables(std::string const &aReadableIdentifier, rendering::RenderableList const &aRenderables)
@@ -3716,16 +3716,16 @@ Generating XML output for class engine::math::CField
 Generating XML output for class engine::asset::CFileSystemAssetDataSource
 Generating XML output for class engine::gfxapi::CFrameBuffer
 Generating XML output for class engine::gfxapi::CFrameBufferDeclaration
-Generating XML output for class engine::framegraph::CFrameGraphModule
-Generating XML output for class engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >
-Generating XML output for class engine::framegraph::CFrameGraphModule< SLightingModuleTag_t >
-Generating XML output for class engine::framegraph::CFrameGraphMutableResources
-Generating XML output for class engine::framegraph::CFrameGraphRenderContext
-Generating XML output for class engine::framegraph::CFrameGraphResources
-Generating XML output for class engine::framegraph::CFrameGraphResourcesRef
-Generating XML output for class engine::framegraph::CFrameGraphResourcesRefContainer
+Generating XML output for class engine::framegraph::CRenderGraphModule
+Generating XML output for class engine::framegraph::CRenderGraphModule< SCompositingModuleTag_t >
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >
+Generating XML output for class engine::framegraph::CRenderGraphModule< SLightingModuleTag_t >
+Generating XML output for class engine::framegraph::CRenderGraphMutableResources
+Generating XML output for class engine::framegraph::CRenderGraphRenderContext
+Generating XML output for class engine::framegraph::CRenderGraphResources
+Generating XML output for class engine::framegraph::CRenderGraphResourcesRef
+Generating XML output for class engine::framegraph::CRenderGraphResourcesRefContainer
 Generating XML output for class engine::resources::CGenericProxyBase
 Generating XML output for class engine::gfxapi::CGFXAPIResourceBackend
 Generating XML output for class engine::gfxapi::CGFXAPIResourceProxy
@@ -3757,9 +3757,9 @@ Generating XML output for class engine::math::CMatrixRowIterator_t
 Generating XML output for class engine::benchmarking::CMeasurementChunk
 Generating XML output for class engine::benchmarking::CMeasurementChunkTraits
 Generating XML output for class engine::benchmarking::CMeasurementDataStore
-Generating XML output for class Test::FrameGraph::CMockFrameGraphRenderContext
-Generating XML output for class Test::FrameGraph::CMockGFXAPIResourceTaskBackend
-Generating XML output for class Test::FrameGraph::CMockRenderContext
+Generating XML output for class Test::RenderGraph::CMockRenderGraphRenderContext
+Generating XML output for class Test::RenderGraph::CMockGFXAPIResourceTaskBackend
+Generating XML output for class Test::RenderGraph::CMockRenderContext
 Generating XML output for class engine::framegraph::CGraph::CMutableAccessor
 Generating XML output for class engine::framegraph::CPassBase::CMutableAccessor
 Generating XML output for class engine::CObserver
@@ -3769,14 +3769,14 @@ Generating XML output for class m::test::test_code::Code
 Generating XML output for class m::components::CodeFigure
 Generating XML output for class documentation::test_doxygen::test_contents::CodeLanguage
 Generating XML output for class test::test_blog::CollapseFirstArticle
-Generating XML output for class test::test_blog::Collap/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:162: warning: argument 'aSubjacentTargetResource' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::readTexture(SFrameGraphResource const &subjacentTargetResource, SFrameGraphTextureResourceFlags const &aFlags)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:169: warning: The following parameters of engine::framegraph::CPassBuilder::readTexture(SFrameGraphResource const &subjacentTargetResource, SFrameGraphTextureResourceFlags const &aFlags) are not documented:
+Generating XML output for class test::test_blog::Collap/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:162: warning: argument 'aSubjacentTargetResource' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::readImage(SRenderGraphResource const &subjacentTargetResource, SRenderGraphTextureResourceFlags const &aFlags)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:169: warning: The following parameters of engine::framegraph::CPassBuilder::readImage(SRenderGraphResource const &subjacentTargetResource, SRenderGraphTextureResourceFlags const &aFlags) are not documented:
   parameter 'subjacentTargetResource'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:262: warning: argument 'aResourceData' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::isTextureBeingReadInSubresourceRange(RefIndex_t const &aResourceViews, CFrameGraphResources const &aResources, SFrameGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:273: warning: The following parameters of engine::framegraph::CPassBuilder::isTextureBeingReadInSubresourceRange(RefIndex_t const &aResourceViews, CFrameGraphResources const &aResources, SFrameGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:262: warning: argument 'aResourceData' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::isImageBeingReadInSubresourceRange(RefIndex_t const &aResourceViews, CRenderGraphResources const &aResources, SRenderGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:273: warning: The following parameters of engine::framegraph::CPassBuilder::isImageBeingReadInSubresourceRange(RefIndex_t const &aResourceViews, CRenderGraphResources const &aResources, SRenderGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange) are not documented:
   parameter 'aResources'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:281: warning: argument 'aResourceData' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::isTextureBeingWrittenInSubresourceRange(RefIndex_t const &aResourceViews, CFrameGraphResources const &aResources, SFrameGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:292: warning: The following parameters of engine::framegraph::CPassBuilder::isTextureBeingWrittenInSubresourceRange(RefIndex_t const &aResourceViews, CFrameGraphResources const &aResources, SFrameGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:281: warning: argument 'aResourceData' of command @param is not found in the argument list of engine::framegraph::CPassBuilder::isImageBeingWrittenInSubresourceRange(RefIndex_t const &aResourceViews, CRenderGraphResources const &aResources, SRenderGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/passbuilder.h:292: warning: The following parameters of engine::framegraph::CPassBuilder::isImageBeingWrittenInSubresourceRange(RefIndex_t const &aResourceViews, CRenderGraphResources const &aResources, SRenderGraphResource const &aSourceResource, CRange const &aArraySliceRange, CRange const &aMipSliceRange) are not documented:
   parameter 'aResources'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/platformtime.h:64: warning: argument 'unit' of command @param is not found in the argument list of engine::CPlatformTime< T >::getConversionMask(ETimeUnit aUnit=ETimeUnit::Seconds)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/timer/platformtime.h:67: warning: Found unknown command `\unit'
@@ -4022,32 +4022,32 @@ Generating XML output for class documentation::test_doxygen::test_cpp::Enum/home
   parameter 'aInitialData'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/serialization/serialization.h:169: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::IDeserializer< T >::deserialize(std::string const &aSource)=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/serialization/serialization.h:179: warning: argument 'aOutResult' of command @param is not found in the argument list of engine::serialization::IDeserializer< T >::deserialize(std::vector< uint8_t > const &aSource)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:77: warning: argument 'aSwapChainResource' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:83: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::beginGraphicsFrame(std::string const &aSwapChainId)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:77: warning: argument 'aSwapChainResource' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::bindSwapChain(std::string const &aSwapChainId)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:83: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::beginGraphicsFrame(std::string const &aSwapChainId)=0 are not documented:
   parameter 'aSwapChainId'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:343: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::loadMeshAsset(SFrameGraphMesh const &aMesh)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:349: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::readMeshAsset(SFrameGraphMesh const &aMesh)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:343: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::loadMeshAsset(SRenderGraphMesh const &aMesh)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:349: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::readMeshAsset(SRenderGraphMesh const &aMesh)=0 are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:352: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:358: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unloadMeshAsset(SFrameGraphMesh const &aMesh)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:352: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::unloadMeshAsset(SRenderGraphMesh const &aMesh)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:358: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::unloadMeshAsset(SRenderGraphMesh const &aMesh)=0 are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:361: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:367: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::bindMesh(SFrameGraphMesh const &aMesh)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:361: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::bindMesh(SRenderGraphMesh const &aMesh)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:367: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::bindMesh(SRenderGraphMesh const &aMesh)=0 are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:370: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unbindMesh(SFrameGraphMesh const &aMesh)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:376: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unbindMesh(SFrameGraphMesh const &aMesh)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:370: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::unbindMesh(SRenderGraphMesh const &aMesh)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:376: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::unbindMesh(SRenderGraphMesh const &aMesh)=0 are not documented:
   parameter 'aMesh'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:379: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:385: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::loadMaterialAsset(SFrameGraphMaterial const &aMaterial)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:379: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::loadMaterialAsset(SRenderGraphMaterial const &aMaterial)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:385: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::loadMaterialAsset(SRenderGraphMaterial const &aMaterial)=0 are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:388: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:394: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unloadMaterialAsset(SFrameGraphMaterial const &aMaterial)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:388: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::unloadMaterialAsset(SRenderGraphMaterial const &aMaterial)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:394: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::unloadMaterialAsset(SRenderGraphMaterial const &aMaterial)=0 are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:397: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:403: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::bindMaterial(SFrameGraphMaterial const &aMaterial)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:397: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::bindMaterial(SRenderGraphMaterial const &aMaterial)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:403: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::bindMaterial(SRenderGraphMaterial const &aMaterial)=0 are not documented:
   parameter 'aMaterial'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:406: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)=0
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:412: warning: The following parameters of engine::framegraph::IFrameGraphRenderContext::unbindMaterial(SFrameGraphMaterial const &aMaterial)=0 are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:406: warning: argument 'aResourceId' of command @param is not found in the argument list of engine::framegraph::IRenderGraphRenderContext::unbindMaterial(SRenderGraphMaterial const &aMaterial)=0
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/framegraph/iframegraphrendercontext.h:412: warning: The following parameters of engine::framegraph::IRenderGraphRenderContext::unbindMaterial(SRenderGraphMaterial const &aMaterial)=0 are not documented:
   parameter 'aMaterial'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:137: warning: argument 'aName' of command @param is not found in the argument list of engine::serialization::IJSONDeserializer< T >::beginObject(uint32_t const &aIndex)=0
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/material/code/include/material/serialization.h:142: warning: The following parameters of engine::serialization::IJSONDeserializer::beginObject(uint32_t const &aIndex)=0 are not documented:
@@ -4114,7 +4114,7 @@ Generating XML output for class engine::IComponent
 Generating XML output for class engine::IComponentFactory
 Generating XML output for class engine::serialization::IDeserializable
 Generating XML output for class engine::serialization::IDeserializer
-Generating XML output for class engine::framegraph::IFrameGraphRenderContext
+Generating XML output for class engine::framegraph::IRenderGraphRenderContext
 Generating XML output for class engine::resources::IGAPIResourceAdapter
 Generating XML output for class engine::gfxapi::IGFXAPIResourceTaskBackendModule
 Generating XML output for class documentation::test_doxygen::test_compound::Ignored
@@ -4273,28 +4273,28 @@ Generating XML output for class documentation::test_doxygen::test_layout::Search
 Generating XML output for class documentation::test_doxygen::test_contents::SectionsHeadings
 Generating XML output for class documentation::test_doxygen::test_contents::SectionUnderscoreOne
 Generating XML output for class documentation::test_doxygen::test_search::Serialization
-Generating XML output for class engine::framegraph::CFrameGraphModule< SCompositingModuleTag_t >::SExportData
-Generating XML output for class engine::framegraph::SFrameGraphAttachmentCollection
-Generating XML output for class engine::framegraph::SFrameGraphBuffer
-Generating XML output for class engine::framegraph::SFrameGraphBufferView
-Generating XML output for class engine::framegraph::SFrameGraphMaterial
-Generating XML output for class engine::framegraph::SFrameGraphMesh
-Generating XML output for class engine::framegraph::SFrameGraphReadTextureFlags
-Generating XML output for class engine::framegraph::SFrameGraphRenderableList
-Generating XML output for class engine::framegraph::SFrameGraphRenderableListView
-Generating XML output for class engine::framegraph::SFrameGraphResource
-Generating XML output for class engine::framegraph::SFrameGraphResourceFlags
-Generating XML output for class engine::framegraph::SFrameGraphTexture
-Generating XML output for class engine::framegraph::SFrameGraphTextureResourceFlags
-Generating XML output for class engine::framegraph::SFrameGraphTextureView
-Generating XML output for class engine::framegraph::SFrameGraphWriteTextureFlags
+Generating XML output for class engine::framegraph::CRenderGraphModule< SCompositingModuleTag_t >::SExportData
+Generating XML output for class engine::framegraph::SRenderGraphAttachmentCollection
+Generating XML output for class engine::framegraph::SRenderGraphBuffer
+Generating XML output for class engine::framegraph::SRenderGraphBufferView
+Generating XML output for class engine::framegraph::SRenderGraphMaterial
+Generating XML output for class engine::framegraph::SRenderGraphMesh
+Generating XML output for class engine::framegraph::SRenderGraphReadTextureFlags
+Generating XML output for class engine::framegraph::SRenderGraphRenderableList
+Generating XML output for class engine::framegraph::SRenderGraphRenderableListView
+Generating XML output for class engine::framegraph::SRenderGraphResource
+Generating XML output for class engine::framegraph::SRenderGraphResourceFlags
+Generating XML output for class engine::framegraph::SRenderGraphImage
+Generating XML output for class engine::framegraph::SRenderGraphTextureResourceFlags
+Generating XML output for class engine::framegraph::SRenderGraphImageView
+Generating XML output for class engine::framegraph::SRenderGraphWriteTextureFlags
 Generating XML output for class engine::gfxapi::SGAPIAdapter
 Generating XML output for class engine::gfxapi::SGAPIAdapterOutputConfig
 Generating XML output for class engine::gfxapi::SGAPIDeviceCapabilities
 Generating XML output for class engine::gfxapi::SGAPIOutput
 Generating XML output for class engine::gfxapi::SGAPIOutputMode
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGBufferModuleTag_t >::SGBufferGenerationImportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >::SGBufferGenerationExportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGBufferModuleTag_t >::SGBufferGenerationImportData
 Generating XML output for class engine::framegraph::SGBufferModuleTag_t
 Generating XML output for class engine::gfxapi::SGFXAPIResourceHandleAssignment
 Generating XML output for class engine::framegraph::SGraphicsAPICommonModuleTag_t
@@ -4302,7 +4302,7 @@ Generating XML output for class documentation::test_doxygen::test_cpp::SignalsSl
 Generating XML output for class documentation::test_python::test_pybind::Signature
 Generating XML output for class documentation::test_python::test_pybind::Signatures
 Generating XML output for class engine::asset::SImage
-Generating XML output for class engine::framegraph::CFrameGraphModule< SLightingModuleTag_t >::SLightingExportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SLightingModuleTag_t >::SLightingExportData
 Generating XML output for class engine::framegraph::SLightingModuleTag_t
 Generating XML output for class m::htmlsanity::SmartQuotes
 Generating XML output for class engine::gfxapi::SMaterial
@@ -4337,16 +4337,16 @@ Generating XML output for class engine::material::SNamedResource
 Generating XML output for class engine::os::SOSDisplayDescriptor
 Generating XML output for class engine::framegraph::SPassResourceConstraint
 Generating XML output for class inspect_string::Specials
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassExportData
-Generating XML output for class engine::framegraph::CFrameGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassImportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPrePassExportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassExportData
+Generating XML output for class engine::framegraph::CRenderGraphModule< SGraphicsAPICommonModuleTag_t >::SPresentPassImportData
 Generating XML output for class engine::CCamera::SProjectionParameters
 Generating XML output for class engine::rendering::SRenderable
 Generating XML output for class engine::rendering::SRendererConfiguration
 Generating XML output for class engine::material::SSampledImage
 Generating XML output for class shader_precompiler::SShaderCompilationElement
 Generating XML output for class shader_precompiler::SShaderCompilationUnit
-Generating XML output for class Test::FrameGraph::SSpawnProxy
+Generating XML output for class Test::RenderGraph::SSpawnProxy
 Generating XML output for class engine::SSpawnProxy
 Generating XML output for class engine::material::SStageInput
 Generating XML output for class engine::material::SStageOutput
@@ -4393,7 +4393,7 @@ Generating XML output for class documentation::test_doxygen::test_cpp::TemplateA
 Generating XML output for class documentation::test_doxygen::test_layout::TemplateFallback
 Generating XML output for class TemplateWarning
 Generating XML output for class documentation::test_doxygen::test_undocumented::Test
-Generating XML output for class Test::FrameGraph::Test__FrameGraph
+Generating XML output for class Test::RenderGraph::Test__RenderGraph
 Generating XML output for class m::components::Text
 Generating XML output for class test::test_page::TitleSitenameAlias
 Generating XML output for class documentation::test_doxygen::test_page::Toc
@@ -4646,7 +4646,7 @@ Generating XML output for namespace sr::serialization
 Generating XML output for namespace std
 Generating XML output for namespace Test
 Generating XML output for namespace test
-Generating XML output for namespace Test::FrameGraph
+Generating XML output for namespace Test::RenderGraph
 Generating XML output for namespace test::test_blog
 Generating XML output for namespace test::test_layout
 Generating XML output for namespace test::test_page
