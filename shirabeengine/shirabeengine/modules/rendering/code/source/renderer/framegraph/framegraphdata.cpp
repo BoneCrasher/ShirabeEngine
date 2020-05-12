@@ -265,7 +265,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SRenderGraphTransientImageDescription::SRenderGraphTransientImageDescription()
+        SRenderGraphDynamicImageDescription::SRenderGraphDynamicImageDescription()
             : STextureInfo()
               , initialState(ERenderGraphResourceInitState::Undefined)
               , permittedUsage(ERenderGraphResourceUsage::Undefined)
@@ -284,19 +284,21 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SRenderGraphTransientImage::SRenderGraphTransientImage()
-            : SRenderGraphTypedResource<SRenderGraphTransientImageDescription>()
+        SRenderGraphImageDescription::SRenderGraphImageDescription()
+            : isDynamicImage(false)
+            , dynamicImage()
+            , persistentImage()
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        bool SRenderGraphTransientImage::validate() const
+        bool SRenderGraphImage::validate() const
         {
-            bool const dimensionsValid = (0 == description.width || not (0 == description.width || 0 == description.height || 0 == description.depth));
-            bool const mipLevelsValid  = (1 <= description.mipLevels);
-            bool const arraySizeValid  = (1 <= description.arraySize);
+            bool const dimensionsValid = (0 == description.dynamicImage.width || not (0 == description.dynamicImage.width || 0 == description.dynamicImage.height || 0 == description.dynamicImage.depth));
+            bool const mipLevelsValid  = (1 <= description.dynamicImage.mipLevels);
+            bool const arraySizeValid  = (1 <= description.dynamicImage.arraySize);
 
             return (dimensionsValid && mipLevelsValid && arraySizeValid);
         }
@@ -458,14 +460,9 @@ namespace engine
 #endif
                 mResources = aOther.resources();
 
-                for(RefIndex_t::value_type const&id : aOther.transientImages())
+                for(RefIndex_t::value_type const&id : aOther.images())
                 {
-                    CRenderGraphResourcesRef<SRenderGraphTransientImage>::insert(id);
-                }
-
-                for(RefIndex_t::value_type const&id : aOther.persistentImages())
-                {
-                    CRenderGraphResourcesRef<SRenderGraphPersistentImage>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphImage>::insert(id);
                 }
 
                 for(RefIndex_t::value_type const&id : aOther.imageViews())
@@ -520,7 +517,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SRenderGraphTransientImage>(framegraph::SRenderGraphTransientImage const &aTexture)
+    std::string convert_to_string<framegraph::SRenderGraphImage>(framegraph::SRenderGraphImage const &aTexture)
     {
         std::string s =
                 CString::format(
@@ -535,31 +532,12 @@ namespace engine
                     "Texture",
                     aTexture.resourceId,
                     aTexture.readableName,
-                    aTexture.description.width, aTexture.description.height, aTexture.description.depth,
-                    convert_to_string(aTexture.description.format),
-                    aTexture.description.arraySize,
-                    aTexture.description.mipLevels,
-                    convert_to_string(aTexture.description.initialState),
+                    aTexture.description.dynamicImage.width, aTexture.description.dynamicImage.height, aTexture.description.dynamicImage.depth,
+                    convert_to_string(aTexture.description.dynamicImage.format),
+                    aTexture.description.dynamicImage.arraySize,
+                    aTexture.description.dynamicImage.mipLevels,
+                    convert_to_string(aTexture.description.dynamicImage.initialState),
                     aTexture.referenceCount);
-        return s;
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
-    template <>
-    std::string convert_to_string<framegraph::SRenderGraphPersistentImage>(framegraph::SRenderGraphPersistentImage const &aTexture)
-    {
-        std::string s =
-                        CString::format(
-                            "  {} (RID: {})"
-                            "\n    Name:            {}"
-                            "\n    Reference-Count: {}",
-                            "Texture",
-                            aTexture.resourceId,
-                            aTexture.readableName,
-                            aTexture.referenceCount);
         return s;
     }
     //<-----------------------------------------------------------------------------

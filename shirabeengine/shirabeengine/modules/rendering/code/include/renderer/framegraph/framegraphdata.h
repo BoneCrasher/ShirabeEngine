@@ -50,14 +50,14 @@ namespace engine
         enum class ERenderGraphResourceType
                 : uint8_t
         {
-            Undefined = 0,
-            Texture   = 1,
-            Buffer,
-            TextureView,
-            BufferView,
-            Mesh,
-            Material,
-            Pipeline
+            Undefined = 0
+            , Image   = 1
+            , Buffer
+            , ImageView
+            , BufferView
+            , Mesh
+            , Material
+            , Pipeline
         };
 
         /**
@@ -222,15 +222,15 @@ namespace engine
             }
 
         public_members:
-            uint32_t                       referenceCount;
-            RenderPassUID_t                assignedRenderpassUID;
-            PassUID_t                      assignedPassUID;
-            RenderGraphResourceId_t         resourceId;
-            RenderGraphResourceId_t         parentResource;
-            RenderGraphResourceId_t         subjacentResource;
-            std::string                    readableName;
-            ERenderGraphResourceType        type;
-            bool                           isExternalResource;
+            uint32_t                 referenceCount;
+            RenderPassUID_t          assignedRenderpassUID;
+            PassUID_t                assignedPassUID;
+            RenderGraphResourceId_t  resourceId;
+            RenderGraphResourceId_t  parentResource;
+            RenderGraphResourceId_t  subjacentResource;
+            std::string              readableName;
+            ERenderGraphResourceType type;
+            bool                     isExternalResource;
         };
 
         SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource);
@@ -351,11 +351,11 @@ namespace engine
         SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphBufferView, SRenderGraphBufferView);
         SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphBufferView, SRenderGraphBufferView);
 
-        struct SHIRABE_TEST_EXPORT SRenderGraphTransientImageDescription
+        struct SHIRABE_TEST_EXPORT SRenderGraphDynamicImageDescription
             : public graphicsapi::STextureInfo
         {
         public_constructors:
-            SRenderGraphTransientImageDescription();
+            SRenderGraphDynamicImageDescription();
 
         public_members:
             ERenderGraphResourceInitState        initialState;
@@ -372,20 +372,31 @@ namespace engine
             resources::ResourceId_t imageId;
         };
 
+        struct SHIRABE_TEST_EXPORT SRenderGraphImageDescription
+        {
+        public_constructors:
+            SRenderGraphImageDescription();
+
+        public_members:
+            bool isDynamicImage;
+            SRenderGraphDynamicImageDescription    dynamicImage;
+            SRenderGraphPersistentImageDescription persistentImage;
+        };
+
         /**
          * @brief The SRenderGraphImage struct
          */
-        struct SHIRABE_TEST_EXPORT SRenderGraphTransientImage
-                : public SRenderGraphTypedResource<SRenderGraphTransientImageDescription>
+        struct SHIRABE_TEST_EXPORT SRenderGraphImage
+                : public SRenderGraphTypedResource<SRenderGraphImageDescription>
         {
         public_constructors:
             /**
              * Default-Construct a frame graph texture
              */
-            SRenderGraphTransientImage();
+            SRenderGraphImage();
 
         public_destructors:
-            virtual ~SRenderGraphTransientImage() = default;
+            virtual ~SRenderGraphImage() = default;
 
         public_methods:
 
@@ -398,12 +409,8 @@ namespace engine
             virtual bool validate() const;
         };
 
-        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentImage
-            : public SRenderGraphTypedResource<SRenderGraphPersistentImageDescription>
-        {};
-
         struct SHIRABE_TEST_EXPORT SRenderGraphRenderTarget
-            : public SRenderGraphTransientImage
+            : public SRenderGraphImage
         {};
 
         struct SHIRABE_TEST_EXPORT SRenderGraphImageViewDescription
@@ -638,8 +645,7 @@ namespace engine
         };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
-            SRenderGraphTransientImage                      \
-            , SRenderGraphPersistentImage                   \
+            SRenderGraphImage                               \
             , SRenderGraphImageView                         \
             , SRenderGraphTransientBuffer                   \
             , SRenderGraphPersistentBuffer                  \
@@ -760,8 +766,7 @@ namespace engine
             }
 
             SHIRABE_INLINE Index_t    const &resources()         const { return mResources;                                                    }
-            SHIRABE_INLINE RefIndex_t const &transientImages()   const { return CRenderGraphResourcesRef<SRenderGraphTransientImage>::get();   }
-            SHIRABE_INLINE RefIndex_t const &persistentImages()  const { return CRenderGraphResourcesRef<SRenderGraphPersistentImage>::get();  }
+            SHIRABE_INLINE RefIndex_t const &images()            const { return CRenderGraphResourcesRef<SRenderGraphImage>::get();   }
             SHIRABE_INLINE RefIndex_t const &imageViews()        const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();        }
             SHIRABE_INLINE RefIndex_t const &transientBuffers()  const { return CRenderGraphResourcesRef<SRenderGraphTransientBuffer>::get();  }
             SHIRABE_INLINE RefIndex_t const &persistentBuffers() const { return CRenderGraphResourcesRef<SRenderGraphPersistentBuffer>::get(); }
@@ -848,18 +853,12 @@ namespace engine
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphResourceInitState>(framegraph::ERenderGraphResourceInitState const &aState);
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::ERenderGraphViewAccessMode>(framegraph::ERenderGraphViewAccessMode const &aAccessMode);
-
-
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphTransientImage>(framegraph::SRenderGraphTransientImage const &aTexture);
-
-    template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphPersistentImage>(framegraph::SRenderGraphPersistentImage const &aTexture);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphImage>(framegraph::SRenderGraphImage const &aTexture);
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphImageView>(framegraph::SRenderGraphImageView const &aTextureView);
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphTransientBuffer>(framegraph::SRenderGraphTransientBuffer const &aBuffer);
-
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphPersistentBuffer>(framegraph::SRenderGraphPersistentBuffer const &aBuffer);
     template <>

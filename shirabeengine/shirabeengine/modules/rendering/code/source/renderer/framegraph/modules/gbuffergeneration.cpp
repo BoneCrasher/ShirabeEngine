@@ -59,7 +59,7 @@ namespace engine
                                        height = displayDesc.bounds.size.y();
                                    }
 
-                                   SRenderGraphImageDescription gbuffer0Desc ={ };
+                                   SRenderGraphDynamicImageDescription gbuffer0Desc ={ };
                                    gbuffer0Desc.width              = width;
                                    gbuffer0Desc.height             = height;
                                    gbuffer0Desc.depth              = 1;
@@ -67,9 +67,9 @@ namespace engine
                                    gbuffer0Desc.initialState       = ERenderGraphResourceInitState::Clear;
                                    gbuffer0Desc.arraySize          = 1;
                                    gbuffer0Desc.mipLevels          = 1;
-                                   gbuffer0Desc.permittedUsage     =   ERenderGraphResourceUsage::InputAttachment
-                                                                       | ERenderGraphResourceUsage::ColorAttachment;
-                                   SRenderGraphImageDescription gbuffer1Desc ={ };
+                                   gbuffer0Desc.permittedUsage     = ERenderGraphResourceUsage::InputAttachment
+                                                                     | ERenderGraphResourceUsage::ColorAttachment;
+                                   SRenderGraphDynamicImageDescription gbuffer1Desc ={ };
                                    gbuffer1Desc.width              = width;
                                    gbuffer1Desc.height             = height;
                                    gbuffer1Desc.depth              = 1;
@@ -77,9 +77,9 @@ namespace engine
                                    gbuffer1Desc.initialState       = ERenderGraphResourceInitState::Clear;
                                    gbuffer1Desc.arraySize          = 1;
                                    gbuffer1Desc.mipLevels          = 1;
-                                   gbuffer1Desc.permittedUsage     =   ERenderGraphResourceUsage::InputAttachment
-                                                                       | ERenderGraphResourceUsage::ColorAttachment;
-                                   SRenderGraphImageDescription gbuffer2And3Desc ={ };
+                                   gbuffer1Desc.permittedUsage     = ERenderGraphResourceUsage::InputAttachment
+                                                                     | ERenderGraphResourceUsage::ColorAttachment;
+                                   SRenderGraphDynamicImageDescription gbuffer2And3Desc ={ };
                                    gbuffer2And3Desc.width          = width;
                                    gbuffer2And3Desc.height         = height;
                                    gbuffer2And3Desc.depth          = 1;
@@ -87,10 +87,10 @@ namespace engine
                                    gbuffer2And3Desc.initialState   = ERenderGraphResourceInitState::Clear;
                                    gbuffer2And3Desc.arraySize      = 2;
                                    gbuffer2And3Desc.mipLevels      = 1;
-                                   gbuffer2And3Desc.permittedUsage =   ERenderGraphResourceUsage::InputAttachment
-                                                                       | ERenderGraphResourceUsage::ColorAttachment;
+                                   gbuffer2And3Desc.permittedUsage = ERenderGraphResourceUsage::InputAttachment
+                                                                     | ERenderGraphResourceUsage::ColorAttachment;
 
-                                   SRenderGraphImageDescription depthStencilDesc ={ };
+                                   SRenderGraphDynamicImageDescription depthStencilDesc ={ };
                                    depthStencilDesc.width          = width;
                                    depthStencilDesc.height         = height;
                                    depthStencilDesc.depth          = 1;
@@ -98,8 +98,8 @@ namespace engine
                                    depthStencilDesc.initialState   = ERenderGraphResourceInitState::Clear;
                                    depthStencilDesc.arraySize      = 1;
                                    depthStencilDesc.mipLevels      = 1;
-                                   depthStencilDesc.permittedUsage =   ERenderGraphResourceUsage::InputAttachment
-                                                                       | ERenderGraphResourceUsage::DepthAttachment;
+                                   depthStencilDesc.permittedUsage = ERenderGraphResourceUsage::InputAttachment
+                                                                     | ERenderGraphResourceUsage::DepthAttachment;
 
                                    // Basic underlying output buffer to be linked
                                    aOutPassData.state.gbufferTexture0Id     = aBuilder.createRenderTarget("GBuffer Array Texture - Positions", gbuffer0Desc).data();

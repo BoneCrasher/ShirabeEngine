@@ -17,7 +17,7 @@ namespace engine
 
             for(auto const &attachmentImageId : attachmentImageIds)
             {
-                auto const &[result, image] = mResourceData.getResourceMutable<SRenderGraphTransientImage>(attachmentImageId);
+                auto const &[result, image] = mResourceData.getResourceMutable<SRenderGraphDynamicImage>(attachmentImageId);
 
                 aResourceContext.createTransientTexture(image);
             }

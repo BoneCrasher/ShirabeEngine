@@ -97,9 +97,9 @@ namespace engine
              * @return            Return a framegraph resource handle for the texture
              *                    creation.
              */
-            CEngineResult<SRenderGraphTransientImage> createImage(
-                std::string                  const &aName,
-                SRenderGraphImageDescription const &aDescriptor);
+            CEngineResult<SRenderGraphImage> createImage(
+                std::string                         const &aName,
+                SRenderGraphDynamicImageDescription const &aDescriptor);
 
             /**
              * Request the creation of a texture resource in the framegraph.
@@ -110,8 +110,8 @@ namespace engine
              *                    creation.
              */
             CEngineResult<SRenderGraphRenderTarget> createRenderTarget(
-                std::string                  const &aName,
-                SRenderGraphImageDescription const &aDescriptor);
+                std::string                           const &aName,
+                SRenderGraphDynamicImageDescription const &aDescriptor);
 
             /**
              * Request a write operation on a subjacent texture instance.
@@ -134,7 +134,7 @@ namespace engine
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> writeAttachment(
-                SRenderGraphImageView             &aImageView,
+                SRenderGraphImageView               &aImageView,
                 SRenderGraphWriteTextureFlags const &aFlags);
 
             /**
@@ -158,7 +158,7 @@ namespace engine
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> readAttachment(
-                SRenderGraphImageView            &aImageView,
+                SRenderGraphImageView              &aImageView,
                 SRenderGraphReadTextureFlags const &aFlags);
 
             /**
@@ -229,9 +229,12 @@ namespace engine
              */
             CEngineResult<> adjustArrayAndMipSliceRanges(
                     CRenderGraphResources const &aResourceData,
-                    SRenderGraphResource  const &aSourceResource,
-                    CRange                const &aArraySliceRange,
-                    CRange                const &aMipSliceRange,
+                    CRange                const &aSubjacentArraySliceRange,
+                    CRange                const &aSubjacentMipSliceRange,
+                    CRange                const &aSourceArraySliceRange,
+                    CRange                const &aSourceMipSliceRange,
+                    CRange                const &aTargetArraySliceRange,
+                    CRange                const &aTargetMipSliceRange,
                     CRange                      &aAdjustedArraySliceRange,
                     CRange                      &aAdjustedMipSliceRange);
 
@@ -295,22 +298,22 @@ namespace engine
 
         private_methods:
             CEngineResult<SRenderGraphImageView> useImage(
-                SRenderGraphImage                    &aTexture,
-                    ERenderGraphViewPurpose    const &aSourceOrTarget,
-                    EFormat                    const &aRequiredFormat,
-                    CRange                     const &aArraySliceRange,
-                    CRange                     const &aMipSliceRange,
-                    ERenderGraphViewAccessMode const &aMode,
-                    EEngineStatus              const &aFailCode);
+                SRenderGraphDynamicImage         &aTexture,
+                ERenderGraphViewPurpose    const &aSourceOrTarget,
+                EFormat                    const &aRequiredFormat,
+                CRange                     const &aArraySliceRange,
+                CRange                     const &aMipSliceRange,
+                ERenderGraphViewAccessMode const &aMode,
+                EEngineStatus              const &aFailCode);
 
             CEngineResult<SRenderGraphImageView> useImageView(
-                SRenderGraphImageView                &aTextureView,
-                    ERenderGraphViewPurpose    const &aSourceOrTarget,
-                    EFormat                    const &aRequiredFormat,
-                    CRange                     const &aArraySliceRange,
-                    CRange                     const &aMipSliceRange,
-                    ERenderGraphViewAccessMode const &aMode,
-                    EEngineStatus              const &aFailCode);
+                SRenderGraphImageView            &aTextureView,
+                ERenderGraphViewPurpose    const &aSourceOrTarget,
+                EFormat                    const &aRequiredFormat,
+                CRange                     const &aArraySliceRange,
+                CRange                     const &aMipSliceRange,
+                ERenderGraphViewAccessMode const &aMode,
+                EEngineStatus              const &aFailCode);
 
         private_members:
             PassUID_t                        mPassUID;

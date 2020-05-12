@@ -1,4 +1,4 @@
-#include "renderer/framegraph/pass.h"
+#include "renderer/framegraph/subpass.h"
 
 namespace engine
 {
@@ -29,7 +29,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        PassUID_t const &CPassBase::passUID() const
+        PassUID_t const &CPassBase::getSubpassUid() const
         {
             return mPassUID;
         }

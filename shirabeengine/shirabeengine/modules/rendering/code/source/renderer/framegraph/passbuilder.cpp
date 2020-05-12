@@ -29,18 +29,22 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphRenderTarget> CPassBuilder::createRenderTarget(
-            std::string                 const &aName,
-            SRenderGraphImageDescription const &aDescriptor)
+            std::string                         const &aName,
+            SRenderGraphDynamicImageDescription const &aDescriptor)
         {
+            SRenderGraphImageDescription description;
+            description.isDynamicImage = true;
+            description.dynamicImage   = aDescriptor;
+
             // Basic abstract descriptor of resources being used.
             SRenderGraphRenderTarget &resource = mResourceData.spawnResource<SRenderGraphRenderTarget>();
-            resource.description           = aDescriptor;
+            resource.description           = description;
             resource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
             resource.assignedPassUID       = mPassUID;
             resource.parentResource        = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource     = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName          = aName;
-            resource.type                  = ERenderGraphResourceType::Texture;
+            resource.type                  = ERenderGraphResourceType::Image;
 
             mPass->registerResource(resource.resourceId);
 
@@ -51,19 +55,23 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SRenderGraphTransientImage> CPassBuilder::createImage(
-                std::string                  const &aName,
-                SRenderGraphImageDescription const &aDescriptor)
+        CEngineResult<SRenderGraphImage> CPassBuilder::createImage(
+            std::string                         const &aName,
+            SRenderGraphDynamicImageDescription const &aDescriptor)
         {
+            SRenderGraphImageDescription description;
+            description.isDynamicImage = true;
+            description.dynamicImage   = aDescriptor;
+
             // Basic abstract descriptor of resources being used.
-            SRenderGraphTransientImage &resource = mResourceData.spawnResource<SRenderGraphTransientImage>();
-            resource.description           = aDescriptor;
+            SRenderGraphImage &resource = mResourceData.spawnResource<SRenderGraphImage>();
+            resource.description           = description;
             resource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
             resource.assignedPassUID       = mPassUID;
             resource.parentResource        = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
             resource.subjacentResource     = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
             resource.readableName          = aName;
-            resource.type                  = ERenderGraphResourceType::Texture;
+            resource.type                  = ERenderGraphResourceType::Image;
 
             mPass->registerResource(resource.resourceId);
 
@@ -75,7 +83,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImageView> CPassBuilder::useImage(
-            SRenderGraphImage                &aTexture,
+            SRenderGraphImage                &aImage,
             ERenderGraphViewPurpose    const &aSourceOrTarget,
             EFormat                    const &aRequiredFormat,
             CRange                     const &aArraySliceRange,
@@ -83,17 +91,24 @@ namespace engine
             ERenderGraphViewAccessMode const &aMode,
             EEngineStatus              const &aFailCode)
         {
-            RenderGraphResourceId_t const subjacentResourceId = aTexture.resourceId;
+            RenderGraphResourceId_t const subjacentResourceId = aImage.resourceId;
 
             ERenderGraphViewAccessMode const mode   = aMode;
             ERenderGraphViewPurpose    const source = aSourceOrTarget;
 
-            CRange adjustedArraySliceRange = aArraySliceRange;
-            CRange adjustedMipSliceRange   = aMipSliceRange;
+            CRange subjacentArraySliceRange = CRange(0, aImage.description.dynamicImage.arraySize);
+            CRange subjacentMipSliceRange   = CRange(0, aImage.description.dynamicImage.mipLevels);
+            CRange sourceArraySliceRange    = subjacentArraySliceRange;
+            CRange sourceMipSliceRange      = subjacentMipSliceRange;
+            CRange adjustedArraySliceRange  = aArraySliceRange;
+            CRange adjustedMipSliceRange    = aMipSliceRange;
 
             adjustArrayAndMipSliceRanges(
                         mResourceData,
-                        aTexture,
+                        subjacentArraySliceRange,
+                        subjacentMipSliceRange,
+                        sourceArraySliceRange,
+                        sourceMipSliceRange,
                         aArraySliceRange,
                         aMipSliceRange,
                         adjustedArraySliceRange,
@@ -101,7 +116,7 @@ namespace engine
 
             validateArrayAndMipSliceRanges(
                         mResourceData,
-                        aTexture,
+                aImage,
                         adjustedArraySliceRange,
                         adjustedMipSliceRange,
                         true,
@@ -116,34 +131,34 @@ namespace engine
             view.description.source          = source;
             view.assignedRenderpassUID       = mEnclosingRenderPass->getRenderPassUid();
             view.assignedPassUID             = mPassUID;
-            view.parentResource              = aTexture.resourceId;
+            view.parentResource              = aImage.resourceId;
             view.subjacentResource           = subjacentResourceId;
-            view.type                        = ERenderGraphResourceType::TextureView;
-            view.readableName                = CString::format("TextureView ID {} - {} #{}"
+            view.type                        = ERenderGraphResourceType::ImageView;
+            view.readableName                = CString::format("ImageView ID {} - {} #{}"
                                                                , view.resourceId
                                                                , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
-                                                               , aTexture.resourceId);
+                                                               , aImage.resourceId);
             view.description.mode.set(mode);
 
             switch(view.description.source)
             {
             case ERenderGraphViewPurpose::InputAttachment:
-                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
+                aImage.description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
                 break;
             case ERenderGraphViewPurpose::ColorAttachment:
-                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
+                aImage.description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
                 break;
             case ERenderGraphViewPurpose::DepthAttachment:
-                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
+                aImage.description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
                 break;
             case ERenderGraphViewPurpose::ShaderInput:
-                aTexture.description.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
+                aImage.description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
                 break;
             default:
                 break;
             }
 
-            ++(aTexture.referenceCount);
+            ++(aImage.referenceCount);
 
             mPass->registerResource(view.resourceId);
             ++(view.referenceCount);
@@ -156,25 +171,38 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImageView> CPassBuilder::useImageView(
-            SRenderGraphImageView             &aTextureView,
-            ERenderGraphViewPurpose       const &aSourceOrTarget,
-            EFormat                      const &aRequiredFormat,
-            CRange                       const &aArraySliceRange,
-            CRange                       const &aMipSliceRange,
-            ERenderGraphViewAccessMode    const &aMode,
-            EEngineStatus                const &aFailCode)
+            SRenderGraphImageView            &aTextureView,
+            ERenderGraphViewPurpose    const &aSourceOrTarget,
+            EFormat                    const &aRequiredFormat,
+            CRange                     const &aArraySliceRange,
+            CRange                     const &aMipSliceRange,
+            ERenderGraphViewAccessMode const &aMode,
+            EEngineStatus              const &aFailCode)
         {
-            RenderGraphResourceId_t const subjacentResourceId = aTextureView.subjacentResource;
-
             ERenderGraphViewAccessMode const mode   = aMode;
             ERenderGraphViewPurpose    const source = aSourceOrTarget;
 
-            CRange adjustedArraySliceRange = aArraySliceRange;
-            CRange adjustedMipSliceRange   = aMipSliceRange;
+            CRange sourceArraySliceRange    = aTextureView.description.arraySliceRange;
+            CRange sourceMipSliceRange      = aTextureView.description.mipSliceRange;
+            CRange adjustedArraySliceRange  = aArraySliceRange;
+            CRange adjustedMipSliceRange    = aMipSliceRange;
+
+            RenderGraphResourceId_t const subjacentResourceId = aTextureView.subjacentResource;
+            auto const &[result, sharedImage] = mResourceData.getResourceMutable<SRenderGraphImage>(subjacentResourceId);
+            if(CheckEngineError(result))
+            {
+                return { result };
+            }
+
+            CRange subjacentArraySliceRange = CRange(0, sharedImage->description.dynamicImage.arraySize);
+            CRange subjacentMipSliceRange   = CRange(0, sharedImage->description.dynamicImage.mipLevels);
 
             adjustArrayAndMipSliceRanges(
                 mResourceData,
-                aTextureView,
+                subjacentArraySliceRange,
+                subjacentMipSliceRange,
+                sourceArraySliceRange,
+                sourceMipSliceRange,
                 aArraySliceRange,
                 aMipSliceRange,
                 adjustedArraySliceRange,
@@ -235,8 +263,8 @@ namespace engine
                 view.assignedPassUID             = mPassUID;
                 view.parentResource              = aTextureView.resourceId;
                 view.subjacentResource           = subjacentResourceId;
-                view.type                        = ERenderGraphResourceType::TextureView;
-                view.readableName                = CString::format("TextureView ID {} - {} #{}"
+                view.type                        = ERenderGraphResourceType::ImageView;
+                view.readableName                = CString::format("ImageView ID {} - {} #{}"
                                                                    , view.resourceId
                                                                    , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
                                                                    , aTextureView.resourceId);
@@ -245,16 +273,16 @@ namespace engine
                 switch(view.description.source)
                 {
                     case ERenderGraphViewPurpose::InputAttachment:
-                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
+                        texture->description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::InputAttachment);
                         break;
                     case ERenderGraphViewPurpose::ColorAttachment:
-                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
+                        texture->description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::ColorAttachment);
                         break;
                     case ERenderGraphViewPurpose::DepthAttachment:
-                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
+                        texture->description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::DepthAttachment);
                         break;
                     case ERenderGraphViewPurpose::ShaderInput:
-                        texture->description.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
+                        texture->description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
                         break;
                     default:
                         break;
@@ -326,8 +354,8 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImageView> CPassBuilder::writeAttachment(
-            SRenderGraphImageView             &aImageView,
-                SRenderGraphWriteTextureFlags const &aFlags)
+            SRenderGraphImageView               &aImageView,
+            SRenderGraphWriteTextureFlags const &aFlags)
         {
             bool const isColorAttachment = (ERenderGraphWriteTarget::Color == aFlags.writeTarget);
             bool const isDepthAttachment = (ERenderGraphWriteTarget::Depth == aFlags.writeTarget);
@@ -398,18 +426,18 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImageView> CPassBuilder::readAttachment(
-            SRenderGraphImageView            &aImageView,
+            SRenderGraphImageView              &aImageView,
             SRenderGraphReadTextureFlags const &aFlags)
         {
             ERenderGraphViewPurpose source = ERenderGraphViewPurpose::InputAttachment;
 
-            auto const &[result, data]  = useImageView(aImageView
-                                                       , source
-                                                       , aFlags.requiredFormat
-                                                       , aFlags.arraySliceRange
-                                                       , aFlags.mipSliceRange
-                                                       , ERenderGraphViewAccessMode::Read
-                                                       , EEngineStatus::RenderGraph_PassBuilder_ReadResourceFailed);
+            auto const &[result, data] = useImageView(aImageView
+                                                      , source
+                                                      , aFlags.requiredFormat
+                                                      , aFlags.arraySliceRange
+                                                      , aFlags.mipSliceRange
+                                                      , ERenderGraphViewAccessMode::Read
+                                                      , EEngineStatus::RenderGraph_PassBuilder_ReadResourceFailed);
 
             if(not CheckEngineError(result))
             {
@@ -510,12 +538,12 @@ namespace engine
         CEngineResult<RenderGraphResourceId_t> CPassBuilder::findDuplicateImageView(
             RenderGraphResourceId_t               const &aSubjacentResourceId,
             RenderGraphFormat_t                   const &aFormat,
-            ERenderGraphViewPurpose                const &aViewSource,
-            CRange                               const &aArrayRange,
-            CRange                               const &aMipRange,
+            ERenderGraphViewPurpose               const &aViewSource,
+            CRange                                const &aArrayRange,
+            CRange                                const &aMipRange,
             CBitField<ERenderGraphViewAccessMode> const &aMode)
         {
-            for(RenderGraphResourceId_t const &viewId : mResourceData.textureViews())
+            for(RenderGraphResourceId_t const &viewId : mResourceData.imageViews())
             {
                 CEngineResult<Shared<SRenderGraphImageView>> viewFetch = mResourceData.getResource<SRenderGraphImageView>(viewId);
                 if(not viewFetch.successful())
@@ -524,13 +552,13 @@ namespace engine
                 }
 
                 SRenderGraphImageView const &compareView = *(viewFetch.data());
-                bool const                  equal        =
-                                                 (compareView.description.arraySliceRange == aArrayRange)
-                                                 and (compareView.description.mipSliceRange == aMipRange)
-                                                 and ((RenderGraphFormat_t::Automatic == aFormat) or (compareView.description.format == aFormat))
-                                                 and (compareView.description.source == aViewSource)
-                                                 and (compareView.description.mode.check(aMode))
-                                                 and (compareView.subjacentResource == aSubjacentResourceId);
+                bool const equal =
+                                (compareView.description.arraySliceRange == aArrayRange)
+                                and (compareView.description.mipSliceRange == aMipRange)
+                                and ((RenderGraphFormat_t::Automatic == aFormat) or (compareView.description.format == aFormat))
+                                and (compareView.description.source == aViewSource)
+                                and (compareView.description.mode.check(aMode))
+                                and (compareView.subjacentResource == aSubjacentResourceId);
 
                 if(equal)
                 {
@@ -547,80 +575,34 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CPassBuilder::adjustArrayAndMipSliceRanges(
             CRenderGraphResources const &aResourceData,
-            SRenderGraphResource  const &aSourceResource,
-            CRange               const &aArraySliceRange,
-            CRange               const &aMipSliceRange,
-            CRange                     &aAdjustedArraySliceRange,
-            CRange                     &aAdjustedMipSliceRange)
+            CRange                const &aSubjacentArraySliceRange,
+            CRange                const &aSubjacentMipSliceRange,
+            CRange                const &aSourceArraySliceRange,
+            CRange                const &aSourceMipSliceRange,
+            CRange                const &aTargetArraySliceRange,
+            CRange                const &aTargetMipSliceRange,
+            CRange                      &aAdjustedArraySliceRange,
+            CRange                      &aAdjustedMipSliceRange)
         {
-            aAdjustedArraySliceRange = aArraySliceRange;
-            aAdjustedMipSliceRange   = aMipSliceRange;
+            aAdjustedArraySliceRange = aTargetArraySliceRange;
+            aAdjustedMipSliceRange   = aTargetMipSliceRange;
 
-            if(ERenderGraphResourceType::TextureView == aSourceResource.type)
+            aAdjustedArraySliceRange.offset = (aSourceArraySliceRange.offset + aTargetArraySliceRange.offset);
+            aAdjustedMipSliceRange.offset   = (aSourceMipSliceRange.offset   + aTargetMipSliceRange.offset);
+
+            bool const arraySliceRangeOutOfBounds =
+                           (aAdjustedArraySliceRange.length > aTargetArraySliceRange.length)
+                           or ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > aSubjacentArraySliceRange.length);
+
+            bool const mipSliceRangeOutOfBounds =
+                           (aAdjustedMipSliceRange.length   > aTargetMipSliceRange.length)
+                           or ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > aSubjacentMipSliceRange.length);
+
+            if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
             {
-                CEngineResult<Shared<SRenderGraphImage>> subjacentFetch = aResourceData.getResource<SRenderGraphImage>(aSourceResource.subjacentResource);
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(not subjacentFetch.successful())
-                {
-                    CLog::Error(logTag(), CString::format("Subjacent resource handle w/ id {} is empty."));
-                    return { EEngineStatus::Error };
-                }
-#endif
-
-                CEngineResult<Shared<SRenderGraphImageView>> parentFetch = aResourceData.getResource<SRenderGraphImageView>(aSourceResource.resourceId);
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                if(not parentFetch.successful())
-                {
-                    CLog::Error(logTag(), CString::format("Parent resource handle w/ id {} is empty.", aSourceResource.resourceId));
-                    return { EEngineStatus::Error };
-                }
-#endif
-
-                SRenderGraphImage     const &subjacent = *(subjacentFetch.data());
-                SRenderGraphImageView const &parent    = *(parentFetch.data());
-
-                aAdjustedArraySliceRange.offset = (parent.description.arraySliceRange.offset + aArraySliceRange.offset);
-                aAdjustedMipSliceRange.offset   = (parent.description.mipSliceRange.offset   + aMipSliceRange.offset);
-
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-                bool const arraySliceRangeOutOfBounds =
-                               (aAdjustedArraySliceRange.length > parent.description.arraySliceRange.length)
-                               or ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.description.arraySize);
-
-                bool const mipSliceRangeOutOfBounds =
-                               (aAdjustedMipSliceRange.length   > parent.description.mipSliceRange.length)
-                               or ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > subjacent.description.mipLevels);
-
-                if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
-                {
-                    CLog::Error(logTag(), CString::format("Derived subresource range out of bounds (Array:{}, Mip:{}).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
-                    return { EEngineStatus::Error };
-                }
-#endif
-
+                CLog::Error(logTag(), CString::format("Derived subresource range out of bounds (Array:{}, Mip:{}).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
+                return { EEngineStatus::Error };
             }
-#if defined SHIRABE_DEBUG || defined SHIRABE_TEST
-            else // Texture
-            {
-                CEngineResult<Shared<SRenderGraphImage>> subjacentFetch = aResourceData.getResource<SRenderGraphImage>(aSourceResource.resourceId);
-                if(not subjacentFetch.successful())
-                {
-                    CLog::Error(logTag(), CString::format("Subjacent resource handle w/ id {} is empty.", aSourceResource.subjacentResource));
-                    return { EEngineStatus::Error };
-                }
-
-                SRenderGraphImage const &subjacent = *(subjacentFetch.data());
-
-                bool const arraySliceRangeOutOfBounds = ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > subjacent.description.arraySize);
-                bool const mipSliceRangeOutOfBounds   = ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length))   > subjacent.description.mipLevels);
-
-                if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
-                {
-                    CLog::Error(logTag(), CString::format("Subresource range out of bounds (Array:{}, Mip:{}).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
-                    return { EEngineStatus::Error };
-                }
-            }
-#endif
 
             return { EEngineStatus::Ok };
         }
@@ -642,7 +624,7 @@ namespace engine
             {
                 CEngineResult<bool> const isBeingReadQuery =
                                               isImageBeingReadInSubresourceRange(
-                                                  aResourceData.textureViews()
+                                                  aResourceData.imageViews()
                                                   , aResourceData
                                                   , aSourceResource
                                                   , aArraySliceRange
@@ -671,7 +653,7 @@ namespace engine
             {
                 CEngineResult<bool> const isBeingWrittenQuery =
                                               isImageBeingWrittenInSubresourceRange(
-                                                  aResourceData.textureViews()
+                                                  aResourceData.imageViews()
                                                   , aResourceData
                                                   , aSourceResource
                                                   , aArraySliceRange

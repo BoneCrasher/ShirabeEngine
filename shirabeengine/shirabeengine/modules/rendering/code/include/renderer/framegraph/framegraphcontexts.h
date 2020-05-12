@@ -217,8 +217,8 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Textures
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SRenderGraphTransientImage const& /* aTexture */)> createTransientTexture;
-            std::function<EEngineStatus(SRenderGraphTransientImage const& /* aTexture */)> destroyTransientTexture;
+            std::function<EEngineStatus(SRenderGraphDynamicImage const& /* aTexture */)> createTransientTexture;
+            std::function<EEngineStatus(SRenderGraphDynamicImage const& /* aTexture */)> destroyTransientTexture;
 
             std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> initializePersistentTexture;
             std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> updatePersistentTexture;

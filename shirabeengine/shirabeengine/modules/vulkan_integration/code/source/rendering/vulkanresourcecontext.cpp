@@ -432,7 +432,7 @@ namespace engine
             auto createTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                         , Shared<CResourceManager>           aResourceManager
                                         , Shared<asset::CAssetStorage>       aAssetStorage
-                                        , SRenderGraphTransientImage const &aTexture) -> EEngineStatus
+                                        , SRenderGraphDynamicImage const &aTexture) -> EEngineStatus
             {
                 STextureDescription desc = {};
                 desc.name        = aTexture.readableName;
@@ -478,7 +478,7 @@ namespace engine
             auto destroyTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
                                          , Shared<CResourceManager>           aResourceManager
                                          , Shared<asset::CAssetStorage>       aAssetStorage
-                                         , SRenderGraphTransientImage const &aTexture) -> EEngineStatus
+                                         , SRenderGraphDynamicImage const &aTexture) -> EEngineStatus
             {
                 CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy transient texture.");
@@ -822,29 +822,13 @@ namespace engine
                                   , Shared<asset::CAssetStorage>  aAssetStorage
                                   , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                for(auto const &buffer : aMaterial.uniformBuffers)
-                {
-                    EEngineStatus const &opSuccessCode = detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::InitializationError;
-                    }
-                }
+                aResourceManager->initializeResource<PipelineResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                aResourceManager->initializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
-                for(auto const &texture : aMaterial.textures)
-                {
-                    EEngineStatus const &opSuccessCode = detail::initializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::InitializationError;
-                    }
-                }
-
-                auto const [opSuccessCode] = aResourceManager->initializeResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
-                if(CheckEngineError(opSuccessCode))
-                {
-                    return EEngineStatus::InitializationError;
-                }
+                for(auto const &buffer : aMaterial.description.buffers)
+                    aResourceManager->initializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                for(auto const &image : aMaterial.description.images)
+                    aResourceManager->initializeResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -858,29 +842,13 @@ namespace engine
                               , Shared<asset::CAssetStorage>  aAssetStorage
                               , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                for(auto const &buffer : aMaterial.uniformBuffers)
-                {
-                    EEngineStatus const &opSuccessCode = detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::UpdateError;
-                    }
-                }
+                aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
-                for(auto const &texture : aMaterial.textures)
-                {
-                    EEngineStatus const &opSuccessCode = detail::updatePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::UpdateError;
-                    }
-                }
-
-                auto const [opSuccessCode] = aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
-                if(CheckEngineError(opSuccessCode))
-                {
-                    return EEngineStatus::UpdateError;
-                }
+                for(auto const &buffer : aMaterial.description.buffers)
+                    aResourceManager->updateResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                for(auto const &image : aMaterial.description.images)
+                    aResourceManager->updateResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -894,29 +862,13 @@ namespace engine
                                     , Shared<asset::CAssetStorage>  aAssetStorage
                                     , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                for(auto const &buffer : aMaterial.uniformBuffers)
-                {
-                    EEngineStatus const &opSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, buffer);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::UpdateError;
-                    }
-                }
+                aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
-                for(auto const &texture : aMaterial.textures)
-                {
-                    EEngineStatus const &opSuccessCode = detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage, texture);
-                    if(CheckEngineError(opSuccessCode))
-                    {
-                        return EEngineStatus::UpdateError;
-                    }
-                }
-
-                auto const [opSuccessCode] = aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.readableName, aVulkanEnvironment);
-                if(CheckEngineError(opSuccessCode))
-                {
-                    return EEngineStatus::UpdateError;
-                }
+                for(auto const &buffer : aMaterial.description.buffers)
+                    aResourceManager->deinitializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                for(auto const &image : aMaterial.description.images)
+                    aResourceManager->deinitializeResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -995,11 +947,11 @@ namespace engine
             // Textures
             // --------------------------------------------------------------------------------------------
             context.createTransientTexture =
-                [&](SRenderGraphTransientImage const &aTexture)
+                [&](SRenderGraphDynamicImage const &aTexture)
                     { return detail::createTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                             , aTexture); };
             context.destroyTransientTexture =
-                [&](SRenderGraphTransientImage const &aTexture)
+                [&](SRenderGraphDynamicImage const &aTexture)
                     { return detail::destroyTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.initializePersistentTexture =
