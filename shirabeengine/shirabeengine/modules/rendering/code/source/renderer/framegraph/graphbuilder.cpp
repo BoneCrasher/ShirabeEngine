@@ -323,7 +323,7 @@ namespace engine
         {
             bool allBindingsValid = true;
 
-            for(RefIndex_t::value_type const &textureViewRef : mResourceData.textureViews())
+            for(RefIndex_t::value_type const &textureViewRef : mResourceData.imageViews())
             {
                 CEngineResult<Shared<SRenderGraphImageView>> textureViewFetch = mResourceData.getResource<SRenderGraphImageView>(textureViewRef);
                 if(not textureViewFetch.successful())
@@ -381,7 +381,7 @@ namespace engine
         bool CGraphBuilder::validateTextureUsage(SRenderGraphImage const &aTexture)
         {
             // Cross both bitsets... permittedUsage should fully contain requestedUsage
-            return aTexture.permittedUsage.check(aTexture.requestedUsage);
+            return aTexture.description.dynamicImage.permittedUsage.check(aTexture.description.dynamicImage.requestedUsage);
         }
         //<-----------------------------------------------------------------------------
 
@@ -404,8 +404,8 @@ namespace engine
                 return power;
             };
 
-            RenderGraphFormat_t const &source = aTexture.format;
-            RenderGraphFormat_t const &target = aTextureView.format;
+            RenderGraphFormat_t const &source = aTexture.description.dynamicImage.format;
+            RenderGraphFormat_t const &target = aTextureView.description.format;
 
             bool formatsCompatible = false;
 
@@ -438,16 +438,16 @@ namespace engine
             SRenderGraphImage     const &aTexture,
                 SRenderGraphImageView const &aTextureView)
         {
-            CRange const &arraySliceRange = aTextureView.arraySliceRange;
-            CRange const &mipSliceRange   = aTextureView.mipSliceRange;
+            CRange const &arraySliceRange = aTextureView.description.arraySliceRange;
+            CRange const &mipSliceRange   = aTextureView.description.mipSliceRange;
 
             bool arraySliceRangeValid = true;
-            arraySliceRangeValid &= (arraySliceRange.offset < aTexture.arraySize);
-            arraySliceRangeValid &= ((arraySliceRange.offset + static_cast<uint32_t>(arraySliceRange.length)) <= aTexture.arraySize);
+            arraySliceRangeValid &= (arraySliceRange.offset < aTexture.description.dynamicImage.arraySize);
+            arraySliceRangeValid &= ((arraySliceRange.offset + static_cast<uint32_t>(arraySliceRange.length)) <= aTexture.description.dynamicImage.arraySize);
 
             bool mipSliceRangeValid = true;
-            mipSliceRangeValid &= (mipSliceRange.offset < aTexture.mipLevels);
-            mipSliceRangeValid &= ((mipSliceRange.offset + static_cast<uint32_t>(mipSliceRange.length)) <= aTexture.mipLevels);
+            mipSliceRangeValid &= (mipSliceRange.offset < aTexture.description.dynamicImage.mipLevels);
+            mipSliceRangeValid &= ((mipSliceRange.offset + static_cast<uint32_t>(mipSliceRange.length)) <= aTexture.description.dynamicImage.mipLevels);
 
             bool const valid = (arraySliceRangeValid && mipSliceRangeValid);
             return valid;

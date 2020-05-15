@@ -158,15 +158,17 @@ namespace engine
 
                                            auto [result, material] = aBuilder.useMaterial(renderableMaterial);
 
-                                           for(auto const &buffer : renderableUniformBuffers)
+                                           for(auto const &bufferDesc : renderableUniformBuffers)
                                            {
+                                               auto [bufferCreationResult, buffer] = aBuilder.createBuffer(bufferDesc.persistentBuffer.bufferResourceId, bufferDesc);
+
                                                auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
                                                material.buffers.push_back(bufferResource);
                                            }
 
                                            for(auto const &imageDesc : renderableImages)
                                            {
-                                               auto [imageCreationResult, image] = aBuilder.createImage(renderableMaterial.materialResourceId, imageDesc);
+                                               auto [imageCreationResult, image] = aBuilder.createImage(imageDesc.persistentImage.imageId, imageDesc);
 
                                                SRenderGraphTextureResourceFlags flags;
                                                flags.arraySliceRange = CRange(0, 1);

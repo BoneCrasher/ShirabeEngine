@@ -178,17 +178,17 @@ namespace engine
                         bool dimensionsValid = true;
                         if(0 > width)
                         {
-                            width  = static_cast<int32_t>(texture.width);
-                            height = static_cast<int32_t>(texture.height);
-                            layers = textureView.arraySliceRange.length;
+                            width  = static_cast<int32_t>(texture.description.dynamicImage.width);
+                            height = static_cast<int32_t>(texture.description.dynamicImage.height);
+                            layers = textureView.description.arraySliceRange.length;
 
                             dimensionsValid = (0 < width and 0 < height and 0 < layers);
                         }
                         else
                         {
-                            bool const validWidth  = (width  == static_cast<int32_t>(texture.width));
-                            bool const validHeight = (height == static_cast<int32_t>(texture.height));
-                            bool const validLayers = (layers == static_cast<int32_t>(textureView.arraySliceRange.length));
+                            bool const validWidth  = (width  == static_cast<int32_t>(texture.description.dynamicImage.width));
+                            bool const validHeight = (height == static_cast<int32_t>(texture.description.dynamicImage.height));
+                            bool const validLayers = (layers == static_cast<int32_t>(textureView.description.arraySliceRange.length));
 
                             dimensionsValid = (validWidth and validHeight and validLayers);
                         }
@@ -216,15 +216,15 @@ namespace engine
                         bool const isDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), textureView.resourceId);
                         bool const isInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), textureView.resourceId);
 
-                        if(nullptr != parentTextureView && ERenderGraphResourceType::TextureView == parentTextureView->type)
+                        if(nullptr != parentTextureView && ERenderGraphResourceType::ImageView == parentTextureView->type)
                         {
                             bool const isParentColorAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getColorAttachments(), parentTextureView->resourceId);
                             bool const isParentDepthAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getDepthAttachments(), parentTextureView->resourceId);
                             bool const isParentInputAttachment = findAttachmentRelationFn(aAttachmentInfo.getAttachmentImageViewResourceIds(), aAttachmentInfo.getInputAttachments(), parentTextureView->resourceId);
 
                             dependency.srcPass = std::distance(aPassExecutionOrder.begin(), std::find_if( aPassExecutionOrder.begin()
-                                                                                                          , aPassExecutionOrder.end()
-                                                                                                          , [&parentTextureView] (PassUID_t const &aUid) -> bool
+                                                                                                             , aPassExecutionOrder.end()
+                                                                                                             , [&parentTextureView] (PassUID_t const &aUid) -> bool
                                     { return (aUid == parentTextureView->assignedPassUID); }));
 
                             if( 0 < k )
@@ -252,7 +252,7 @@ namespace engine
                                 }
                             }
                         }
-                        else if(nullptr != parentTextureView && ERenderGraphResourceType::Texture == parentTextureView->type)
+                        else if(nullptr != parentTextureView && ERenderGraphResourceType::Image == parentTextureView->type)
                         {
                             dependency.srcPass   = VK_SUBPASS_EXTERNAL;
                             dependency.srcStage  = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -268,7 +268,7 @@ namespace engine
                         }
                         else if(isDepthAttachment)
                         {
-                            if(textureView.mode.check(ERenderGraphViewAccessMode::Read))
+                            if(textureView.description.mode.check(ERenderGraphViewAccessMode::Read))
                             {
                                 attachmentReference.layout = EImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL;
                             }
@@ -300,7 +300,7 @@ namespace engine
                             attachmentDesc.stencilStoreOp = EAttachmentStoreOp::DONT_CARE;
                             attachmentDesc.initialLayout  = EImageLayout::UNDEFINED;
                             attachmentDesc.finalLayout    = EImageLayout::TRANSFER_SRC_OPTIMAL; // For now we just assume everything to be presentable...
-                            attachmentDesc.format         = texture.format;
+                            attachmentDesc.format         = texture.description.dynamicImage.format;
 
                             if(isColorAttachment)
                             {
@@ -382,7 +382,7 @@ namespace engine
                                    , Shared<asset::CAssetStorage>  aAssetStorage
                                    , ResourceId_t           const &aRenderPassId) -> EEngineStatus
             {
-                CEngineResult<> const deinitialized = aResourceManager->template discardResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment);
+                CEngineResult<> const deinitialized = aResourceManager->discardResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment.get());
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy render pass.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
             };
@@ -418,7 +418,7 @@ namespace engine
                                     , Shared<asset::CAssetStorage>  aAssetStorage
                                     , ResourceId_t           const &aFrameBufferId) -> EEngineStatus
             {
-                CEngineResult<> const deinitialized = aResourceManager->discardResource<FrameBufferResourceState_t>(aFrameBufferId, aVulkanEnvironment);
+                CEngineResult<> const deinitialized = aResourceManager->discardResource<FrameBufferResourceState_t>(aFrameBufferId, aVulkanEnvironment.get());
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy framebuffer.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 
@@ -429,29 +429,29 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto createTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
-                                        , Shared<CResourceManager>           aResourceManager
-                                        , Shared<asset::CAssetStorage>       aAssetStorage
-                                        , SRenderGraphDynamicImage const &aTexture) -> EEngineStatus
+            auto createTransientTexture(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                        , Shared<CResourceManager>      aResourceManager
+                                        , Shared<asset::CAssetStorage>  aAssetStorage
+                                        , SRenderGraphImage const      &aTexture) -> EEngineStatus
             {
                 STextureDescription desc = {};
                 desc.name        = aTexture.readableName;
-                desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture.description);
+                desc.textureInfo = static_cast<graphicsapi::STextureInfo>(aTexture.description.dynamicImage);
                 // Always set those...
                 desc.gpuBinding.set(EBufferBinding::CopySource);
                 desc.gpuBinding.set(EBufferBinding::CopyTarget);
 
-                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::ColorAttachment))
+                if(aTexture.description.dynamicImage.requestedUsage.check(ERenderGraphResourceUsage::ColorAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::ColorAttachment);
                 }
 
-                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::DepthAttachment))
+                if(aTexture.description.dynamicImage.requestedUsage.check(ERenderGraphResourceUsage::DepthAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::DepthAttachment);
                 }
 
-                if(aTexture.description.requestedUsage.check(ERenderGraphResourceUsage::InputAttachment))
+                if(aTexture.description.dynamicImage.requestedUsage.check(ERenderGraphResourceUsage::InputAttachment))
                 {
                     desc.gpuBinding.set(EBufferBinding::InputAttachment);
                 }
@@ -475,12 +475,12 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto destroyTransientTexture(Shared<CVulkanEnvironment>           aVulkanEnvironment
-                                         , Shared<CResourceManager>           aResourceManager
-                                         , Shared<asset::CAssetStorage>       aAssetStorage
-                                         , SRenderGraphDynamicImage const &aTexture) -> EEngineStatus
+            auto destroyTransientTexture(Shared<CVulkanEnvironment>     aVulkanEnvironment
+                                         , Shared<CResourceManager>     aResourceManager
+                                         , Shared<asset::CAssetStorage> aAssetStorage
+                                         , SRenderGraphImage const     &aTexture) -> EEngineStatus
             {
-                CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
+                CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment.get());
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy transient texture.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 
@@ -491,15 +491,15 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto initializePersistentTexture(Shared<CVulkanEnvironment>            aVulkanEnvironment
-                                             , Shared<CResourceManager>            aResourceManager
-                                             , Shared<asset::CAssetStorage>        aAssetStorage
-                                             , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
+            auto initializePersistentTexture(Shared<CVulkanEnvironment>      aVulkanEnvironment
+                                             , Shared<CResourceManager>      aResourceManager
+                                             , Shared<asset::CAssetStorage>  aAssetStorage
+                                             , SRenderGraphImage      const &aTexture) -> EEngineStatus
             {
                 {
-                    auto const &[successCode] = aResourceManager->initializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
-                    EngineStatusPrintOnError(successCode, logTag(), "Failed to initialize persistent texture.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
+                    CEngineResult<> const status = aResourceManager->initializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment.get());
+                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to initialize persistent texture.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(status.result());
                 }
 
                 return EEngineStatus::Ok;
@@ -509,15 +509,15 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto updatePersistentTexture(Shared<CVulkanEnvironment>          aVulkanEnvironment
-                                       , Shared<CResourceManager>            aResourceManager
-                                       , Shared<asset::CAssetStorage>        aAssetStorage
-                                       , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
+            auto updatePersistentTexture(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                       , Shared<CResourceManager>      aResourceManager
+                                       , Shared<asset::CAssetStorage>  aAssetStorage
+                                       , SRenderGraphImage      const &aTexture) -> EEngineStatus
             {
                 {
-                    auto const &[successCode] = aResourceManager->updateResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
-                    EngineStatusPrintOnError(successCode, logTag(), "Failed to update persistent texture.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
+                    CEngineResult<> const status = aResourceManager->updateResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment.get());
+                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to update persistent texture.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(status.result());
                 }
 
                 return EEngineStatus::Ok;
@@ -527,15 +527,15 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto deinitializePersistentTexture(Shared<CVulkanEnvironment>          aVulkanEnvironment
-                                             , Shared<CResourceManager>            aResourceManager
-                                             , Shared<asset::CAssetStorage>        aAssetStorage
-                                             , SRenderGraphPersistentImage const &aTexture) -> EEngineStatus
+            auto deinitializePersistentTexture(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                             , Shared<CResourceManager>      aResourceManager
+                                             , Shared<asset::CAssetStorage>  aAssetStorage
+                                             , SRenderGraphImage      const &aTexture) -> EEngineStatus
             {
                 {
-                    auto const &[successCode] = aResourceManager->deinitializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment);
-                    EngineStatusPrintOnError(successCode, logTag(), "Failed to deinitialize persistent texture.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(successCode);
+                    CEngineResult<> const status = aResourceManager->deinitializeResource<TextureResourceState_t>(aTexture.readableName, aVulkanEnvironment.get());
+                    EngineStatusPrintOnError(status.result(), logTag(), "Failed to deinitialize persistent texture.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(status.result());
                 }
 
                 return EEngineStatus::Ok;
@@ -574,7 +574,7 @@ namespace engine
                                     , Shared<asset::CAssetStorage>  aAssetStorage
                                     , SRenderGraphImageView const &aTextureView) -> EEngineStatus
             {
-                CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureViewResourceState_t>(aTextureView.readableName, aVulkanEnvironment);
+                CEngineResult<> const deinitialized = aResourceManager->discardResource<TextureViewResourceState_t>(aTextureView.readableName, aVulkanEnvironment.get());
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy textureview.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 

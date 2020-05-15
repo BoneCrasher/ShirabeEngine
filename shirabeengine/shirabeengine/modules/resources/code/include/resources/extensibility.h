@@ -47,6 +47,10 @@ namespace engine::resources
         using Descriptor_t      = typename LogicalResource_t::Descriptor_t;
         using GpuApiHandles_t   = typename GpuApiResource_t ::Handles_t;
 
+        static constexpr bool is_loadable      = GpuApiResource_t::is_loadable;
+        static constexpr bool is_unloadable    = GpuApiResource_t::is_unloadable;
+        static constexpr bool is_transferrable = GpuApiResource_t::is_transferrable;
+
         Descriptor_t    description;
         GpuApiHandles_t gpuApiHandles;
         ResourceState_t loadState;

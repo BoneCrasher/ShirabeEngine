@@ -56,7 +56,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<> CGraph::execute(SRenderGraphDataSource    const &aDataSource
+        CEngineResult<> CGraph::execute(SRenderGraphPlatformContext const &aPlatformContext
+                                      , SRenderGraphDataSource      const &aDataSource
                                       , SRenderGraphResourceContext     &aResourceContext
                                       , SRenderGraphRenderContext       &aRenderContext)
         {
@@ -98,7 +99,7 @@ namespace engine
 
                     initializeSubpassResources(aResourceContext, subpass);
 
-                    CEngineResult<> executed = subpass->execute(aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
+                    CEngineResult<> executed = subpass->execute(aPlatformContext, aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
                     if(not executed.successful())
                     {
                         CLog::Error(logTag(), CString::format("Failed to execute pass {}", subpass->getSubpassUid()));

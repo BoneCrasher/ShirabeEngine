@@ -37,7 +37,7 @@ namespace engine::framegraph
                 // For each underlying OR imported resource (textures/buffers or whatever importable)
                 if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == resource.parentResource)
                 {
-                    if(ERenderGraphResourceType::Texture == resource.type)
+                    if(ERenderGraphResourceType::Image == resource.type)
                     {
                         #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
                         // Map the resources to it's pass appropriately
@@ -95,7 +95,7 @@ namespace engine::framegraph
                     }
                     #endif
 
-                    if(ERenderGraphResourceType::TextureView == resource.type)
+                    if(ERenderGraphResourceType::ImageView == resource.type)
                     {
                         CEngineResult<Shared<SRenderGraphImage>>     textureFetch     = mAccumulatedResourceData.getResourceMutable<SRenderGraphImage>(resource.subjacentResource);
                         CEngineResult<Shared<SRenderGraphImageView>> textureViewFetch = mAccumulatedResourceData.getResourceMutable<SRenderGraphImageView>(resource.resourceId);
@@ -108,9 +108,9 @@ namespace engine::framegraph
                         SRenderGraphImageView &textureView = *(textureViewFetch.data());
 
                         // Auto adjust format if requested
-                        if(RenderGraphFormat_t::Automatic == textureView.format)
+                        if(RenderGraphFormat_t::Automatic == textureView.description.format)
                         {
-                            textureView.format = texture.format;
+                            textureView.description.format = texture.description.dynamicImage.format;
                         }
                     }
                     else if(ERenderGraphResourceType::BufferView == resource.type)

@@ -67,9 +67,9 @@ namespace engine
              * @returns EEngineStatus::Ok    If successful
              * @returns EEngineStatus::Error On error
              */
-            std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState         */
-                                      , SRenderGraphResource       const&/* aSourceTexture */
-                                      , SRenderGraphResource       const&/* aTargetTexture */)> copyImage;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState         */
+                                      , SRenderGraphImage const&/* aSourceTexture */
+                                      , SRenderGraphImage const&/* aTargetTexture */)> copyImage;
             /**
              * Copy aTexture to the currently bound back buffer.
              *
@@ -78,19 +78,19 @@ namespace engine
              * @returns EEngineStatus::Error On error
              */
             std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState */
-                                        , SRenderGraphResource     const&/* aTexture */)> copyImageToBackBuffer;
+                                        , SRenderGraphImage const&/* aTexture */)> copyImageToBackBuffer;
 
             /**
              * Transfers an image from one layout into another.
              * Important: If this call is made within a renderpass, a subpass-self-dependency is required!
              */
-            std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState        */
-                                      , SRenderGraphResource       const&/* aImageHandle  */
-                                      , CRange                     const&/* aArrayRange   */
-                                      , CRange                     const&/* aMipRange     */
-                                      , VkImageAspectFlags         const&/* aAspectFlags  */
-                                      , VkImageLayout              const&/* aSourceLayout */
-                                      , VkImageLayout              const&/* aTargetLayout */)> performImageLayoutTransfer;
+            std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState        */
+                                      , SRenderGraphImage const        &/* aImageHandle  */
+                                      , CRange const                   &/* aArrayRange   */
+                                      , CRange const                   &/* aMipRange     */
+                                      , VkImageAspectFlags const       &/* aAspectFlags  */
+                                      , VkImageLayout const            &/* aSourceLayout */
+                                      , VkImageLayout const            &/* aTargetLayout */)> performImageLayoutTransfer;
 
             /**
              *
@@ -217,12 +217,12 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Textures
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SRenderGraphDynamicImage const& /* aTexture */)> createTransientTexture;
-            std::function<EEngineStatus(SRenderGraphDynamicImage const& /* aTexture */)> destroyTransientTexture;
+            std::function<EEngineStatus(SRenderGraphImage const& /* aTexture */)> createTransientTexture;
+            std::function<EEngineStatus(SRenderGraphImage const& /* aTexture */)> destroyTransientTexture;
 
-            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> initializePersistentTexture;
-            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> updatePersistentTexture;
-            std::function<EEngineStatus(SRenderGraphPersistentImage const &/* aTexture */)> deinitializePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> initializePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> updatePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> deinitializePersistentTexture;
 
             std::function<EEngineStatus(std::string             const &/* aTextureName */
                                         , SRenderGraphImageView const& /* aTextureView */)> createTextureView;
@@ -231,12 +231,12 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Buffers
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SRenderGraphTransientBuffer const& /* aBuffer */)> createTransientBuffer;
-            std::function<EEngineStatus(SRenderGraphTransientBuffer const& /* aBuffer */)> destroyTransientBuffer;
+            std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> createTransientBuffer;
+            std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> destroyTransientBuffer;
 
-            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> initializePersistentBuffer;
-            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> updatePersistentBuffer;
-            std::function<EEngineStatus(SRenderGraphPersistentBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> initializePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> updatePersistentBuffer;
+            std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
 
             std::function<EEngineStatus(std::string               const& /* aBufferName */
                                         , SRenderGraphBufferView  const& /* aBufferView */)> createBufferView;

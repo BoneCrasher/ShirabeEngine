@@ -286,40 +286,38 @@ namespace engine
             resources::ResourceId_t bufferResourceId;
         };
 
-        struct SHIRABE_TEST_EXPORT SRenderGraphTransientBufferDescription
+        struct SHIRABE_TEST_EXPORT SRenderGraphDynamicBufferDescription
         {
         public_constructors:
-            SRenderGraphTransientBufferDescription();
+            SRenderGraphDynamicBufferDescription();
 
         public_members:
             VkBufferUsageFlags      bufferUsage;
             std::size_t             sizeInBytes;
         };
 
-        /**
-         * The SRenderGraphBuffer struct describes any kind of framegraph buffer resources.
-         */
-        struct SHIRABE_TEST_EXPORT SRenderGraphPersistentBuffer
-                : public SRenderGraphTypedResource<SRenderGraphPersistentBufferDescription>
+        struct SHIRABE_TEST_EXPORT SRenderGraphBufferDescription
         {
         public_constructors:
-            /**
-             * Default-Construct a framegraph buffer.
-             */
-            SRenderGraphPersistentBuffer();
+            SRenderGraphBufferDescription();
+
+        public_members:
+            bool isDynamicBuffer;
+            SRenderGraphDynamicBufferDescription    dynamicBuffer;
+            SRenderGraphPersistentBufferDescription persistentBuffer;
         };
 
         /**
          * The SRenderGraphBuffer struct describes any kind of framegraph buffer resources.
          */
-        struct SHIRABE_TEST_EXPORT SRenderGraphTransientBuffer
-            : public SRenderGraphTypedResource<SRenderGraphTransientBufferDescription>
+        struct SHIRABE_TEST_EXPORT SRenderGraphBuffer
+                : public SRenderGraphTypedResource<SRenderGraphBufferDescription>
         {
         public_constructors:
             /**
              * Default-Construct a framegraph buffer.
              */
-            SRenderGraphTransientBuffer();
+            SRenderGraphBuffer();
         };
 
         struct SHIRABE_TEST_EXPORT SRenderGraphBufferViewDescription
@@ -609,8 +607,8 @@ namespace engine
         public_members:
             resources::ResourceId_t materialResourceId;
             resources::ResourceId_t sharedMaterialResourceId;
-            std::vector<SRenderGraphPersistentBufferDescription> buffers;
-            std::vector<SRenderGraphPersistentImageDescription>  images;
+            std::vector<SRenderGraphBufferDescription> buffers;
+            std::vector<SRenderGraphImageDescription>  images;
         };
 
         struct SRenderGraphMaterial
@@ -635,20 +633,11 @@ namespace engine
             std::array<SRenderGraphMaterialDescription, 4> materials;
         };
 
-        struct SRenderGraphRenderableFetchFilter
-        {};
-        //<-----------------------------------------------------------------------------
-
-        struct SRenderGraphDataSource
-        {
-            std::function<std::vector<SRenderGraphRenderable>(SRenderGraphRenderableFetchFilter)> fetchRenderables;
-        };
-
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
             SRenderGraphImage                               \
+            , SRenderGraphRenderTarget                      \
             , SRenderGraphImageView                         \
-            , SRenderGraphTransientBuffer                   \
-            , SRenderGraphPersistentBuffer                  \
+            , SRenderGraphBuffer                            \
             , SRenderGraphBufferView                        \
             , SRenderGraphMesh                              \
             , SRenderGraphMaterial                          \
@@ -742,7 +731,7 @@ namespace engine
              */
             template <typename T>
             CEngineResult<Shared<T>> const
-            getResource(RenderGraphResourceId_t const &aResourceId) const
+                getResource(RenderGraphResourceId_t const &aResourceId) const
             {
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(mResources.size() <= aResourceId)
@@ -765,15 +754,14 @@ namespace engine
                 return { EEngineStatus::Ok, ptr };
             }
 
-            SHIRABE_INLINE Index_t    const &resources()         const { return mResources;                                                    }
-            SHIRABE_INLINE RefIndex_t const &images()            const { return CRenderGraphResourcesRef<SRenderGraphImage>::get();   }
-            SHIRABE_INLINE RefIndex_t const &imageViews()        const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();        }
-            SHIRABE_INLINE RefIndex_t const &transientBuffers()  const { return CRenderGraphResourcesRef<SRenderGraphTransientBuffer>::get();  }
-            SHIRABE_INLINE RefIndex_t const &persistentBuffers() const { return CRenderGraphResourcesRef<SRenderGraphPersistentBuffer>::get(); }
-            SHIRABE_INLINE RefIndex_t const &bufferViews()       const { return CRenderGraphResourcesRef<SRenderGraphBufferView>::get();       }
-            SHIRABE_INLINE RefIndex_t const &meshes()            const { return CRenderGraphResourcesRef<SRenderGraphMesh>::get();             }
-            SHIRABE_INLINE RefIndex_t const &materials()         const { return CRenderGraphResourcesRef<SRenderGraphMaterial>::get();         }
-            SHIRABE_INLINE RefIndex_t const &pipelines()         const { return CRenderGraphResourcesRef<SRenderGraphPipeline>::get();         }
+            SHIRABE_INLINE Index_t    const &resources()   const { return mResources;                                              }
+            SHIRABE_INLINE RefIndex_t const &images()      const { return CRenderGraphResourcesRef<SRenderGraphImage>::get();      }
+            SHIRABE_INLINE RefIndex_t const &imageViews()  const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();  }
+            SHIRABE_INLINE RefIndex_t const &buffers()     const { return CRenderGraphResourcesRef<SRenderGraphBuffer>::get();     }
+            SHIRABE_INLINE RefIndex_t const &bufferViews() const { return CRenderGraphResourcesRef<SRenderGraphBufferView>::get(); }
+            SHIRABE_INLINE RefIndex_t const &meshes()      const { return CRenderGraphResourcesRef<SRenderGraphMesh>::get();       }
+            SHIRABE_INLINE RefIndex_t const &materials()   const { return CRenderGraphResourcesRef<SRenderGraphMaterial>::get();   }
+            SHIRABE_INLINE RefIndex_t const &pipelines()   const { return CRenderGraphResourcesRef<SRenderGraphPipeline>::get();   }
 
         protected_members:
             Index_t mResources;
@@ -800,7 +788,7 @@ namespace engine
 
                 mResources.push_back(ptr);
 
-                CRenderGraphResourcesRef<T>::insert(ptr->resourceId);
+                static_cast<CRenderGraphResourcesRef<T> *>(this)->insert(ptr->resourceId);
 
                 return (*ptr);
             }
@@ -858,9 +846,7 @@ namespace engine
     template <>
     SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphImageView>(framegraph::SRenderGraphImageView const &aTextureView);
     template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphTransientBuffer>(framegraph::SRenderGraphTransientBuffer const &aBuffer);
-    template <>
-    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphPersistentBuffer>(framegraph::SRenderGraphPersistentBuffer const &aBuffer);
+    SHIRABE_TEST_EXPORT std::string convert_to_string<framegraph::SRenderGraphBuffer>(framegraph::SRenderGraphBuffer const &aBuffer);
     template <>
     SHIRABE_TEST_EXPORT  std::string convert_to_string<framegraph::SRenderGraphBufferView>(framegraph::SRenderGraphBufferView const &aBufferView);
 

@@ -85,7 +85,8 @@ namespace engine
              *
              * @return True, if successfully executed. False otherwise.
              */
-            CEngineResult<> execute(SRenderGraphDataSource      const &aDataSource
+            CEngineResult<> execute(SRenderGraphPlatformContext const &aPlatformContext
+                                    , SRenderGraphDataSource    const &aDataSource
                                     , SRenderGraphResourceContext     &aResourceContext
                                     , SRenderGraphRenderContext       &aRenderContext);
 

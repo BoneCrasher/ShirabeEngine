@@ -15,9 +15,9 @@ namespace engine
         {
         default:
         case ERenderGraphResourceType::Undefined:   return "Undefined";
-        case ERenderGraphResourceType::Texture:     return "Texture";
+        case ERenderGraphResourceType::Image:       return "Image";
         case ERenderGraphResourceType::Buffer:      return "Buffer";
-        case ERenderGraphResourceType::TextureView: return "TextureView";
+        case ERenderGraphResourceType::ImageView:   return "ImageView";
         case ERenderGraphResourceType::BufferView:  return "BufferView";
         }
     }
@@ -214,7 +214,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SRenderGraphTransientBufferDescription::SRenderGraphTransientBufferDescription()
+        SRenderGraphDynamicBufferDescription::SRenderGraphDynamicBufferDescription()
             : bufferUsage(VkBufferUsageFlagBits::VK_BUFFER_USAGE_FLAG_BITS_MAX_ENUM)
               , sizeInBytes(0)
         {}
@@ -231,16 +231,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SRenderGraphTransientBuffer::SRenderGraphTransientBuffer()
-            : SRenderGraphTypedResource<SRenderGraphTransientBufferDescription>()
+        SRenderGraphBufferDescription::SRenderGraphBufferDescription()
+            : isDynamicBuffer(false)
+            , dynamicBuffer()
+            , persistentBuffer()
         {}
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SRenderGraphPersistentBuffer::SRenderGraphPersistentBuffer()
-            : SRenderGraphTypedResource<SRenderGraphPersistentBufferDescription>()
+        SRenderGraphBuffer::SRenderGraphBuffer()
+            : SRenderGraphTypedResource<SRenderGraphBufferDescription>()
         {}
         //<-----------------------------------------------------------------------------
 
@@ -470,16 +472,10 @@ namespace engine
                     CRenderGraphResourcesRef<SRenderGraphImageView>::insert(id);
                 }
 
-                for(RefIndex_t::value_type const&id : aOther.transientBuffers())
+                for(RefIndex_t::value_type const&id : aOther.buffers())
                 {
-                    CRenderGraphResourcesRef<SRenderGraphTransientBuffer>::insert(id);
+                    CRenderGraphResourcesRef<SRenderGraphBuffer>::insert(id);
                 }
-
-                for(RefIndex_t::value_type const&id : aOther.persistentBuffers())
-                {
-                    CRenderGraphResourcesRef<SRenderGraphPersistentBuffer>::insert(id);
-                }
-
                 for(RefIndex_t::value_type const&id : aOther.bufferViews())
                 {
                     CRenderGraphResourcesRef<SRenderGraphBufferView>::insert(id);
@@ -575,28 +571,13 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <>
-    std::string convert_to_string<framegraph::SRenderGraphTransientBuffer>(framegraph::SRenderGraphTransientBuffer const &aBuffer)
+    std::string convert_to_string<framegraph::SRenderGraphBuffer>(framegraph::SRenderGraphBuffer const &aBuffer)
     {
         std::string s =
                 CString::format(
                     "  {} (RID: {})",
                     "Buffer",
                     aBuffer.resourceId);
-        return s;
-    }
-    //<-----------------------------------------------------------------------------
-
-    //<-----------------------------------------------------------------------------
-    //<
-    //<-----------------------------------------------------------------------------
-    template <>
-    std::string convert_to_string<framegraph::SRenderGraphPersistentBuffer>(framegraph::SRenderGraphPersistentBuffer const &aBuffer)
-    {
-        std::string s =
-                        CString::format(
-                            "  {} (RID: {})",
-                            "Buffer",
-                            aBuffer.resourceId);
         return s;
     }
     //<-----------------------------------------------------------------------------

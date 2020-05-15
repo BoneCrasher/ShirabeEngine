@@ -173,6 +173,14 @@ namespace engine
                 SRenderGraphImage                      &subjacentTargetResource,
                 SRenderGraphTextureResourceFlags const &aFlags);
 
+            CEngineResult<SRenderGraphBuffer> createBuffer(
+                std::string                          const &aName,
+                SRenderGraphDynamicBufferDescription const &aBufferDescription);
+
+            CEngineResult<SRenderGraphBufferView> readBuffer(
+                SRenderGraphBuffer &subjacentTargetResource,
+                CRange const       &aSubrange);
+
             CEngineResult<SRenderGraphMesh> useMesh(SRenderGraphMeshDescription const &aMeshDescription);
 
             CEngineResult<SRenderGraphMaterial> useMaterial(SRenderGraphMaterialDescription const &aMaterialDescription);
@@ -298,7 +306,7 @@ namespace engine
 
         private_methods:
             CEngineResult<SRenderGraphImageView> useImage(
-                SRenderGraphDynamicImage         &aTexture,
+                SRenderGraphImage                &aTexture,
                 ERenderGraphViewPurpose    const &aSourceOrTarget,
                 EFormat                    const &aRequiredFormat,
                 CRange                     const &aArraySliceRange,

@@ -9,9 +9,12 @@
 
 namespace engine::framegraph
 {
+    struct SRenderGraphRenderableFetchFilter
+    {};
+
     struct SRenderGraphDataSource
     {
-        std::function<std::vector<SRenderGraphRenderableResources>(SRenderGraphRenderableFetchFilter)> fetchRenderables;
+        std::function<std::vector<SRenderGraphRenderable>(SRenderGraphRenderableFetchFilter)> fetchRenderables;
     };
 }
 

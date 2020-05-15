@@ -5,6 +5,8 @@
 #ifndef __SHIRABEDEVELOPMENT_PLATFORMCONTEXT_H__
 #define __SHIRABEDEVELOPMENT_PLATFORMCONTEXT_H__
 
+#include <wsi/display.h>
+#include <os/applicationenvironment.h>
 #include "framegraphdata.h"
 
 namespace engine::framegraph

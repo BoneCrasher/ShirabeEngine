@@ -69,20 +69,20 @@ namespace engine::resources
 
     private_methods:
         template <typename TResource, typename... TArgs>
-        CEngineResult<> initializeResourceImpl(TResource const &aResource
-                                             , TArgs       &&...aArgs);
+        EEngineStatus initializeResourceImpl(TResource &aResource
+                                             , TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<> deinitializeResourceImpl(TResource const &aResource
-                                               , TArgs       &&...aArgs);
+        EEngineStatus deinitializeResourceImpl(TResource &aResource
+                                               , TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<> transferResourceImpl(TResource const &aResourceId
-                                           , TArgs       &&...aArgs);
+        EEngineStatus transferResourceImpl(TResource &aResourceId
+                                           , TArgs &&...aArgs);
 
         template <typename TResource, typename... TArgs>
-        CEngineResult<> updateResourceImpl(TResource const &aResource
-                                         , TArgs       &&...aArgs);
+        EEngineStatus updateResourceImpl(TResource &aResource
+                                         , TArgs &&...aArgs);
 
         template <typename TResource>
         OptionalRef_t<TResource> getResourceObject(ResourceId_t const &aId)
@@ -194,8 +194,7 @@ namespace engine::resources
     CEngineResult<OptionalRef_t<TResource>>
         CResourceManagerBase<TResources...>
             ::getResource(
-                ResourceId_t const &aId
-                , TArgs        &&...aArgs)
+                ResourceId_t const &aId, TArgs &&...aArgs)
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(false == resource.has_value())
@@ -214,13 +213,13 @@ namespace engine::resources
     CEngineResult<>
         CResourceManagerBase<TResources...>
             ::initializeResource(
-                ResourceId_t const &aId
-                , TArgs        &&...aArgs)
+                ResourceId_t const &aId, TArgs &&...aArgs)
     {
-        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
-        if(resource.has_value())
+        OptionalRef_t<TResource> resourceOpt = getResourceObject<TResource>(aId);
+        if(resourceOpt.has_value())
         {
-            auto const &[result] = initializeResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            TResource &resource = *resourceOpt;
+            auto const &[result] = initializeResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -245,13 +244,13 @@ namespace engine::resources
     CEngineResult<>
         CResourceManagerBase<TResources...>
             ::updateResource(
-                ResourceId_t const &aId
-                , TArgs        &&...aArgs)
+                ResourceId_t const &aId, TArgs &&...aArgs)
     {
-        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
-        if(resource.has_value())
+        OptionalRef_t<TResource> resourceOpt = getResourceObject<TResource>(aId);
+        if(resourceOpt.has_value())
         {
-            auto const &[result] = updateResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            TResource &resource = *resourceOpt;
+            auto const &[result] = updateResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -274,13 +273,13 @@ namespace engine::resources
     CEngineResult<>
         CResourceManagerBase<TResources...>
             ::deinitializeResource(
-                ResourceId_t const &aId
-                , TArgs        &&...aArgs)
+                ResourceId_t const &aId, TArgs &&...aArgs)
     {
-        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
-        if(resource.has_value())
+        OptionalRef_t<TResource> resourceOpt = getResourceObject<TResource>(aId);
+        if(resourceOpt.has_value())
         {
-            auto const &[result] = deinitializeResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            TResource &resource = *resourceOpt;
+            auto const &[result] = deinitializeResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -302,13 +301,13 @@ namespace engine::resources
     CEngineResult<>
         CResourceManagerBase<TResources...>
             ::uploadResource(
-                  ResourceId_t const &aId
-                , TArgs          &&...aArgs)
+                  ResourceId_t const &aId, TArgs &&...aArgs)
     {
-        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
-        if(resource.has_value())
+        OptionalRef_t<TResource> resourceOpt = getResourceObject<TResource>(aId);
+        if(resourceOpt.has_value())
         {
-            auto const &[result] = transferResourceImpl(*resource, this, std::forward<TArgs>(aArgs)...);
+            TResource &resource = *resourceOpt;
+            auto const &[result] = transferResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:
@@ -330,13 +329,13 @@ namespace engine::resources
     CEngineResult<>
         CResourceManagerBase<TResources...>
             ::discardResource(
-                ResourceId_t const &aResourceId
-                , TArgs        &&...aArgs)
+                ResourceId_t const &aResourceId, TArgs &&...aArgs)
     {
-        OptionalRef_t<TResource> resource = getResourceObject<TResource>(aResourceId);
-        if(resource.has_value())
+        OptionalRef_t<TResource> resourceOpt = getResourceObject<TResource>(aResourceId);
+        if(resourceOpt.has_value())
         {
-            EEngineStatus const deinitialized = deinitializeResourceImpl(*resource, std::forward<TArgs>(aArgs)...);
+            TResource &resource = *resourceOpt;
+            EEngineStatus const deinitialized = deinitializeResourceImpl(resource, std::forward<TArgs>(aArgs)...);
             if(CheckEngineError(deinitialized))
             {
                 CLog::Error(logTag(), "Failed to deinitialize resource with ID '{}'", aResourceId);
@@ -356,11 +355,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<>
+    EEngineStatus
         CResourceManagerBase<TResources...>
             ::initializeResourceImpl(
-                TResource const &aResource
-              , TArgs       &&...aArgs)
+                TResource &aResource, TArgs &&...aArgs)
     {
         using namespace core;
 
@@ -386,7 +384,7 @@ namespace engine::resources
         {
             aResource.loadState.set(EGpuApiResourceState::Creating);
 
-            EEngineStatus const initResult = TResource::GpuApiResource_t::template initialize<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const initResult = TResource::GpuApiResource_t::template initialize<My_t>(aResource.description, aResource.gpuApiHandles, this, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(initResult))
             {
                 aResource.loadState.set(EGpuApiResourceState::Error);
@@ -418,11 +416,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<>
+    EEngineStatus
         CResourceManagerBase<TResources...>
             ::updateResourceImpl(
-                TResource const &aResource
-              , TArgs       &&...aArgs)
+                TResource &aResource, TArgs &&...aArgs)
     {
         using namespace core;
 
@@ -445,7 +442,7 @@ namespace engine::resources
             {
                 aResource.loadState.set(EGpuApiResourceState::Loading);
 
-                EEngineStatus const loadResult = TResource::GpuApiResource_t::template load<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const loadResult = TResource::GpuApiResource_t::template load<My_t>(aResource.description, aResource.gpuApiHandles, this, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(loadResult))
                 {
                     aResource.loadState.set(EGpuApiResourceState::Error);
@@ -478,8 +475,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<> CResourceManagerBase<TResources...>::deinitializeResourceImpl(TResource const &aResource
-                                                                                , TArgs       &&...aArgs)
+    EEngineStatus
+        CResourceManagerBase<TResources...>
+            ::deinitializeResourceImpl(
+                    TResource &aResource, TArgs       &&...aArgs)
     {
         using namespace core;
 
@@ -509,7 +508,7 @@ namespace engine::resources
             {
                 aResource.loadState.set(EGpuApiResourceState::Unloading);
 
-                EEngineStatus const unloadResult = TResource::GpuApiResource_t::template unload<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const unloadResult = TResource::GpuApiResource_t::template unload<My_t>(aResource.description, aResource.gpuApiHandles, this, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(unloadResult))
                 {
                     aResource.loadState.set(EGpuApiResourceState::Error);
@@ -526,7 +525,7 @@ namespace engine::resources
         {
             aResource.loadState.reset(EGpuApiResourceState::Discarding);
 
-            EEngineStatus const deinitResult = TResource::GpuApiResource_t::template deinitialize<My_t>(aResource.descriptor, aResource.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const deinitResult = TResource::GpuApiResource_t::template deinitialize<My_t>(aResource.description, aResource.gpuApiHandles, this, std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(deinitResult))
             {
                 return deinitResult;
@@ -545,10 +544,10 @@ namespace engine::resources
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
     template <typename TResource, typename... TArgs>
-    CEngineResult<>
+    EEngineStatus
         CResourceManagerBase<TResources...>
             ::transferResourceImpl(
-                TResource const &aResourceId, TArgs &&...aArgs)
+                TResource &aResourceId, TArgs &&...aArgs)
     {
         using namespace core;
 
@@ -566,7 +565,7 @@ namespace engine::resources
             {
                 aResourceId.loadState.set(EGpuApiResourceState::Transferring);
 
-                EEngineStatus const transferResult = TResource::GpuApiResource_t::template transfer<My_t>(aResourceId.descriptor, aResourceId.gpuApiHandles, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const transferResult = TResource::GpuApiResource_t::template transfer<My_t>(aResourceId.description, aResourceId.gpuApiHandles, this, std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(transferResult))
                 {
                     return transferResult;

@@ -487,17 +487,17 @@ namespace engine::datastructures
     {
         std::vector<TIdType> ordered;
 
-        std::function<void(Tree_t<TIdType> const   &,
-                           TIdType const           &,
-                           std::map<TIdType, bool> &,
-                           std::vector<TIdType>    &)> DSFi_fn;
+        std::function<void(Tree_t<TIdType> const &,
+                           TIdType const &,
+                           std::unordered_map<TIdType, bool> &,
+                           std::vector<TIdType> &)> DSFi_fn;
 
         // Define the recursive sort function
         DSFi_fn =
-            [&](Tree_t<TIdType> const   &aEdges,
-                TIdType const           &aVertex,
-                std::map<TIdType, bool> &aVisitedEdges,
-                std::vector<TIdType>    &aPassOrder) -> void
+            [&](Tree_t<TIdType> const             &aEdges,
+                TIdType const                     &aVertex,
+                std::unordered_map<TIdType, bool> &aVisitedEdges,
+                std::vector<TIdType>              &aPassOrder) -> void
                 {
                     bool const edgeVisited = aVisitedEdges[aVertex];
                     if(edgeVisited)
@@ -508,7 +508,7 @@ namespace engine::datastructures
                     aVisitedEdges[aVertex] = true;
 
                     // For each outgoing edge...
-                    bool const doesContainEdge = (false == (aEdges.end() == aEdges.find(aVertex)));
+                    bool const doesContainEdge = (aEdges.end() != aEdges.find(aVertex));
                     if(doesContainEdge)
                     {
                         for(TIdType const &adjacent : aEdges.at(aVertex))
@@ -517,13 +517,13 @@ namespace engine::datastructures
                         }
                     }
 
-                    aPassOrder.push(aVertex);
+                    aPassOrder.push_back(aVertex);
                 };
 
         // Kick-off the sort algorithm
         try
         {
-            std::map<TIdType, bool> visitedEdges = {};
+            std::unordered_map<TIdType, bool> visitedEdges = {};
             for(typename Tree_t<TIdType>::value_type &passAdjacency : mForwardTree)
             {
                 visitedEdges[passAdjacency.first] = false;
@@ -544,7 +544,7 @@ namespace engine::datastructures
         }
 
         // Reverse order, as the first item is at the end w/ this algorithm.
-        std::reverse(ordered);
+        std::reverse(ordered.begin(), ordered.end());
 
         return ordered;
     }
