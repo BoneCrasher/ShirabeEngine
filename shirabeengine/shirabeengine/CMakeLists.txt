@@ -13,14 +13,8 @@ add_subdirectory(modules/os)
 add_subdirectory(modules/utility)
 add_subdirectory(modules/wsi)
 add_subdirectory(modules/graphicsapi)
-add_subdirectory(modules/resources)
-add_subdirectory(modules/resources/submodules/buffers)
-add_subdirectory(modules/resources/submodules/textures)
-add_subdirectory(modules/resources/submodules/material)
-add_subdirectory(modules/resources/submodules/mesh)
-add_subdirectory(modules/rendering)
-add_subdirectory(modules/vulkan_integration)
 add_subdirectory(modules/asset)
+add_subdirectory(modules/rendering)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
 include(project_default_template)
@@ -45,29 +39,18 @@ set(
         resources
         rendering
         graphicsapi
-		buffers
-		textures
-        material
-		mesh
-        vulkan_integration
         asset)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEVULKAN)
+        SHIRABEMODULERENDERING)
 
 include(project_setup)
 
 add_dependencies(shirabeengine INSTALL_wsi)
-add_dependencies(shirabeengine INSTALL_resources)
 add_dependencies(shirabeengine INSTALL_graphicsapi)
 add_dependencies(shirabeengine INSTALL_rendering)
-add_dependencies(shirabeengine INSTALL_vulkan_integration)
 add_dependencies(shirabeengine INSTALL_asset)
-add_dependencies(shirabeengine INSTALL_material)
-add_dependencies(shirabeengine INSTALL_mesh)
-add_dependencies(shirabeengine INSTALL_buffers)
-add_dependencies(shirabeengine INSTALL_textures)
 add_dependencies(shirabeengine INSTALL_utility)
 add_dependencies(shirabeengine INSTALL_core)
 add_dependencies(shirabeengine INSTALL_os)

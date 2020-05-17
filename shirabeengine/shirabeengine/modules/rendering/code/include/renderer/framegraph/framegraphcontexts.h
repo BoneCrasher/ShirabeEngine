@@ -6,8 +6,8 @@
 #include <log/log.h>
 #include <core/enginetypehelper.h>
 #include <asset/assetstorage.h>
-#include <resources/extensibility.h>
 
+#include "renderer/resource_management/extensibility.h"
 #include "renderer/renderertypes.h"
 #include "renderer/framegraph/framegraphdata.h"
 

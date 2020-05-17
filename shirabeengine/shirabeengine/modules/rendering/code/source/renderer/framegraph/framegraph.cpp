@@ -1,5 +1,4 @@
-#include <resources/resourcetypes.h>
-
+#include "renderer/resource_management/resourcetypes.h"
 #include "renderer/framegraph/framegraph.h"
 
 namespace engine

@@ -13,14 +13,16 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         CPassBuilder::CPassBuilder(
-                PassUID_t const             &aPassUID,
-                Shared<CPassBase>            aPass,
-                Shared<CRenderPass>          aEnclosingRenderPass,
+                PassUID_t const              &aPassUID,
+                Shared<CPassBase>             aPass,
+                Shared<CRenderPass>           aEnclosingRenderPass,
+                CResourceManager const       &aResourceManager,
                 CRenderGraphMutableResources &aOutResourceData)
             : mPassUID             (aPassUID                           )
             , mPass                (std::move(aPass                   ))
             , mEnclosingRenderPass (std::move(aEnclosingRenderPass    ))
             , mResourceData        (aOutResourceData                   )
+            , mResourceManager     (aResourceManager                   )
             , mAttachmentCollection(aEnclosingRenderPass->attachments())
         {}
         //<-----------------------------------------------------------------------------
@@ -62,6 +64,44 @@ namespace engine
             SRenderGraphImageDescription description;
             description.isDynamicImage = true;
             description.dynamicImage   = aDescriptor;
+
+            // Basic abstract descriptor of resources being used.
+            SRenderGraphImage &resource = mResourceData.spawnResource<SRenderGraphImage>();
+            resource.description           = description;
+            resource.assignedRenderpassUID = mEnclosingRenderPass->getRenderPassUid();
+            resource.assignedPassUID       = mPassUID;
+            resource.parentResource        = SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE;
+            resource.subjacentResource     = resource.resourceId; // This is a trick to keep algorithms consistent while supporting r/w from textures and t-views.
+            resource.readableName          = aName;
+            resource.type                  = ERenderGraphResourceType::Image;
+
+            mPass->registerResource(resource.resourceId);
+
+            return { EEngineStatus::Ok, resource };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SRenderGraphImage> CPassBuilder::importImage(
+            std::string                            const &aName,
+            SRenderGraphPersistentImageDescription const &aDescriptor)
+        {
+            SRenderGraphImageDescription description;
+            description.isDynamicImage  = false;
+            description.persistentImage = aDescriptor;
+
+            auto const &[result, resourceDesc] =
+                mResourceManager.getResourceDescription<STexture>(description.persistentImage.imageId);
+            if(CheckEngineError(result))
+            {
+                return EEngineStatus::ResourceError_NotFound;
+            }
+
+            description.dynamicImage = SRenderGraphDynamicImageDescription(resourceDesc.textureInfo);
+            description.dynamicImage.requestedUsage.set(ERenderGraphResourceUsage::SampledImage);
+            description.dynamicImage.permittedUsage.set(ERenderGraphResourceUsage::SampledImage);
 
             // Basic abstract descriptor of resources being used.
             SRenderGraphImage &resource = mResourceData.spawnResource<SRenderGraphImage>();
@@ -487,6 +527,59 @@ namespace engine
             materialResource.description           = aMaterialDescription;
 
             return { EEngineStatus::Ok, materialResource };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SRenderGraphBuffer> CPassBuilder::createBuffer(std::string const &aName, SRenderGraphDynamicBufferDescription const &aBufferDescription)
+        {
+            SRenderGraphBuffer buffer = mResourceData.spawnResource<SRenderGraphBuffer>();
+            buffer.readableName                 = aName;
+            buffer.description.isDynamicBuffer  = true;
+            buffer.description.dynamicBuffer    = aBufferDescription;
+
+            return { EEngineStatus::Ok, buffer };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SRenderGraphBuffer> CPassBuilder::importBuffer(std::string const &aName, SRenderGraphPersistentBufferDescription const &aBufferDescription)
+        {
+            SRenderGraphBuffer buffer = mResourceData.spawnResource<SRenderGraphBuffer>();
+            buffer.readableName                 = aName;
+            buffer.description.isDynamicBuffer  = false;
+            buffer.description.persistentBuffer = aBufferDescription;
+
+            auto const &[result, resourceDesc] =
+                mResourceManager.getResourceDescription<SBuffer>(aBufferDescription.bufferResourceId);
+
+            if(CheckEngineError(result))
+            {
+                return EEngineStatus::ResourceError_NotFound;
+            }
+
+            buffer.description.dynamicBuffer.bufferUsage = resourceDesc.createInfo.usage;
+            buffer.description.dynamicBuffer.sizeInBytes = resourceDesc.createInfo.size;
+
+            return { EEngineStatus::Ok, buffer };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SRenderGraphBufferView> CPassBuilder::readBuffer(SRenderGraphBuffer &subjacentTargetResource, CRange const &aSubrange)
+        {
+            SRenderGraphBufferView bufferView = mResourceData.spawnResource<SRenderGraphBufferView>();
+            bufferView.readableName = CString::format("Buffer_%d_View_%d", subjacentTargetResource.resourceId, bufferView.resourceId);
+            bufferView.description.mode     = ERenderGraphViewAccessMode::Read;
+            bufferView.description.subrange = aSubrange;
+
+            return { EEngineStatus::Ok, bufferView };
         }
         //<-----------------------------------------------------------------------------
 

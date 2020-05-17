@@ -7,23 +7,17 @@ set(SHIRABE_TEMPLATE "StaticLib")
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEMATERIAL
-        SHIRABEMODULEMESH
-        SHIRABEMODULETEXTURES
+        SHIRABEMODULEASSET
+        SHIRABEMODULEGRAPHICSAPI
         SHIRABEMODULEWSI)
 
 set(SHIRABE_EXCLUDED_HEADERS)
-set(SHIRABE_EXCLUDED_SOURCES
-        renderer/framegraph/framegraphrendercontext.cpp)
+set(SHIRABE_EXCLUDED_SOURCES)
 
 include(project_setup)
 
 add_dependencies(rendering INSTALL_asset)
 add_dependencies(rendering INSTALL_graphicsapi)
-add_dependencies(rendering INSTALL_resources)
-add_dependencies(rendering INSTALL_textures)
-add_dependencies(rendering INSTALL_mesh)
-add_dependencies(rendering INSTALL_material)
 add_dependencies(rendering INSTALL_wsi)
 add_dependencies(rendering INSTALL_core)
 add_dependencies(rendering INSTALL_os)

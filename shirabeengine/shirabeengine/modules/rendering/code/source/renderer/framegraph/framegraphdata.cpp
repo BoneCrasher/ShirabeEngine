@@ -278,6 +278,17 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
+        SRenderGraphDynamicImageDescription::SRenderGraphDynamicImageDescription(STextureInfo const &aTextureInfo)
+            : STextureInfo(aTextureInfo)
+              , initialState(ERenderGraphResourceInitState::Undefined)
+              , permittedUsage(ERenderGraphResourceUsage::Undefined)
+              , requestedUsage(ERenderGraphResourceUsage::Undefined)
+        {}
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
         SRenderGraphPersistentImageDescription::SRenderGraphPersistentImageDescription()
             : imageId()
         {}

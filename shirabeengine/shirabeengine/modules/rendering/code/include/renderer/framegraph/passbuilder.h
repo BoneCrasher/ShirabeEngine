@@ -10,6 +10,8 @@
 #include <core/random.h>
 #include <core/uid.h>
 #include <graphicsapi/definitions.h>
+
+#include "renderer/vulkan_resources/resources/vulkanresourceoperations.h"
 #include "renderer/framegraph/framegraphdata.h"
 
 namespace engine
@@ -22,6 +24,9 @@ namespace engine
         class CPassBase;
         class CRenderPass;
 
+        #ifdef None
+        #undef None
+        #endif
         /**
          * The EPassResourceConstraintFlags enum describes various parameters which can be constrained.
          */
@@ -72,9 +77,10 @@ namespace engine
              * @param aOutResourceData Container for the pass' resources requested/used.
              */
             CPassBuilder(
-                    PassUID_t             const &aPassUID,
-                    Shared<CPassBase>            aPass,
-                    Shared<CRenderPass>          aEnclosingRenderPass,
+                    PassUID_t              const &aPassUID,
+                    Shared<CPassBase>             aPass,
+                    Shared<CRenderPass>           aEnclosingRenderPass,
+                    CResourceManager const       &aResourceManager,
                     CRenderGraphMutableResources &aOutResourceData);
 
         public_methods:
@@ -100,6 +106,10 @@ namespace engine
             CEngineResult<SRenderGraphImage> createImage(
                 std::string                         const &aName,
                 SRenderGraphDynamicImageDescription const &aDescriptor);
+
+            CEngineResult<SRenderGraphImage> importImage(
+                std::string                            const &aName,
+                SRenderGraphPersistentImageDescription const &aDescriptor);
 
             /**
              * Request the creation of a texture resource in the framegraph.
@@ -176,6 +186,10 @@ namespace engine
             CEngineResult<SRenderGraphBuffer> createBuffer(
                 std::string                          const &aName,
                 SRenderGraphDynamicBufferDescription const &aBufferDescription);
+
+            CEngineResult<SRenderGraphBuffer> importBuffer(
+                std::string                             const &aName,
+                SRenderGraphPersistentBufferDescription const &aBufferDescription);
 
             CEngineResult<SRenderGraphBufferView> readBuffer(
                 SRenderGraphBuffer &subjacentTargetResource,
@@ -324,11 +338,12 @@ namespace engine
                 EEngineStatus              const &aFailCode);
 
         private_members:
-            PassUID_t                        mPassUID;
-            Shared<CPassBase>                mPass;
-            Shared<CRenderPass>              mEnclosingRenderPass;
+            PassUID_t                         mPassUID;
+            Shared<CPassBase>                 mPass;
+            Shared<CRenderPass>               mEnclosingRenderPass;
             CRenderGraphMutableResources     &mResourceData;
             SRenderGraphAttachmentCollection &mAttachmentCollection;
+            CResourceManager const           &mResourceManager;
         };
     }
 }

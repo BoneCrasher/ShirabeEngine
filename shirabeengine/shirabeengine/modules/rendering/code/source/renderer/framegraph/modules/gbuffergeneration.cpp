@@ -160,15 +160,15 @@ namespace engine
 
                                            for(auto const &bufferDesc : renderableUniformBuffers)
                                            {
-                                               auto [bufferCreationResult, buffer] = aBuilder.createBuffer(bufferDesc.persistentBuffer.bufferResourceId, bufferDesc);
+                                               auto [bufferCreationResult, buffer] = aBuilder.importBuffer(bufferDesc.bufferResourceId, bufferDesc);
 
-                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer);
+                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer, { 0, buffer.description.dynamicBuffer.sizeInBytes });
                                                material.buffers.push_back(bufferResource);
                                            }
 
                                            for(auto const &imageDesc : renderableImages)
                                            {
-                                               auto [imageCreationResult, image] = aBuilder.createImage(imageDesc.persistentImage.imageId, imageDesc);
+                                               auto [imageCreationResult, image] = aBuilder.importImage(imageDesc.imageId, imageDesc);
 
                                                SRenderGraphTextureResourceFlags flags;
                                                flags.arraySliceRange = CRange(0, 1);
@@ -190,7 +190,7 @@ namespace engine
             // ----------------------------------------------------------------------------------
             // Execution
             // ----------------------------------------------------------------------------------
-            auto const execute = [=] (SPassData const                    &aPassData
+            auto const execute = [=] (SPassData const                     &aPassData
                                       , SRenderGraphPlatformContext const &aPlatformContext
                                       , SRenderGraphDataSource const      &aDataSource
                                       , CRenderGraphResources const       &aRenderGraphResources
@@ -202,10 +202,10 @@ namespace engine
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-                std::vector<SRenderGraphRenderableResources> renderables = aDataSource.fetchRenderables({});
+                std::vector<SRenderGraphRenderable> renderables = aDataSource.fetchRenderables({});
 
                 // Render-Loop
-                for(SRenderGraphRenderableResources const &renderableResources : renderables)
+                for(SRenderGraphRenderable const &renderableResources : renderables)
                 {
                     for(auto const &[id, mesh] : renderableResources.meshes)
                     {

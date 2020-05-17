@@ -3,7 +3,7 @@ function(linkLibrary)
     set(BINARY_NAME mesh)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/mesh)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/asset/submodules/mesh)
 
     # -I
     append_parentscope(

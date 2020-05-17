@@ -9,8 +9,10 @@ set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
         SHIRABEMODULEUTILITY
         SHIRABEMODULEGRAPHICSAPI
-        STBI                    
+        VULKANHEADERS
+        STBI
         FXGLTF)
+
 
 include(project_setup)
 
@@ -21,3 +23,5 @@ add_dependencies(asset INSTALL_utility)
 add_dependencies(asset INSTALL_graphicsapi)
 add_dependencies(asset INSTALL_math)
 add_dependencies(asset INSTALL_log)
+
+

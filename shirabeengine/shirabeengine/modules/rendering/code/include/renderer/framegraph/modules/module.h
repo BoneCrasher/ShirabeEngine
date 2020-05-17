@@ -3,13 +3,14 @@
 
 #include <platform/platform.h>
 #include <asset/assetstorage.h>
-#include <resources/cresourcemanager.h>
-#include <mesh/loader.h>
-#include <mesh/declaration.h>
-#include <material/loader.h>
-#include <material/declaration.h>
-#include <textures/loader.h>
-#include <textures/declaration.h>
+#include <asset/mesh/loader.h>
+#include <asset/mesh/declaration.h>
+#include <asset/material/loader.h>
+#include <asset/material/declaration.h>
+#include <asset/textures/loader.h>
+#include <asset/textures/declaration.h>
+
+#include "renderer/resource_management/cresourcemanager.h"
 
 namespace engine
 {

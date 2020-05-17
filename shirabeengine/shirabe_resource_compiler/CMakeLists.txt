@@ -13,10 +13,7 @@ set(SHIRABE_ADDITIONAL_PROJECT_PREPROCESSOR_DEFINITIONS
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULEMATERIAL
-        SHIRABEMODULEMESH
-        SHIRABEMODULETEXTURES
-        SHIRABEMODULEBUFFERS
+        SHIRABEMODULEASSET
         SPIRVCROSS
         SPIRVTOOLS
         GLSLANG
@@ -31,11 +28,6 @@ add_dependencies(shirabe_resource_compiler INSTALL_core)
 add_dependencies(shirabe_resource_compiler INSTALL_utility)
 add_dependencies(shirabe_resource_compiler INSTALL_asset)
 add_dependencies(shirabe_resource_compiler INSTALL_math)
-add_dependencies(shirabe_resource_compiler INSTALL_resources)
 add_dependencies(shirabe_resource_compiler INSTALL_graphicsapi)
-add_dependencies(shirabe_resource_compiler INSTALL_buffers)
-add_dependencies(shirabe_resource_compiler INSTALL_material)
-add_dependencies(shirabe_resource_compiler INSTALL_mesh)
-add_dependencies(shirabe_resource_compiler INSTALL_textures)
 
 install(DIRECTORY ${SHIRABE_WORKSPACE_ROOT_DIR}/tools DESTINATION ${SHIRABE_PROJECT_PUBLIC_DEPLOY_DIR}/bin USE_SOURCE_PERMISSIONS)

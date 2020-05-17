@@ -3,7 +3,7 @@ function(linkLibrary)
     set(BINARY_NAME buffers)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/resources/submodules/buffers)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/asset/submodules/buffers)
 
     # -I
     append_parentscope(

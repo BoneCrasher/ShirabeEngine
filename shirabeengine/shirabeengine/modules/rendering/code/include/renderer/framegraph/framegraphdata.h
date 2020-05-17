@@ -21,7 +21,8 @@
 #include <core/enginestatus.h>
 #include <log/log.h>
 #include <math/geometric/rect.h>
-#include <resources/extensibility.h>
+
+#include "renderer/resource_management/extensibility.h"
 #include "renderer/renderertypes.h"
 
 #ifdef None
@@ -354,6 +355,8 @@ namespace engine
         {
         public_constructors:
             SRenderGraphDynamicImageDescription();
+            SRenderGraphDynamicImageDescription(SRenderGraphDynamicImageDescription const &aOther) = default;
+            explicit SRenderGraphDynamicImageDescription(graphicsapi::STextureInfo const &aTextureInfo);
 
         public_members:
             ERenderGraphResourceInitState        initialState;
@@ -607,8 +610,8 @@ namespace engine
         public_members:
             resources::ResourceId_t materialResourceId;
             resources::ResourceId_t sharedMaterialResourceId;
-            std::vector<SRenderGraphBufferDescription> buffers;
-            std::vector<SRenderGraphImageDescription>  images;
+            std::vector<SRenderGraphPersistentBufferDescription> buffers;
+            std::vector<SRenderGraphPersistentImageDescription>  images;
         };
 
         struct SRenderGraphMaterial
