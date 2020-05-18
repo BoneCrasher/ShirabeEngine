@@ -540,6 +540,8 @@ namespace engine
             buffer.description.isDynamicBuffer  = true;
             buffer.description.dynamicBuffer    = aBufferDescription;
 
+            mPass->registerResource(buffer.resourceId);
+
             return { EEngineStatus::Ok, buffer };
         }
         //<-----------------------------------------------------------------------------
@@ -565,6 +567,8 @@ namespace engine
             buffer.description.dynamicBuffer.bufferUsage = resourceDesc.createInfo.usage;
             buffer.description.dynamicBuffer.sizeInBytes = resourceDesc.createInfo.size;
 
+            mPass->registerResource(buffer.resourceId);
+
             return { EEngineStatus::Ok, buffer };
         }
         //<-----------------------------------------------------------------------------
@@ -578,6 +582,9 @@ namespace engine
             bufferView.readableName = CString::format("Buffer_%d_View_%d", subjacentTargetResource.resourceId, bufferView.resourceId);
             bufferView.description.mode     = ERenderGraphViewAccessMode::Read;
             bufferView.description.subrange = aSubrange;
+
+            mPass->registerResource(bufferView.resourceId);
+            ++(bufferView.referenceCount);
 
             return { EEngineStatus::Ok, bufferView };
         }
@@ -689,7 +696,7 @@ namespace engine
 
             bool const mipSliceRangeOutOfBounds =
                            (aAdjustedMipSliceRange.length   > aTargetMipSliceRange.length)
-                           or ((aAdjustedMipSliceRange.offset   + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > aSubjacentMipSliceRange.length);
+                           or ((aAdjustedMipSliceRange.offset + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > aSubjacentMipSliceRange.length);
 
             if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
             {
