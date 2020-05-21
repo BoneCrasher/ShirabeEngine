@@ -26,6 +26,17 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CRenderGraphModule<SCompositingModuleTag_t>);
 
         public_structs:
+            struct SInputData
+            {
+                SRenderGraphImageView gbuffer0
+                                      , gbuffer1
+                                      , gbuffer2
+                                      , gbuffer3
+                                      , depthStencil
+                                      , lightAccumulationBuffer;
+
+            };
+
             /**
              * The SImportData struct describes all imported data for the
              * compositing pass.
@@ -65,14 +76,9 @@ namespace engine
              * @return                         Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SExportData> addDefaultCompositingPass(
-                std::string const      &aPassName,
-                    CGraphBuilder          &aGraphBuilder,
-                    SRenderGraphImageView &aGbuffer0,
-                    SRenderGraphImageView &aGbuffer1,
-                    SRenderGraphImageView &aGbuffer2,
-                    SRenderGraphImageView &aGbuffer3,
-                    SRenderGraphImageView &aDepthStencil,
-                    SRenderGraphImageView &aLightAccumulationBuffer);
+                std::string const &aPassName,
+                CGraphBuilder     &aGraphBuilder,
+                SInputData        &aInputData);
         };
 
     }

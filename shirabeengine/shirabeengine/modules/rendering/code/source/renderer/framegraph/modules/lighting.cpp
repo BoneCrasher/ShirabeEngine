@@ -14,12 +14,8 @@ namespace engine
         >
         CRenderGraphModule<SLightingModuleTag_t>::addLightingPass(
             std::string const      &aPassName,
-                CGraphBuilder          &aGraphBuilder,
-                SRenderGraphImageView &aGbuffer0,
-                SRenderGraphImageView &aGbuffer1,
-                SRenderGraphImageView &aGbuffer2,
-                SRenderGraphImageView &aGbuffer3,
-                SRenderGraphImageView &aDepthStencil)
+            CGraphBuilder          &aGraphBuilder,
+            SLightingPassInputData &aInputData)
         {
             /**
              * The SState struct is the internal state of the lighting pass.
@@ -53,7 +49,7 @@ namespace engine
                                ) -> CEngineResult<>
                                {
                                    auto gbufferTextureFetch = aGraphBuilder.getResources()
-                                                                           .getResource<SRenderGraphImage>(aGbuffer0.subjacentResource);
+                                                                           .getResource<SRenderGraphImage>(aInputData.gbuffer0.subjacentResource);
                                    if(not gbufferTextureFetch.successful())
                                    {
                                        CLog::Error(logTag(), "Failed to fetch gbuffer texture.");
@@ -62,9 +58,9 @@ namespace engine
 
                                    SRenderGraphImage gbufferTexture = *(gbufferTextureFetch.data());
 
-                                   SRenderGraphRenderTarget lightAccBufferDesc ={ };
-                                   lightAccBufferDesc.width          = gbufferTexture.width;
-                                   lightAccBufferDesc.height         = gbufferTexture.height;
+                                   SRenderGraphDynamicImageDescription lightAccBufferDesc ={ };
+                                   lightAccBufferDesc.width          = gbufferTexture.description.dynamicImage.width;
+                                   lightAccBufferDesc.height         = gbufferTexture.description.dynamicImage.height;
                                    lightAccBufferDesc.depth          = 1;
                                    lightAccBufferDesc.format         = RenderGraphFormat_t::R32G32B32A32_FLOAT;
                                    lightAccBufferDesc.mipLevels      = 1;
@@ -86,11 +82,11 @@ namespace engine
                                    depthReadFlags.arraySliceRange = CRange(0, 1);
                                    depthReadFlags.mipSliceRange   = CRange(0, 1);
 
-                                   aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aGbuffer0,     readFlags     ).data();
-                                   aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aGbuffer1,     readFlags     ).data();
-                                   aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aGbuffer2,     readFlags     ).data();
-                                   aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aGbuffer3,     readFlags     ).data();
-                                   aOutPassData.importData.depth    = aBuilder.readAttachment(aDepthStencil, depthReadFlags).data();
+                                   aOutPassData.importData.gbuffer0 = aBuilder.readAttachment(aInputData.gbuffer0,     readFlags     ).data();
+                                   aOutPassData.importData.gbuffer1 = aBuilder.readAttachment(aInputData.gbuffer1,     readFlags     ).data();
+                                   aOutPassData.importData.gbuffer2 = aBuilder.readAttachment(aInputData.gbuffer2,     readFlags     ).data();
+                                   aOutPassData.importData.gbuffer3 = aBuilder.readAttachment(aInputData.gbuffer3,     readFlags     ).data();
+                                   aOutPassData.importData.depth    = aBuilder.readAttachment(aInputData.depthStencil, depthReadFlags).data();
 
                                    SRenderGraphWriteTextureFlags writeFlags{ };
                                    writeFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
@@ -100,9 +96,11 @@ namespace engine
 
                                    aOutPassData.exportData.lightAccumulationBuffer = aBuilder.writeAttachment(aOutPassData.state.lightAccumulationBufferTextureId, writeFlags).data();
 
-                                   SRenderGraphPipelineConfig pipelineConfig {};
-                                   SRenderGraphMaterial const &material = aBuilder.useMaterial("phong_lighting", util::crc32FromString("materials/deferred/phong/phong_lighting.material.meta"), pipelineConfig).data();
+                                   SRenderGraphMaterial const &material = aBuilder.useMaterial("phong_lighting").data();
                                    aOutPassData.importData.material = material;
+
+                                   SRenderGraphPipelineConfig config;
+                                   auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.description.sharedMaterialResourceId, config);
 
                                    return { EEngineStatus::Ok };
                                };

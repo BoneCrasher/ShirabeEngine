@@ -11,9 +11,9 @@ namespace engine
         <
             CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
         >
-        CRenderGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(
-                std::string               const &aPassName,
-                CGraphBuilder                   &aGraphBuilder)
+        CRenderGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(std::string const                  &aPassName
+                                                                          , CGraphBuilder                    &aGraphBuilder
+                                                                          , SBufferGenerationInputData const &aInputData)
         {
             /**
              * The SState struct is the internal state of the gbuffer generation pass.
@@ -142,7 +142,6 @@ namespace engine
                                    aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
                                    std::vector<SRenderGraphRenderable> renderables = aDataSource.fetchRenderables({});
-                                   std::vector<SRenderGraphMesh>       validMeshes;
 
                                    // Render-Loop
                                    for(auto const &renderableResources : renderables)
@@ -152,37 +151,13 @@ namespace engine
                                        auto const materials = renderableResources.materials;
                                        for(std::size_t k=0; k<materials.size(); ++k)
                                        {
-                                           auto const renderableMaterial       = materials[k];
-                                           auto const renderableUniformBuffers = renderableMaterial.buffers;
-                                           auto const renderableImages         = renderableMaterial.images;
+                                           auto const renderableMaterial = materials[k];
 
                                            auto [result, material] = aBuilder.useMaterial(renderableMaterial);
 
-                                           for(auto const &bufferDesc : renderableUniformBuffers)
-                                           {
-                                               auto [bufferCreationResult, buffer] = aBuilder.importBuffer(bufferDesc.bufferResourceId, bufferDesc);
-
-                                               auto const [result, bufferResource] = aBuilder.readBuffer(buffer, { 0, buffer.description.dynamicBuffer.sizeInBytes });
-                                               material.buffers.push_back(bufferResource);
-                                           }
-
-                                           for(auto const &imageDesc : renderableImages)
-                                           {
-                                               auto [imageCreationResult, image] = aBuilder.importImage(imageDesc.imageId, imageDesc);
-
-                                               SRenderGraphTextureResourceFlags flags;
-                                               flags.arraySliceRange = CRange(0, 1);
-                                               flags.mipSliceRange   = CRange(0, 1);
-                                               flags.requiredFormat  = EFormat::Automatic;
-
-                                               auto const [result, textureResource] = aBuilder.readImage(image, flags);
-                                               material.images.push_back(textureResource);
-                                           }
-
-                                           auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, {});
+                                           SRenderGraphPipelineConfig config;
+                                           auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, config);
                                        }
-
-                                       validMeshes.push_back(mesh);
                                    }
 
                                    return { EEngineStatus::Ok };

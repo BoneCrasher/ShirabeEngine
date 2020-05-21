@@ -26,6 +26,8 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(CRenderGraphModule<SGBufferModuleTag_t>);
 
         public_structs:
+            struct SBufferGenerationInputData
+            {};
 
             /**
              * The SGBufferGenerationImportData struct describes all imported data for the
@@ -57,8 +59,9 @@ namespace engine
              * @return                 Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SGBufferGenerationExportData> addGBufferGenerationPass(
-                    std::string               const &aPassName,
-                    CGraphBuilder                   &aGraphBuilder);
+                    std::string const                  &aPassName
+                    , CGraphBuilder                    &aGraphBuilder
+                    , SBufferGenerationInputData const &aInputData);
         };
 
     }

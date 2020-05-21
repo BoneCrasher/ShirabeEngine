@@ -511,6 +511,47 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SRenderGraphMaterial> CPassBuilder:: useMaterial(resources::ResourceId_t const &aResourceId)
+        {
+            auto const &[status, materialResourceDescription] = mResourceManager.getResourceDescription<SMaterial>(aResourceId);
+            if(CheckEngineError(status))
+            {
+                return EEngineStatus::Error;
+            }
+
+            SRenderGraphMaterialDescription renderGraphMaterialDescription;
+            renderGraphMaterialDescription.materialResourceId       = aResourceId;
+            renderGraphMaterialDescription.sharedMaterialResourceId = materialResourceDescription.systemMaterialId;
+
+            for(auto const &bufferDesc : materialResourceDescription.uniformBufferDescriptors)
+            {
+                SRenderGraphPersistentBufferDescription renderGraphBufferDesc;
+                renderGraphBufferDesc.bufferResourceId = bufferDesc.name;
+
+                renderGraphMaterialDescription.buffers.push_back(renderGraphBufferDesc);
+            }
+
+            for(auto const &imageDesc : materialResourceDescription.sampledImages)
+            {
+                SRenderGraphPersistentImageDescription renderGraphImageDesc;
+                renderGraphImageDesc.imageId = imageDesc.name;
+
+                renderGraphMaterialDescription.images.push_back(renderGraphImageDesc);
+            }
+
+            auto const [deferredStatus, renderGraphMaterial] = useMaterial(renderGraphMaterialDescription);
+            if(CheckEngineError(deferredStatus))
+            {
+                return EEngineStatus::Error;
+            }
+
+            return { EEngineStatus::Ok, renderGraphMaterial };
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphMaterial> CPassBuilder::useMaterial(SRenderGraphMaterialDescription const &aMaterialDescription)
@@ -525,6 +566,27 @@ namespace engine
             materialResource.referenceCount        = 0;
             materialResource.subjacentResource     = 0;
             materialResource.description           = aMaterialDescription;
+
+            for(auto const &bufferDesc : aMaterialDescription.buffers)
+            {
+                auto [bufferCreationResult, buffer] = importBuffer(bufferDesc.bufferResourceId, bufferDesc);
+
+                auto const [result, bufferResource] = readBuffer(buffer, { 0, buffer.description.dynamicBuffer.sizeInBytes });
+                materialResource.buffers.push_back(bufferResource);
+            }
+
+            for(auto const &imageDesc : aMaterialDescription.images)
+            {
+                auto [imageCreationResult, image] = importImage(imageDesc.imageId, imageDesc);
+
+                SRenderGraphTextureResourceFlags flags;
+                flags.arraySliceRange = CRange(0, 1);
+                flags.mipSliceRange   = CRange(0, 1);
+                flags.requiredFormat  = EFormat::Automatic;
+
+                auto const [result, textureResource] = readImage(image, flags);
+                materialResource.images.push_back(textureResource);
+            }
 
             return { EEngineStatus::Ok, materialResource };
         }

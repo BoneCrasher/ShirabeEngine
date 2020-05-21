@@ -57,8 +57,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CEngineResult<> CGraph::execute(SRenderGraphPlatformContext const &aPlatformContext
                                       , SRenderGraphDataSource      const &aDataSource
-                                      , SRenderGraphResourceContext     &aResourceContext
-                                      , SRenderGraphRenderContext       &aRenderContext)
+                                      , SRenderGraphResourceContext       &aResourceContext
+                                      , SRenderGraphRenderContext         &aRenderContext)
         {
             SRenderGraphRenderContextState renderContextState {};
 

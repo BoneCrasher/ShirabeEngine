@@ -197,6 +197,7 @@ namespace engine
 
             CEngineResult<SRenderGraphMesh> useMesh(SRenderGraphMeshDescription const &aMeshDescription);
 
+            CEngineResult<SRenderGraphMaterial> useMaterial(resources::ResourceId_t const &aResourceId);
             CEngineResult<SRenderGraphMaterial> useMaterial(SRenderGraphMaterialDescription const &aMaterialDescription);
 
             CEngineResult<SRenderGraphPipeline> usePipeline(resources::ResourceId_t      const &aSharedMaterialResourceid

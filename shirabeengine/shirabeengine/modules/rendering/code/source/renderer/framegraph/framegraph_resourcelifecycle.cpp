@@ -34,6 +34,14 @@ namespace engine
 
         bool CGraph::initializeSubpassResources(SRenderGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass)
         {
+            // Order of initialization:
+            //    1. Images
+            //    2. Buffers
+            //    3. Shared Materials
+            //    4. Materials
+            //    5. Pipelines
+            //    6. Meshes
+            std::vector<RenderGraphResourceId_t> resources = aSubpass->mutableResourceReferences();
 
         }
 

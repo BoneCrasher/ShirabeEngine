@@ -25,6 +25,16 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(RenderGraphModule<SLightingModuleTag_t>);
 
         public_structs:
+
+            struct SLightingPassInputData
+            {
+                SRenderGraphImageView gbuffer0
+                                      , gbuffer1
+                                      , gbuffer2
+                                      , gbuffer3
+                                      , depthStencil;
+            };
+
             /**
              * The SLightingImportData struct describes all imported data for the
              * lighting pass.
@@ -62,13 +72,9 @@ namespace engine
              * @return              Export data of this pass to chain it with other passes' inputs.
              */
             CEngineResult<SLightingExportData> addLightingPass(
-                std::string const      &aPassName,
-                    CGraphBuilder          &aGraphBuilder,
-                    SRenderGraphImageView &aGbuffer0,
-                    SRenderGraphImageView &aGbuffer1,
-                    SRenderGraphImageView &aGbuffer2,
-                    SRenderGraphImageView &aGbuffer4,
-                    SRenderGraphImageView &aDepthStencil);
+                std::string const        &aPassName
+                , CGraphBuilder          &aGraphBuilder
+                , SLightingPassInputData &aInputData);
 
         };
 

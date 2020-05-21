@@ -13,14 +13,9 @@ namespace engine
             CRenderGraphModule<SCompositingModuleTag_t>::SExportData
         >
         CRenderGraphModule<SCompositingModuleTag_t>::addDefaultCompositingPass(
-            std::string const      &aPassName,
-                CGraphBuilder          &aGraphBuilder,
-                SRenderGraphImageView &aGbuffer0,
-                SRenderGraphImageView &aGbuffer1,
-                SRenderGraphImageView &aGbuffer2,
-                SRenderGraphImageView &aGbuffer3,
-                SRenderGraphImageView &aDepthStencil,
-                SRenderGraphImageView &aLightAccumulationBuffer)
+            std::string const &aPassName,
+            CGraphBuilder     &aGraphBuilder,
+            SInputData        &aInputData)
         {
             /**
              * The SState struct is the internal state of the compositing pass.
@@ -58,9 +53,9 @@ namespace engine
 
                 SRenderGraphImage gbufferTexture = *(gbufferTextureFetch.data());
 
-                SRenderGraphRenderTarget compositingBufferDesc ={ };
-                compositingBufferDesc.width          = gbufferTexture.width;
-                compositingBufferDesc.height         = gbufferTexture.height;
+                SRenderGraphDynamicImageDescription compositingBufferDesc ={ };
+                compositingBufferDesc.width          = gbufferTexture.description.dynamicImage.width;
+                compositingBufferDesc.height         = gbufferTexture.description.dynamicImage.height;
                 compositingBufferDesc.depth          = 1;
                 compositingBufferDesc.format         = RenderGraphFormat_t::B8G8R8A8_UNORM;
                 compositingBufferDesc.mipLevels      = 1;
@@ -82,12 +77,12 @@ namespace engine
                 depthReadFlags.arraySliceRange = CRange(0, 1);
                 depthReadFlags.mipSliceRange   = CRange(0, 1);
 
-                aOutPassData.importData.gbuffer0                = aBuilder.readAttachment(aGbuffer0,                readFlags     ).data();
-                aOutPassData.importData.gbuffer1                = aBuilder.readAttachment(aGbuffer1,                readFlags     ).data();
-                aOutPassData.importData.gbuffer2                = aBuilder.readAttachment(aGbuffer2,                readFlags     ).data();
-                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aGbuffer3,                readFlags     ).data();
-                aOutPassData.importData.depth                   = aBuilder.readAttachment(aDepthStencil,            depthReadFlags).data();
-                aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aLightAccumulationBuffer, readFlags     ).data();
+                aOutPassData.importData.gbuffer0                = aBuilder.readAttachment(aInputData.gbuffer0,                readFlags     ).data();
+                aOutPassData.importData.gbuffer1                = aBuilder.readAttachment(aInputData.gbuffer1,                readFlags     ).data();
+                aOutPassData.importData.gbuffer2                = aBuilder.readAttachment(aInputData.gbuffer2,                readFlags     ).data();
+                aOutPassData.importData.gbuffer3                = aBuilder.readAttachment(aInputData.gbuffer3,                readFlags     ).data();
+                aOutPassData.importData.depth                   = aBuilder.readAttachment(aInputData.depthStencil,            depthReadFlags).data();
+                aOutPassData.importData.lightAccumulationBuffer = aBuilder.readAttachment(aInputData.lightAccumulationBuffer, readFlags     ).data();
 
                 SRenderGraphWriteTextureFlags writeFlags{ };
                 writeFlags.requiredFormat  = RenderGraphFormat_t::Automatic;
@@ -98,13 +93,16 @@ namespace engine
                 aOutPassData.exportData.output = aBuilder.writeAttachment(aOutPassData.state.compositingBufferId, writeFlags).data();
 
                 SRenderGraphPipelineConfig pipelineConfig {};
-                SRenderGraphMaterial const &material = aBuilder.useMaterial("compositing", util::crc32FromString("materials/deferred/compositing/compositing.material.meta"), pipelineConfig).data();
+                SRenderGraphMaterial const &material = aBuilder.useMaterial("compositing").data();
                 aOutPassData.importData.material = material;
+
+                SRenderGraphPipelineConfig config;
+                auto const [pipelineResult, pipeline] = aBuilder.usePipeline(material.description.sharedMaterialResourceId, config);
 
                 return { EEngineStatus::Ok };
             };
 
-            auto const execute = [=] (SPassData const                    &aPassData
+            auto const execute = [=] (SPassData const                     &aPassData
                                       , SRenderGraphPlatformContext const &aPlatformContext
                                       , SRenderGraphDataSource const      &aDataSource
                                       , CRenderGraphResources const       &aRenderGraphResources
