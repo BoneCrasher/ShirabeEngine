@@ -69,7 +69,6 @@ namespace engine::textures
     //<-----------------------------------------------------------------------------
     asset::EFormat fromFormatString(std::string const &aFormat)
     {
-        
             if     ("Undefined"                == aFormat) return asset::EFormat::Undefined               ;
             else if("Automatic"                == aFormat) return asset::EFormat::Automatic               ;
             else if("Structured"               == aFormat) return asset::EFormat::Structured              ;
@@ -118,7 +117,7 @@ namespace engine::textures
             else if("D24_UNORM_S8_UINT"        == aFormat) return asset::EFormat::D24_UNORM_S8_UINT       ;
             else if("D32_FLOAT"                == aFormat) return asset::EFormat::D32_FLOAT               ;
             else if("D32_FLOAT_S8X24_UINT"     == aFormat) return asset::EFormat::D32_FLOAT_S8X24_UINT    ;
-        
+            else                                           return asset::EFormat::Undefined               ;
     }
     //<-----------------------------------------------------------------------------
 

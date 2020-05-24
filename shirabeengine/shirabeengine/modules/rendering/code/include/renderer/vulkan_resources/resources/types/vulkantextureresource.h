@@ -23,7 +23,7 @@ namespace engine
 
     namespace texture_log
     {
-        SHIRABE_DECLARE_LOG_TAG(SVulkanTextureResource);
+        SHIRABE_DECLARE_LOG_TAG(SVulkanTextureResource)
     }
 
     namespace vulkan

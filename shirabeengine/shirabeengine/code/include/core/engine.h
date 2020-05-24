@@ -9,7 +9,7 @@
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
 
-#include <renderer/framegraph/framegraphcontexts.h>
+#include <renderer/rendergraph/framegraphcontexts.h>
 #include <resources/cresourcemanager.h>
 #include <material/loader.h>
 #include <mesh/loader.h>

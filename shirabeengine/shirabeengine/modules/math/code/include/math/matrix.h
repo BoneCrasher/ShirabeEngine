@@ -710,7 +710,7 @@ namespace engine
             __shirabe_math__matrix_multiply<val_type, M, S, N>(aLHS.const_ptr(), aRHS.const_ptr(), product.ptr());
 
 			return (product);
-		};
+		}
 
         // Square matrix multiplications.
         CMatrix2x2 SMMatrixMultiply(CMatrix2x2 const &aLHS, CMatrix2x2 const &aRHS);

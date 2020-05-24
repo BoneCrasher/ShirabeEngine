@@ -17,7 +17,7 @@ namespace engine
          */
         class IAssetStorage
         {
-            SHIRABE_DECLARE_INTERFACE(IAssetStorage);
+            SHIRABE_DECLARE_INTERFACE(IAssetStorage)
 
         public_api:
 
@@ -83,6 +83,8 @@ namespace engine
         class SHIRABE_TEST_EXPORT CAssetStorage
                 : public IAssetStorage
         {
+            SHIRABE_DECLARE_LOG_TAG(CAssetStorage)
+
         public_typedefs:
             using AssetRegistry_t = CAssetRegistry<SAsset>;
 

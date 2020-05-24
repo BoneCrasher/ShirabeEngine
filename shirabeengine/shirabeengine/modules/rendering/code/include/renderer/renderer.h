@@ -5,8 +5,8 @@
 #include <os/applicationenvironment.h>
 #include <wsi/display.h>
 #include "renderer/rendererconfiguration.h"
-#include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraph.h"
+#include "renderer/rendergraph/rendergraphdata.h"
+#include "renderer/rendergraph/rendergraph.h"
 
 namespace engine
 {
@@ -37,7 +37,7 @@ namespace engine
              * @param aDisplay                 WSI display instance to bind against the currently selected monitor config.
              * @param aConfiguration           Renderer configuration as provided from the engine default config
              *                                 and dynamic engine configuration.
-             * @param aRenderGraphRenderContext Rendercontext for the framegraph.
+             * @param aRenderGraphRenderContext Rendercontext for the rendergraph.
              * @return                         EEngineStatus::Ok, if successful. An error code otherwise.
              */
             EEngineStatus initialize(

@@ -7,7 +7,7 @@
 
 #include <wsi/display.h>
 #include <os/applicationenvironment.h>
-#include "framegraphdata.h"
+#include "rendergraphdata.h"
 
 namespace engine::framegraph
 {

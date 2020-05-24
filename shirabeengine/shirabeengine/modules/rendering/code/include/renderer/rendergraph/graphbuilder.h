@@ -14,8 +14,8 @@
 #include <core/random.h>
 #include <core/uid.h>
 #include <wsi/display.h>
-#include "renderer/framegraph/framegraph.h"
-#include "renderer/framegraph/renderpass.h"
+#include "renderer/rendergraph/rendergraph.h"
+#include "renderer/rendergraph/renderpass.h"
 
 namespace engine
 {

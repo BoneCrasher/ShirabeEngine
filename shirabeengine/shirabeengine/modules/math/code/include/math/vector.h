@@ -111,9 +111,17 @@ namespace engine
              * @param aX
              */
             explicit CVectorImpl(ValueType_t const &aX);
+
+        public_operators:
+            CVectorImpl &operator =(ClassType_t const &aOther)
+            {
+                BaseType_t::operator=(aOther);
+
+                return (*this);
+            };
             
         public_methods:
-            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 1, x);
+            SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 1, x)
             
             /**
              * Set the value of the x-component to 'aValue'.
@@ -185,6 +193,14 @@ namespace engine
                 ValueType_t const &aX,
                 ValueType_t const &aY
             );
+
+        public_operators:
+            CVectorImpl &operator =(ClassType_t const &aOther)
+            {
+                BaseType_t::operator=(aOther);
+
+                return (*this);
+            };
 
         public_methods:
             SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 2, x)
@@ -290,6 +306,14 @@ namespace engine
                 CVectorImpl<T, 2> const &aVector2D,
                 T                 const &aZ         = T(0)
             );
+
+        public_operators:
+            CVectorImpl &operator =(ClassType_t const &aOther)
+            {
+                BaseType_t::operator=(aOther);
+
+                return (*this);
+            };
 
         public_methods:
             SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 3, x)
@@ -437,6 +461,14 @@ namespace engine
                 T                 const &aW         = T(0)
             );
 
+        public_operators:
+            CVectorImpl &operator =(ClassType_t const &aOther)
+            {
+                BaseType_t::operator=(aOther);
+
+                return (*this);
+            };
+
         public_methods:
             SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, x)
             SHIRABE_DECLARE_IMMUTABLE_GETTER(CVectorImpl, 4, y)
@@ -582,6 +614,14 @@ namespace engine
              * @param aOther The vector to copy from.
              */
             CVector(ClassType_t const &aOther);
+
+        public_operators:
+            CVector &operator=(ClassType_t const &aOther)
+            {
+                BaseType_t::operator=(aOther);
+
+                return (*this);
+            };
 
         public_operators:
             /**
@@ -1134,7 +1174,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 1, x, 0);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 1, x, 0)
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -1221,8 +1261,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, x, 0);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, y, 1);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, x, 0)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 2, y, 1)
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -1341,9 +1381,9 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, x, 0);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, y, 1);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, z, 2);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, x, 0)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, y, 1)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 3, z, 2)
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -1495,10 +1535,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, x, 0);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, y, 1);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, z, 2);
-        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, w, 3);
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, x, 0)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, y, 1)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, z, 2)
+        SHIRABE_DEFINE_IMMUTABLE_GETTER(CVectorImpl, 4, w, 3)
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------

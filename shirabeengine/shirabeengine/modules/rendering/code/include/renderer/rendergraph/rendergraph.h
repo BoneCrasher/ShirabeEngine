@@ -9,10 +9,10 @@
 #include <core/enginetypehelper.h>
 #include <core/passkey.h>
 #include <core/datastructures/adjacencytree.h>
-#include "renderer/framegraph/framegraphserialization.h"
-#include "renderer/framegraph/renderpass.h"
-#include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraphcontexts.h"
+#include "renderer/rendergraph/rendergraphserialization.h"
+#include "renderer/rendergraph/renderpass.h"
+#include "renderer/rendergraph/rendergraphdata.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
 
 namespace engine
 {
@@ -25,7 +25,7 @@ namespace engine
 #endif
 
         /**
-         * A CGraph describes the hierarchical structure of the framegraph,
+         * A CGraph describes the hierarchical structure of the rendergraph,
          * i.e. its inputs, outputs, passes, resources and all operations performed.
          */
         class SHIRABE_TEST_EXPORT CGraph
@@ -81,7 +81,7 @@ namespace engine
 
         public_methods:
             /**
-             * Execute the framegraph, causing it create the respective command buffers.
+             * Execute the rendergraph, causing it create the respective command buffers.
              *
              * @return True, if successfully executed. False otherwise.
              */
@@ -117,11 +117,20 @@ namespace engine
             SHIRABE_INLINE CGraph &operator=(CGraph const &aOther);
 
         private_methods:
-            bool initializeAttachments(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
-            bool deinitializeAttachments(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+            bool initializeGraphGlobalResources(SRenderGraphResourceContext &aResourceContext);
+            bool deinitializeGraphGlobalResources(SRenderGraphResourceContext &aResourceContext);
 
-            bool initializeSubpassResources(SRenderGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
-            bool deinitializeSubpassResources(SRenderGraphResourceContext &aResourceContext, Shared<CPassBase> aSubpass);
+            bool initializeRenderPassResources(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+            bool deinitializeRenderPassResources(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass);
+
+            bool initializeSubpassResources(SRenderGraphResourceContext &aResourceContext
+                                            , Shared<CRenderPass>        aRenderPass
+                                            , Shared<CPassBase>          aSubpass
+                                            , uint32_t const            &aSubpassIndex);
+            bool deinitializeSubpassResources(SRenderGraphResourceContext &aResourceContext
+                                              , Shared<CRenderPass>        aRenderPass
+                                              , Shared<CPassBase>          aSubpass
+                                              , uint32_t const            &aSubpassIndex);
 
         public_methods:
             PassMap const &subpasses() const { return mSubpasses; }

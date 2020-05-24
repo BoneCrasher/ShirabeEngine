@@ -1,4 +1,4 @@
-#include "renderer/framegraph/modules/compositing.h"
+#include "renderer/rendergraph/modules/compositing.h"
 #include <util/crc32.h>
 
 namespace engine
@@ -44,7 +44,7 @@ namespace engine
                     -> CEngineResult<>
             {
                 auto gbufferTextureFetch = aGraphBuilder.getResources()
-                                                        .getResource<SRenderGraphImage>(aGbuffer0.subjacentResource);
+                                                        .getResource<SRenderGraphImage>(aInputData.gbuffer0.subjacentResource);
                 if(not gbufferTextureFetch.successful())
                 {
                     CLog::Error(logTag(), "Failed to fetch gbuffer texure.");

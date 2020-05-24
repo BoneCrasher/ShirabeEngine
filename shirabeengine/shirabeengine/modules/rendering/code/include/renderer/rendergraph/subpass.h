@@ -10,12 +10,12 @@
 #include <core/passkey.h>
 #include <os/applicationenvironment.h>
 
-#include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraphcontexts.h"
-#include "renderer/framegraph/framegraphserialization.h"
-#include "renderer/framegraph/passbuilder.h"
-#include "renderer/framegraph/scenedatasource.h"
-#include "renderer/framegraph/platformcontext.h"
+#include "renderer/rendergraph/rendergraphdata.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
+#include "renderer/rendergraph/rendergraphserialization.h"
+#include "renderer/rendergraph/passbuilder.h"
+#include "renderer/rendergraph/scenedatasource.h"
+#include "renderer/rendergraph/platformcontext.h"
 
 namespace engine
 {
@@ -88,8 +88,8 @@ namespace engine
             virtual bool acceptDeserializer(IRenderGraphDeserializer &aDeserializer);
 #endif
 
-            RenderGraphResourceIdList const &resourceReferences() const { return mResourceReferences; }
-            RenderGraphResourceIdList       &mutableResourceReferences() { return mResourceReferences; }
+            CRenderGraphResourceReferences_t const &resourceReferences() const { return mResourceReferences; }
+            CRenderGraphResourceReferences_t       &mutableResourceReferences() { return mResourceReferences; }
 
             /**
              * Register a resource in this pass instance.
@@ -97,6 +97,7 @@ namespace engine
              * @param aResourceUID The resource uid of the resource to register.
              * @return             True, if successful. False otherwise.
              */
+            template <typename T>
             CEngineResult<> registerResource(RenderGraphResourceId_t const &aResourceUID);
 
             /**
@@ -117,7 +118,7 @@ namespace engine
              *
              * @param aRenderGraphResources A collection of resolved and loaded resources requested during
              *                             setup for use during exeuction.
-             * @param aContext             The render context of the framegraph interfacing with all subsystems.
+             * @param aContext             The render context of the rendergraph interfacing with all subsystems.
              * @return                     True, if successful. False otherwise.
              */
             virtual CEngineResult<> execute(
@@ -129,13 +130,24 @@ namespace engine
                 SRenderGraphRenderContext         &aRenderContext) = 0;
 
         private_members:
-            PassUID_t                mPassUID;
-            std::string              mPassName;
-            RenderGraphResourceIdList mResourceReferences;
+            PassUID_t                        mPassUID;
+            std::string                      mPassName;
+            CRenderGraphResourceReferences_t mResourceReferences;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CPassBase>, CPassBase);
-        SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, Shared<CPassBase>, Pass);
+        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CPassBase>, CPassBase)
+        SHIRABE_DECLARE_MAP_OF_TYPES(PassUID_t, Shared<CPassBase>, Pass)
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        template <typename T>
+        CEngineResult<> CPassBase::registerResource(RenderGraphResourceId_t const &aResourceUID)
+        {
+            static_cast<CRenderGraphResourcesRef<typename std::enable_if_t<std::is_base_of_v<SRenderGraphResource, T>, T>> *>(&mResourceReferences)->insert(aResourceUID);
+            return { EEngineStatus::Ok };
+        }
+        //<-----------------------------------------------------------------------------
 
         /**
          * The CallbackPass is a pass implementation, which accepts callbacks for setup and execute,
@@ -194,7 +206,7 @@ namespace engine
              *
              * @param aRenderGraphResources A collection of resolved and loaded resources requested during
              *                             setup for use during exeuction.
-             * @param aContext             The render context of the framegraph interfacing with all subsystems.
+             * @param aContext             The render context of the rendergraph interfacing with all subsystems.
              * @return                     True, if successful. False otherwise.
              */
             CEngineResult<> execute(
@@ -216,10 +228,9 @@ namespace engine
             }
 
         private_members:
-            SetupCallback_t          mSetupCallback;
-            ExecCallback_t           mExecCallback;
-            RenderGraphResourceIdList mResources;
-            TPassData                mPassData;
+            SetupCallback_t                  mSetupCallback;
+            ExecCallback_t                   mExecCallback;
+            TPassData                        mPassData;
         };
         //<-----------------------------------------------------------------------------
 

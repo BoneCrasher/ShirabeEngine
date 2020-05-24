@@ -2,9 +2,9 @@
 #define __SHIRABE_FRAMEGRAPH_MODULE_COMPOSITING_H__
 
 #include <log/log.h>
-#include "renderer/framegraph/graphbuilder.h"
-#include "renderer/framegraph/passbuilder.h"
-#include "renderer/framegraph/modules/module.h"
+#include "renderer/rendergraph/graphbuilder.h"
+#include "renderer/rendergraph/passbuilder.h"
+#include "renderer/rendergraph/modules/module.h"
 
 namespace engine
 {

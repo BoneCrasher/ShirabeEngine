@@ -13,7 +13,7 @@ namespace engine
         template <typename TUIDUnderlyingType>
         class IUIDGenerator
         {
-            SHIRABE_DECLARE_INTERFACE(IUIDGenerator);
+            SHIRABE_DECLARE_INTERFACE(IUIDGenerator)
 
         public_api:
             /**

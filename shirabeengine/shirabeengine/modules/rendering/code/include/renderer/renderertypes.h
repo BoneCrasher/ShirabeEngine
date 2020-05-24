@@ -26,7 +26,7 @@ namespace engine
             std::string      materialInstanceId;
             asset::AssetId_t materialInstanceAssetId;
         };
-        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderable, Renderable);
+        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderable, Renderable)
     }
 
     /**

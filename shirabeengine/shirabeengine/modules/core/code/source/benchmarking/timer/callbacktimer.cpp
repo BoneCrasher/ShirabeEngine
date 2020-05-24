@@ -87,7 +87,14 @@ namespace engine
     CEngineResult<> CCallbackTimer::resume()
     {
         if(false == mRunning.load()) // Implicit run feature.
-            run();
+        {
+            auto const &[result] = run();
+            if(CheckEngineError(result))
+            {
+                CLog::Error(logTag(), "Cannot run timer thread.");
+                return { EEngineStatus::Error };
+            }
+        }
         else
         {
             // Do not allow multithreaded execution corruption by

@@ -13,7 +13,7 @@ namespace engine
 
         class IAssetDataSource
         {
-            SHIRABE_DECLARE_INTERFACE(IAssetDataSource);
+            SHIRABE_DECLARE_INTERFACE(IAssetDataSource)
 
         public_api:
             /**

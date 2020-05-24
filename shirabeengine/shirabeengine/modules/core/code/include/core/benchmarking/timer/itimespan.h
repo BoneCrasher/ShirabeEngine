@@ -53,7 +53,7 @@ namespace engine
      */
     class ITimespan
     {
-        SHIRABE_DECLARE_INTERFACE(ITimespan);
+        SHIRABE_DECLARE_INTERFACE(ITimespan)
 
     public_typedefs:
         typedef ITimespan ClassType_t;

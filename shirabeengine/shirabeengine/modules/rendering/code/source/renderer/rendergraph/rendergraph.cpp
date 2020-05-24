@@ -1,5 +1,5 @@
 #include "renderer/resource_management/resourcetypes.h"
-#include "renderer/framegraph/framegraph.h"
+#include "renderer/rendergraph/rendergraph.h"
 
 namespace engine
 {
@@ -70,6 +70,8 @@ namespace engine
             // In any case...
             aRenderContext.beginFrameCommandBuffers(renderContextState);
 
+            initializeGraphGlobalResources(aResourceContext);
+
             // if(EGraphMode::Graphics == mGraphMode)
             // {
             //     aRenderContext.bindRenderPass(renderContextState, sRenderPassResourceId, sFrameBufferResourceId, mResourceData);
@@ -84,7 +86,7 @@ namespace engine
                 resources::ResourceId_t renderpassResourceId  = renderpass->getRenderPassName();
                 resources::ResourceId_t framebufferResourceId = renderpassResourceId + "_framebuffer";
 
-                initializeAttachments(aResourceContext, renderpass);
+                initializeRenderPassResources(aResourceContext, renderpass);
 
                 aResourceContext.createRenderPass(renderpassResourceId, subpasses, renderpass->attachments(), mResourceData);
                 aResourceContext.createFrameBuffer(framebufferResourceId, renderpassResourceId);
@@ -96,7 +98,7 @@ namespace engine
                     PassUID_t         const subpassUid = subpasses.at(j);
                     Shared<CPassBase> const subpass    = mSubpasses.at(subpassUid);
 
-                    initializeSubpassResources(aResourceContext, subpass);
+                    initializeSubpassResources(aResourceContext, renderpass, subpass, j);
 
                     CEngineResult<> executed = subpass->execute(aPlatformContext, aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
                     if(not executed.successful())
@@ -105,7 +107,7 @@ namespace engine
                         break;
                     }
 
-                    // deinitializeSubpassResources(subpass);
+                    deinitializeSubpassResources(aResourceContext, renderpass, subpass, j);
 
                     aRenderContext.nextSubpass(renderContextState);
                 }
@@ -114,7 +116,7 @@ namespace engine
                 // aResourceContext.destroyFrameBuffer(framebufferResourceId);
                 // aResourceContext.destroyRenderPass(renderpassResourceId);
 
-                // deinitializeAttachments(renderpass);
+                deinitializeRenderPassResources(aResourceContext, renderpass);
             }
 
             if(EGraphMode::Graphics == mGraphMode && mRenderToBackBuffer)
@@ -136,6 +138,8 @@ namespace engine
 
                 aRenderContext.copyImageToBackBuffer(renderContextState, *(parentResourceFetch.data()));
             }
+
+            deinitializeGraphGlobalResources(aResourceContext);
 
             // In any case...
             aRenderContext.endFrameCommandBuffers(renderContextState);

@@ -10,12 +10,12 @@
 #include <core/enginetypehelper.h>
 #include <core/serialization/serialization.h>
 
-#include "renderer/framegraph/framegraphdata.h"
+#include "renderer/rendergraph/framegraphdata.h"
 
 namespace engine
 {
     // Forward declarations in proper namespaces
-    namespace framegraph
+    namespace rendergraph
     {
         class  CGraph;
         class  CPassBase;
@@ -24,19 +24,19 @@ namespace engine
 
     namespace serialization
     {
-        using framegraph::CGraph;
-        using framegraph::CPassBase;
-        using framegraph::SRenderGraphResource;
-        using framegraph::PassUID_t;
-        using framegraph::SRenderGraphTexture;
-        using framegraph::SRenderGraphImageView;
-        using framegraph::SRenderGraphRenderableList;
-        using framegraph::SRenderGraphRenderableListView;
-        using framegraph::RenderGraphResourceId_t;
+        using rendergraph::CGraph;
+        using rendergraph::CPassBase;
+        using rendergraph::SRenderGraphResource;
+        using rendergraph::PassUID_t;
+        using rendergraph::SRenderGraphTexture;
+        using rendergraph::SRenderGraphImageView;
+        using rendergraph::SRenderGraphRenderableList;
+        using rendergraph::SRenderGraphRenderableListView;
+        using rendergraph::RenderGraphResourceId_t;
 
         /**
          * The IRenderGraphSerializer interface describes the basic requiremets
-         * to serialize a framegraph instance.
+         * to serialize a rendergraph instance.
          */
         class IRenderGraphSerializer
                 : public ISerializer<CGraph>
@@ -48,7 +48,7 @@ namespace engine
              * Serialize the graph itself. This is the main entry point of serialization.
              * This call will invoke serializePass and serializeResource serveral times.
              *
-             * @param aGraph The framegraph instance to serialize.
+             * @param aGraph The rendergraph instance to serialize.
              * @return       True, if successful. False otherwise.
              */
             virtual bool serializeGraph(CGraph const &aGraph) = 0;
@@ -60,7 +60,7 @@ namespace engine
              */
             virtual bool serializePass(CPassBase const &aPass) = 0;
             /**
-             * Serialize a framegraph resource.
+             * Serialize a rendergraph resource.
              *
              * @param aResource The resource to serialize.
              * @return          True, if successful. False otherwise.
@@ -70,7 +70,7 @@ namespace engine
 
         /**
          * The IRenderGraphDeserializer interface describes the basic requirements
-         * to deserialize to a framegraph instance.
+         * to deserialize to a rendergraph instance.
          */
         class IRenderGraphDeserializer
                 : public IDeserializer<CGraph>
@@ -84,7 +84,7 @@ namespace engine
         };
 
         /**
-         * The RenderGraphGraphVizSerializer class implements framegraph serialization
+         * The RenderGraphGraphVizSerializer class implements rendergraph serialization
          * to the graphviz dot format.
          */
         class SHIRABE_TEST_EXPORT CRenderGraphGraphVizSerializer
@@ -141,7 +141,7 @@ namespace engine
              * Serialize the graph itself. This is the main entry point of serialization.
              * This call will invoke serializePass and serializeResource serveral times.
              *
-             * @param aGraph The framegraph instance to serialize.
+             * @param aGraph The rendergraph instance to serialize.
              * @return       True, if successful. False otherwise.
              */
             bool serializeGraph(CGraph const &aGraph);
@@ -153,7 +153,7 @@ namespace engine
              */
             bool serializePass(CPassBase const &aPass);
             /**
-             * Serialize a framegraph resource.
+             * Serialize a rendergraph resource.
              *
              * @param aResource The resource to serialize.
              * @return          True, if successful. False otherwise.
@@ -162,7 +162,7 @@ namespace engine
 
         private_methods:
             /**
-             * Begin writing the framegraph, writing out some header information and style data for
+             * Begin writing the rendergraph, writing out some header information and style data for
              * the dot layout engine.
              */
             void beginGraph();

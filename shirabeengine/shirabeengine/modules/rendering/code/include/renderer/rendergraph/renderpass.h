@@ -6,7 +6,7 @@
 #define __SHIRABEDEVELOPMENT_RENDERPASS_H__
 
 #include <core/datastructures/adjacencytree.h>
-#include "renderer/framegraph/subpass.h"
+#include "renderer/rendergraph/subpass.h"
 
 namespace engine::framegraph
 {
@@ -59,8 +59,8 @@ namespace engine::framegraph
         SRenderGraphAttachmentCollection mAttachments;
     };
 
-    SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CRenderPass>, CRenderPassPass);
-    SHIRABE_DECLARE_MAP_OF_TYPES(RenderPassUID_t, Shared<CRenderPass>, RenderPass);
+    SHIRABE_DECLARE_LIST_OF_TYPE(Shared<CRenderPass>, CRenderPassPass)
+    SHIRABE_DECLARE_MAP_OF_TYPES(RenderPassUID_t, Shared<CRenderPass>, RenderPass)
 }
 
 #endif //__SHIRABEDEVELOPMENT_RENDERPASS_H__

@@ -30,7 +30,7 @@ namespace engine
 
         namespace bufferview_log
         {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanBufferViewResource);
+            SHIRABE_DECLARE_LOG_TAG(SVulkanBufferViewResource)
         }
 
         /**

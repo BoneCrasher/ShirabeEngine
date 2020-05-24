@@ -12,7 +12,7 @@
 #include <graphicsapi/definitions.h>
 
 #include "renderer/vulkan_resources/resources/vulkanresourceoperations.h"
-#include "renderer/framegraph/framegraphdata.h"
+#include "renderer/rendergraph/rendergraphdata.h"
 
 namespace engine
 {
@@ -46,8 +46,8 @@ namespace engine
         {
         public_constructors:
             SHIRABE_INLINE SPassResourceConstraint(
-                    SRenderGraphResource          const &aTarget,
-                    SRenderGraphResource          const &aSource,
+                    SRenderGraphResource         const &aTarget,
+                    SRenderGraphResource         const &aSource,
                     EPassResourceConstraintFlags const &aFlags)
                 : target(aTarget)
                 , source(aSource)
@@ -55,8 +55,8 @@ namespace engine
             {}
 
         public_members:
-            SRenderGraphResource          target;
-            SRenderGraphResource          source;
+            SRenderGraphResource         target;
+            SRenderGraphResource         source;
             EPassResourceConstraintFlags flags;
         };
 
@@ -96,11 +96,11 @@ namespace engine
             }
 
             /**
-             * Request the creation of a texture resource in the framegraph.
+             * Request the creation of a texture resource in the rendergraph.
              *
              * @param aName       Name of the texture to create.
              * @param aDescriptor Descriptor of the texture to create.
-             * @return            Return a framegraph resource handle for the texture
+             * @return            Return a rendergraph resource handle for the texture
              *                    creation.
              */
             CEngineResult<SRenderGraphImage> createImage(
@@ -112,11 +112,11 @@ namespace engine
                 SRenderGraphPersistentImageDescription const &aDescriptor);
 
             /**
-             * Request the creation of a texture resource in the framegraph.
+             * Request the creation of a texture resource in the rendergraph.
              *
              * @param aName       Name of the texture to create.
              * @param aDescriptor Descriptor of the texture to create.
-             * @return            Return a framegraph resource handle for the texture
+             * @return            Return a rendergraph resource handle for the texture
              *                    creation.
              */
             CEngineResult<SRenderGraphRenderTarget> createRenderTarget(
@@ -128,7 +128,7 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to write.
              * @param aFlags                   Flags detailing the texture write operation.
-             * @return                         Return a framegraph resource handle for the texture
+             * @return                         Return a rendergraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> writeAttachment(
@@ -140,7 +140,7 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to write.
              * @param aFlags                   Flags detailing the texture write operation.
-             * @return                         Return a framegraph resource handle for the texture
+             * @return                         Return a rendergraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> writeAttachment(
@@ -152,7 +152,7 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to read.
              * @param aFlags                   Flags detailing the texture read operation.
-             * @return                         Return a framegraph resource handle for the texture
+             * @return                         Return a rendergraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> readAttachment(
@@ -164,7 +164,7 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to read.
              * @param aFlags                   Flags detailing the texture read operation.
-             * @return                         Return a framegraph resource handle for the texture
+             * @return                         Return a rendergraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> readAttachment(
@@ -176,7 +176,7 @@ namespace engine
              *
              * @param aSubjacentTargetResource The resource id of the texture to read.
              * @param aFlags                   Flags detailing the texture read operation.
-             * @return                         Return a framegraph resource handle for the texture
+             * @return                         Return a rendergraph resource handle for the texture
              *                                 creation.
              */
             CEngineResult<SRenderGraphImageView> readImage(
@@ -242,7 +242,7 @@ namespace engine
              * 2. Is valid.
              * 3. Is adjusted to: Array: Off 0 Len 1, Mip: Off 1 Len 1)
              *
-             * @param aResourceData            The framegraph resources array in which to search for parent
+             * @param aResourceData            The rendergraph resources array in which to search for parent
              *                                 and subjacent resources.
              * @param aSourceResource          The resource to adjust.
              * @param aArraySliceRange         The resource array range to adjust.
@@ -265,7 +265,7 @@ namespace engine
              * Validate array and mip slice ranges for read and/or write to be in valid bounds with
              * respect to the subjacent texture resource.
              *
-             * @param aResourceData    The framegraph resources array in which to search for parent
+             * @param aResourceData    The rendergraph resources array in which to search for parent
              *                         and subjacent resources.
              * @param aSourceResource  The resource to validate.
              * @param aArraySliceRange The resource array range to validate.
@@ -286,7 +286,7 @@ namespace engine
              * resource views of the pass to be set-up.
              *
              * @param aResourceViews   The current list of resource view ids attached to the pass.
-             * @param aResourceData    The framegraph resources array in which to search for parent
+             * @param aResourceData    The rendergraph resources array in which to search for parent
              *                         and subjacent resources.
              * @param aSourceResource  The resource to validate.
              * @param aArraySliceRange The resource array range to validate.
@@ -305,7 +305,7 @@ namespace engine
              * resource views of the pass to be set-up.
              *
              * @param aResourceViews   The current list of resource view ids attached to the pass.
-             * @param aResourceData    The framegraph resources array in which to search for parent
+             * @param aResourceData    The rendergraph resources array in which to search for parent
              *                         and subjacent resources.
              * @param aSourceResource  The resource to validate.
              * @param aArraySliceRange The resource array range to validate.

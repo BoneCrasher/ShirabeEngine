@@ -24,6 +24,8 @@ namespace engine
      */
     class CCallbackTimer
     {
+        SHIRABE_DECLARE_LOG_TAG(CCallbackTimer)
+
     public:
         using CallbackFn = std::function<void()>;
 

@@ -179,7 +179,7 @@ set(SHIRABE_CC__ENABLE_RUNTIME_CHECK_INITIALIZATION YES)
 # Constraints: -
 # Allowed Values: YES|NO
 #-------------------------------------------------
-set(SHIRABE_CC__TREAT_WARNINGS_AS_ERRORS NO)
+set(SHIRABE_CC__TREAT_WARNINGS_AS_ERRORS YES)
 #-------------------------------------------------
 
 #-------------------------------------------------

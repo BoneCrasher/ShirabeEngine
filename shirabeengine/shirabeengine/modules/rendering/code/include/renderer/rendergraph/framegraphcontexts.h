@@ -9,7 +9,7 @@
 
 #include "renderer/resource_management/extensibility.h"
 #include "renderer/renderertypes.h"
-#include "renderer/framegraph/framegraphdata.h"
+#include "renderer/rendergraph/rendergraphdata.h"
 
 namespace engine
 {
@@ -220,11 +220,11 @@ namespace engine
             std::function<EEngineStatus(SRenderGraphImage const& /* aTexture */)> createTransientTexture;
             std::function<EEngineStatus(SRenderGraphImage const& /* aTexture */)> destroyTransientTexture;
 
-            std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> initializePersistentTexture;
+            std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> initializePersistentImage;
             std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> updatePersistentTexture;
             std::function<EEngineStatus(SRenderGraphImage const &/* aTexture */)> deinitializePersistentTexture;
 
-            std::function<EEngineStatus(std::string             const &/* aTextureName */
+            std::function<EEngineStatus(SRenderGraphImage      const &/* aTextureName */
                                         , SRenderGraphImageView const& /* aTextureView */)> createTextureView;
             std::function<EEngineStatus(SRenderGraphImageView const& /* aTextureView */)>   destroyTextureView;
 
@@ -238,7 +238,7 @@ namespace engine
             std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> updatePersistentBuffer;
             std::function<EEngineStatus(SRenderGraphBuffer const& /* aBuffer */)> deinitializePersistentBuffer;
 
-            std::function<EEngineStatus(std::string               const& /* aBufferName */
+            std::function<EEngineStatus(SRenderGraphBuffer        const& /* aBuffer     */
                                         , SRenderGraphBufferView  const& /* aBufferView */)> createBufferView;
             std::function<EEngineStatus(SRenderGraphBufferView const& /* aBufferView */)> destroyBufferView;
 
@@ -259,7 +259,9 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */)> createPipeline;
+            std::function<EEngineStatus(SRenderGraphPipeline const     &/* aPipeline */
+                                       , resources::ResourceId_t const &/* aRenderPassResourceId */
+                                       , uint32_t const                &/* aSubpassIndex*/)> createPipeline;
             std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */)> destroyPipeline;
         };
 

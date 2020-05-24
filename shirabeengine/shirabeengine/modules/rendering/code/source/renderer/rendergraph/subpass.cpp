@@ -1,4 +1,4 @@
-#include "renderer/framegraph/subpass.h"
+#include "renderer/rendergraph/subpass.h"
 
 namespace engine
 {
@@ -55,16 +55,6 @@ namespace engine
             return deserialized;
         }
 #endif
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //<
-        //<-----------------------------------------------------------------------------
-        CEngineResult<> CPassBase::registerResource(RenderGraphResourceId_t const &aResourceUID)
-        {
-            mResourceReferences.push_back(aResourceUID);
-            return { EEngineStatus::Ok };
-        }
         //<-----------------------------------------------------------------------------
     }
 }

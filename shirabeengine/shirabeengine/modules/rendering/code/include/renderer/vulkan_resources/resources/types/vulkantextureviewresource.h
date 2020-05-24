@@ -29,7 +29,7 @@ namespace engine
 
         namespace textureview_log
         {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanTextureViewResource);
+            SHIRABE_DECLARE_LOG_TAG(SVulkanTextureViewResource)
         }
 
         /**

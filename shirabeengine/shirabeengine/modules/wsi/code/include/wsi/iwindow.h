@@ -20,7 +20,7 @@ namespace engine
          */
         class IWindow
         {
-            SHIRABE_DECLARE_INTERFACE(IWindow);
+            SHIRABE_DECLARE_INTERFACE(IWindow)
 
         public_interfaces:
             /**
@@ -29,7 +29,7 @@ namespace engine
              */
             class IEventCallback
             {
-                SHIRABE_DECLARE_INTERFACE(IEventCallback);
+                SHIRABE_DECLARE_INTERFACE(IEventCallback)
 
             public_api:
                 /**
@@ -91,7 +91,7 @@ namespace engine
             };
 
         public_typedefs:
-            SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IEventCallback>, IEventCallback); // IEventCallbackList
+            SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IEventCallback>, IEventCallback) // IEventCallbackList
 
 
         public_api:
@@ -169,7 +169,7 @@ namespace engine
             virtual EEngineStatus unregisterCallback(Shared<IWindow::IEventCallback> aCallback) = 0;
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IWindow>, IWindow);
+        SHIRABE_DECLARE_LIST_OF_TYPE(Shared<IWindow>, IWindow)
 
     }
 }

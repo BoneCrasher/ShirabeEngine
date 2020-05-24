@@ -92,7 +92,12 @@ namespace engine
 
             if(0 < aInitialData.size())
             {
-                mAssetDataSource->writeAsset(asset.uri, aInitialData);
+                auto const &[writeResult] = mAssetDataSource->writeAsset(asset.uri, aInitialData);
+                if(CheckEngineError(writeResult))
+                {
+                    CLog::Error(logTag(), "Failed to write asset w/ uri '%s'", asset.uri.string());
+                    return 0_uid;
+                }
             }
 
             mAssetIndex.addAsset(assetUID, asset);

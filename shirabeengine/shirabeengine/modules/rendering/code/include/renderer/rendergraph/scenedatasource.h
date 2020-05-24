@@ -5,7 +5,7 @@
 #ifndef __SHIRABEDEVELOPMENT_SCENEDATASOURCE_H__
 #define __SHIRABEDEVELOPMENT_SCENEDATASOURCE_H__
 
-#include "framegraphdata.h"
+#include "rendergraphdata.h"
 
 namespace engine::framegraph
 {

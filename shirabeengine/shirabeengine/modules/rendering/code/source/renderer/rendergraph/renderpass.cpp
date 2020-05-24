@@ -2,8 +2,8 @@
 // Created by dottideveloper on 07.05.20.
 //
 
-#include "renderer/framegraph/graphbuilder.h"
-#include "renderer/framegraph/renderpass.h"
+#include "renderer/rendergraph/graphbuilder.h"
+#include "renderer/rendergraph/renderpass.h"
 
 namespace engine::framegraph
 {
@@ -22,8 +22,8 @@ namespace engine::framegraph
     void CRenderPass::collectSubpasses(CGraphBuilder &aGraphBuilder)
     {
         for(auto const subpass : mSubpasses)
-        {
-            RenderGraphResourceIdList const subpassResourceReferences = subpass.second->mutableResourceReferences();
+        {asdfasfdj;kl
+            CRenderGraphResourceReferences_t const subpassResourceReferences = subpass.second->mutableResourceReferences();
             for(RenderGraphResourceId_t const &resourceId : subpassResourceReferences)
             {
                 CEngineResult<Shared<SRenderGraphResource>> resourceFetch = mAccumulatedResourceData.getResourceMutable<SRenderGraphResource>(resourceId);

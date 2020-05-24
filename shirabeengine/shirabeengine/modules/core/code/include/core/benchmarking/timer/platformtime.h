@@ -134,7 +134,7 @@ namespace engine
         return (mConversionFactors.end() != it)
                     ? it->second
                     : 1.0;
-	};
+	}
     //<-----------------------------------------------------------------------------
 }
 

@@ -1,8 +1,8 @@
 #include <base/string.h>
-#include "renderer/framegraph/renderpass.h"
-#include "renderer/framegraph/subpass.h"
-#include "renderer/framegraph/graphbuilder.h"
-#include "renderer/framegraph/passbuilder.h"
+#include "renderer/rendergraph/renderpass.h"
+#include "renderer/rendergraph/subpass.h"
+#include "renderer/rendergraph/graphbuilder.h"
+#include "renderer/rendergraph/passbuilder.h"
 
 
 namespace engine
@@ -48,7 +48,11 @@ namespace engine
             resource.readableName          = aName;
             resource.type                  = ERenderGraphResourceType::Image;
 
-            mPass->registerResource(resource.resourceId);
+            auto const &[result] = mPass->registerResource<SRenderGraphRenderTarget>(resource.resourceId);
+            if(CheckEngineError(result))
+            {
+                return { result };
+            }
 
             return { EEngineStatus::Ok, resource };
         }
@@ -75,7 +79,11 @@ namespace engine
             resource.readableName          = aName;
             resource.type                  = ERenderGraphResourceType::Image;
 
-            mPass->registerResource(resource.resourceId);
+            auto const &[result] = mPass->registerResource<SRenderGraphImage>(resource.resourceId);
+            if(CheckEngineError(result))
+            {
+                return { result };
+            }
 
             return { EEngineStatus::Ok, resource };
         }
@@ -113,7 +121,11 @@ namespace engine
             resource.readableName          = aName;
             resource.type                  = ERenderGraphResourceType::Image;
 
-            mPass->registerResource(resource.resourceId);
+            auto const &[registrationResult] = mPass->registerResource<SRenderGraphImage>(resource.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                return { registrationResult };
+            }
 
             return { EEngineStatus::Ok, resource };
         }
@@ -143,7 +155,8 @@ namespace engine
             CRange adjustedArraySliceRange  = aArraySliceRange;
             CRange adjustedMipSliceRange    = aMipSliceRange;
 
-            adjustArrayAndMipSliceRanges(
+            auto const [adjustmentResult]
+                = adjustArrayAndMipSliceRanges(
                         mResourceData,
                         subjacentArraySliceRange,
                         subjacentMipSliceRange,
@@ -153,14 +166,17 @@ namespace engine
                         aMipSliceRange,
                         adjustedArraySliceRange,
                         adjustedMipSliceRange);
+            EngineStatusPrintOnError(adjustmentResult, logTag(), "Couldn't adjust array and mipslice ranges properly.");
 
-            validateArrayAndMipSliceRanges(
+            auto const [validationResult]
+                = validateArrayAndMipSliceRanges(
                         mResourceData,
-                aImage,
+                        aImage,
                         adjustedArraySliceRange,
                         adjustedMipSliceRange,
                         true,
                         true);
+            EngineStatusPrintOnError(adjustmentResult, logTag(), "Couldn't validate array and mipslice ranges properly.");
 
             Optional_t<RefWrapper_t<SRenderGraphImageView>> resource{};
 
@@ -200,7 +216,13 @@ namespace engine
 
             ++(aImage.referenceCount);
 
-            mPass->registerResource(view.resourceId);
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphImageView>(view.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", view.resourceId);
+                return { EEngineStatus::Error };
+            }
+
             ++(view.referenceCount);
 
             return { EEngineStatus::Ok, *resource };
@@ -237,24 +259,28 @@ namespace engine
             CRange subjacentArraySliceRange = CRange(0, sharedImage->description.dynamicImage.arraySize);
             CRange subjacentMipSliceRange   = CRange(0, sharedImage->description.dynamicImage.mipLevels);
 
-            adjustArrayAndMipSliceRanges(
-                mResourceData,
-                subjacentArraySliceRange,
-                subjacentMipSliceRange,
-                sourceArraySliceRange,
-                sourceMipSliceRange,
-                aArraySliceRange,
-                aMipSliceRange,
-                adjustedArraySliceRange,
-                adjustedMipSliceRange);
+            auto const [adjustmentResult]
+                = adjustArrayAndMipSliceRanges(
+                    mResourceData,
+                    subjacentArraySliceRange,
+                    subjacentMipSliceRange,
+                    sourceArraySliceRange,
+                    sourceMipSliceRange,
+                    aArraySliceRange,
+                    aMipSliceRange,
+                    adjustedArraySliceRange,
+                    adjustedMipSliceRange);
+            EngineStatusPrintOnError(adjustmentResult, logTag(), "Couldn't adjust array and mipslice ranges properly.");
 
-            validateArrayAndMipSliceRanges(
-                mResourceData,
-                aTextureView,
-                adjustedArraySliceRange,
-                adjustedMipSliceRange,
-                true,
-                true);
+            auto const [validationResult]
+                = validateArrayAndMipSliceRanges(
+                    mResourceData,
+                    aTextureView,
+                    adjustedArraySliceRange,
+                    adjustedMipSliceRange,
+                    true,
+                    true);
+            EngineStatusPrintOnError(adjustmentResult, logTag(), "Couldn't validate array and mipslice ranges properly.");
 
             Optional_t<RefWrapper_t<SRenderGraphImageView>> resource{};
 
@@ -337,7 +363,12 @@ namespace engine
             {
                 SRenderGraphResource &ref = resource->get();
 
-                mPass->registerResource(ref.resourceId);
+                auto const [registrationResult] = mPass->registerResource<SRenderGraphImageView>(ref.resourceId);
+                if(CheckEngineError(registrationResult))
+                {
+                    CLog::Error(logTag(), "Failed to register resource reference w/ id %d in pass.", ref.resourceId);
+                    return { EEngineStatus::Error };
+                }
                 ++(ref.referenceCount);
 
                 return { EEngineStatus::Ok, *resource };
@@ -588,6 +619,13 @@ namespace engine
                 materialResource.images.push_back(textureResource);
             }
 
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphMaterial>(materialResource.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", materialResource.resourceId);
+                return { EEngineStatus::Error };
+            }
+
             return { EEngineStatus::Ok, materialResource };
         }
         //<-----------------------------------------------------------------------------
@@ -602,7 +640,12 @@ namespace engine
             buffer.description.isDynamicBuffer  = true;
             buffer.description.dynamicBuffer    = aBufferDescription;
 
-            mPass->registerResource(buffer.resourceId);
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphBuffer>(buffer.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", buffer.resourceId);
+                return { EEngineStatus::Error };
+            }
 
             return { EEngineStatus::Ok, buffer };
         }
@@ -629,7 +672,12 @@ namespace engine
             buffer.description.dynamicBuffer.bufferUsage = resourceDesc.createInfo.usage;
             buffer.description.dynamicBuffer.sizeInBytes = resourceDesc.createInfo.size;
 
-            mPass->registerResource(buffer.resourceId);
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphBuffer>(buffer.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", buffer.resourceId);
+                return { EEngineStatus::Error };
+            }
 
             return { EEngineStatus::Ok, buffer };
         }
@@ -645,7 +693,13 @@ namespace engine
             bufferView.description.mode     = ERenderGraphViewAccessMode::Read;
             bufferView.description.subrange = aSubrange;
 
-            mPass->registerResource(bufferView.resourceId);
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphBufferView>(bufferView.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", bufferView.resourceId);
+                return { EEngineStatus::Error };
+            }
+
             ++(bufferView.referenceCount);
 
             return { EEngineStatus::Ok, bufferView };
@@ -668,6 +722,13 @@ namespace engine
             meshResource.subjacentResource     = 0;
             meshResource.description           = aMeshDescription;
 
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphMesh>(meshResource.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", meshResource.resourceId);
+                return { EEngineStatus::Error };
+            }
+
             return { EEngineStatus::Ok, meshResource };
         }
         //<-----------------------------------------------------------------------------
@@ -689,6 +750,13 @@ namespace engine
             resource.subjacentResource        = 0;
             resource.sharedMaterialResourceId = aSharedMaterialResourceid;
             resource.pipelineConfiguration    = aPipelineConfig;
+
+            auto const [registrationResult] = mPass->registerResource<SRenderGraphPipeline>(resource.resourceId);
+            if(CheckEngineError(registrationResult))
+            {
+                CLog::Error(logTag(), "Failed to register resource w/ id %d in pass.", resource.resourceId);
+                return { EEngineStatus::Error };
+            }
 
             return { EEngineStatus::Ok, resource };
         }

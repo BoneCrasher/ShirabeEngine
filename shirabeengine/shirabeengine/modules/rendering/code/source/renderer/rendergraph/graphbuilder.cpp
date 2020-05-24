@@ -1,5 +1,5 @@
 ﻿#include <assert.h>
-#include "renderer/framegraph/graphbuilder.h"
+#include "renderer/rendergraph/graphbuilder.h"
 
 namespace engine
 {
@@ -178,14 +178,19 @@ namespace engine
 
             if(not (containsSourcePass && containsTargetPass))
             {
-                CLog::Error(logTag(), CString::format("Cannot create pass dependency from {} to {}. At least one pass was not found.", aPassSource, aPassTarget));
+                CLog::Error(logTag(), "Cannot create pass dependency from %s to %s. At least one pass was not found.", aPassSource, aPassTarget);
                 return { EEngineStatus::Error };
             }
 
             PassUID_t const &sourcePassUID = sourcePass->second->getRenderPassUid();
             PassUID_t const &targetPassUID = targetPass->second->getRenderPassUid();
 
-            createRenderPassDependencyByUID(sourcePassUID, targetPassUID);
+            auto const &[result] = createRenderPassDependencyByUID(sourcePassUID, targetPassUID);
+            if(CheckEngineError(result))
+            {
+                CLog::Error(logTag(), "Cannot create renderpass dependency by UID for passes %s and %s.", aPassSource, aPassTarget);
+                return { EEngineStatus::Error };
+            }
 
             return { EEngineStatus::Ok };
         }

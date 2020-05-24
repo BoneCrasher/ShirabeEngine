@@ -29,7 +29,7 @@ namespace engine
 
         namespace shadermodule_log
         {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanShaderModuleResource);
+            SHIRABE_DECLARE_LOG_TAG(SVulkanShaderModuleResource)
         }
 
         /**

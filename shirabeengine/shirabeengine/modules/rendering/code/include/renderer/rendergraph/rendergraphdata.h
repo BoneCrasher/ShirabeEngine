@@ -43,7 +43,7 @@ namespace engine
 
 #define SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE 0
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(RenderGraphResourceId_t, RenderGraphResourceId);
+        SHIRABE_DECLARE_LIST_OF_TYPE(RenderGraphResourceId_t, RenderGraphResourceId)
 
         /**
          * The RenderGraphResourceType enum describes Values that represent top-level frame graph resource types
@@ -78,7 +78,7 @@ namespace engine
                 RenderGraphFormat_t const &aDerived);
 
         /**
-         * The RenderGraphResourceUsage enum describes how a framegraph resource should be
+         * The RenderGraphResourceUsage enum describes how a rendergraph resource should be
          * used within the pipeline.
          */
         enum class ERenderGraphResourceUsage
@@ -201,7 +201,7 @@ namespace engine
         {
         public_constructors:
             /**
-             * Default-Construct a framegraph resources.
+             * Default-Construct a rendergraph resources.
              */
             SRenderGraphResource();
 
@@ -234,7 +234,7 @@ namespace engine
             bool                     isExternalResource;
         };
 
-        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource)
 
         SHIRABE_TEST_EXPORT
         SHIRABE_INLINE
@@ -246,7 +246,7 @@ namespace engine
         }
 
         /**
-         * Compare two framegraph resources for a less equal relation ship.
+         * Compare two rendergraph resources for a less equal relation ship.
          *
          * @param aLHS
          * @param aRHS
@@ -257,7 +257,7 @@ namespace engine
                 SRenderGraphResource const &aRHS);
 
         /**
-         * Compare two framegraph resources for inequality.
+         * Compare two rendergraph resources for inequality.
          *
          * @param aLHS
          * @param aRHS
@@ -267,7 +267,7 @@ namespace engine
                 SRenderGraphResource const &aLHS,
                 SRenderGraphResource const &aRHS);
 
-        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource);
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphResource, SRenderGraphResource)
 
         template <typename T>
         struct SHIRABE_TEST_EXPORT SRenderGraphTypedResource
@@ -309,14 +309,14 @@ namespace engine
         };
 
         /**
-         * The SRenderGraphBuffer struct describes any kind of framegraph buffer resources.
+         * The SRenderGraphBuffer struct describes any kind of rendergraph buffer resources.
          */
         struct SHIRABE_TEST_EXPORT SRenderGraphBuffer
                 : public SRenderGraphTypedResource<SRenderGraphBufferDescription>
         {
         public_constructors:
             /**
-             * Default-Construct a framegraph buffer.
+             * Default-Construct a rendergraph buffer.
              */
             SRenderGraphBuffer();
         };
@@ -333,22 +333,22 @@ namespace engine
         };
 
         /**
-         * The SRenderGraphBufferView struct describes any kind of buffer view resources in the framegraph.
+         * The SRenderGraphBufferView struct describes any kind of buffer view resources in the rendergraph.
          */
         struct SHIRABE_TEST_EXPORT SRenderGraphBufferView
                 : public SRenderGraphTypedResource<SRenderGraphBufferViewDescription>
         {
         public_constructors:
             /**
-             * Default-Construct a framegraph buffer view.
+             * Default-Construct a rendergraph buffer view.
              */
             SRenderGraphBufferView();
 
         public_members:
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphBufferView, SRenderGraphBufferView);
-        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphBufferView, SRenderGraphBufferView);
+        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphBufferView, SRenderGraphBufferView)
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphBufferView, SRenderGraphBufferView)
 
         struct SHIRABE_TEST_EXPORT SRenderGraphDynamicImageDescription
             : public graphicsapi::STextureInfo
@@ -428,7 +428,7 @@ namespace engine
         };
 
         /**
-         * The SRenderGraphImageView struct describes any kind of frame graph texture view in the framegraph
+         * The SRenderGraphImageView struct describes any kind of frame graph texture view in the rendergraph
          */
         struct SHIRABE_TEST_EXPORT SRenderGraphImageView
                 : public SRenderGraphTypedResource<SRenderGraphImageViewDescription>
@@ -440,8 +440,8 @@ namespace engine
             SRenderGraphImageView();
         };
 
-        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphImageView, SRenderGraphImageView);
-        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphImageView, SRenderGraphImageView);
+        SHIRABE_DECLARE_LIST_OF_TYPE(SRenderGraphImageView, SRenderGraphImageView)
+        SHIRABE_DECLARE_MAP_OF_TYPES(RenderGraphResourceId_t, SRenderGraphImageView, SRenderGraphImageView)
 
         /**
          * @brief The SRenderGraphAttachmentCollection struct
@@ -648,7 +648,7 @@ namespace engine
 
 
         /**
-         * Describes a list of framegraph resources.
+         * Describes a list of rendergraph resources.
          */
         using Index_t = Vector<Shared<SRenderGraphResource>>;
 
@@ -709,14 +709,25 @@ namespace engine
         template <typename... TTypes>
         class CRenderGraphResourcesRefContainer
                 : public CRenderGraphResourcesRef<TTypes>...
-        {};
+        {
+        public_methods:
+            SHIRABE_INLINE RefIndex_t const &images()      const { return CRenderGraphResourcesRef<SRenderGraphImage>::get();      }
+            SHIRABE_INLINE RefIndex_t const &imageViews()  const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();  }
+            SHIRABE_INLINE RefIndex_t const &buffers()     const { return CRenderGraphResourcesRef<SRenderGraphBuffer>::get();     }
+            SHIRABE_INLINE RefIndex_t const &bufferViews() const { return CRenderGraphResourcesRef<SRenderGraphBufferView>::get(); }
+            SHIRABE_INLINE RefIndex_t const &meshes()      const { return CRenderGraphResourcesRef<SRenderGraphMesh>::get();       }
+            SHIRABE_INLINE RefIndex_t const &materials()   const { return CRenderGraphResourcesRef<SRenderGraphMaterial>::get();   }
+            SHIRABE_INLINE RefIndex_t const &pipelines()   const { return CRenderGraphResourcesRef<SRenderGraphPipeline>::get();   }
+        };
+
+        using CRenderGraphResourceReferences_t = CRenderGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>;
 
         /**
          * Collection-type to store a list of resources and various resource-ref collections
          * for each supported type.
          */
         class CRenderGraphResources
-                : public CRenderGraphResourcesRefContainer<SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES>
+                : public CRenderGraphResourceReferences_t
         {
             SHIRABE_DECLARE_LOG_TAG(CRenderGraphResources)
 
@@ -757,14 +768,7 @@ namespace engine
                 return { EEngineStatus::Ok, ptr };
             }
 
-            SHIRABE_INLINE Index_t    const &resources()   const { return mResources;                                              }
-            SHIRABE_INLINE RefIndex_t const &images()      const { return CRenderGraphResourcesRef<SRenderGraphImage>::get();      }
-            SHIRABE_INLINE RefIndex_t const &imageViews()  const { return CRenderGraphResourcesRef<SRenderGraphImageView>::get();  }
-            SHIRABE_INLINE RefIndex_t const &buffers()     const { return CRenderGraphResourcesRef<SRenderGraphBuffer>::get();     }
-            SHIRABE_INLINE RefIndex_t const &bufferViews() const { return CRenderGraphResourcesRef<SRenderGraphBufferView>::get(); }
-            SHIRABE_INLINE RefIndex_t const &meshes()      const { return CRenderGraphResourcesRef<SRenderGraphMesh>::get();       }
-            SHIRABE_INLINE RefIndex_t const &materials()   const { return CRenderGraphResourcesRef<SRenderGraphMaterial>::get();   }
-            SHIRABE_INLINE RefIndex_t const &pipelines()   const { return CRenderGraphResourcesRef<SRenderGraphPipeline>::get();   }
+            SHIRABE_INLINE Index_t const &resources() const { return mResources; }
 
         protected_members:
             Index_t mResources;
@@ -820,7 +824,7 @@ namespace engine
             }
 
             /**
-             * Merge two sets of framegraph resources together.
+             * Merge two sets of rendergraph resources together.
              *
              * @param aOther Another set of resources to be merged with this one.
              * @return       True, if aOther was successfully merged into this instance. False otherwise.

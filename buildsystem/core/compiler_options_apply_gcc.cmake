@@ -111,17 +111,17 @@ endif()
 # Convert SHIRABE_CC__WARNING_LEVEL
 #
 if(SHIRABE_CC__WARNING_LEVEL)
-        if(${SHIRABE_CC__WARNING_LEVEL} GREATER 2) # Activate even more complaints
-            append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wextra")
-        elseif(${SHIRABE_CC__WARNING_LEVEL} GREATER 1) # Activate "all" warnings
-            append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wall")
+    if(${SHIRABE_CC__WARNING_LEVEL} GREATER 2) # Activate even more complaints
+        append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wextra")
+    elseif(${SHIRABE_CC__WARNING_LEVEL} GREATER 1) # Activate "all" warnings
+        append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wall")
 	else()
 	     # Default, nothing to add.
 	endif()
 
 	 # Additionally, enforce ISO-violation warnings and even more?
-        if(${SHIRABE_CC__WARNING_LEVEL} GREATER 3)
-            # append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wpedantic")
+    if(${SHIRABE_CC__WARNING_LEVEL} GREATER 3)
+        append(SHIRABE_GCC_CL_COMMON_FLAGS "-Wpedantic")
 	endif()
 else() # 0# Default. Don't change anything
         append(SHIRABE_GCC_CL_COMMON_FLAGS "-w")

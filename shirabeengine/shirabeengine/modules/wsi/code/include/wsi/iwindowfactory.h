@@ -15,7 +15,7 @@ namespace engine
     {
         class IWindowFactory
         {
-            SHIRABE_DECLARE_INTERFACE(IWindowFactory);
+            SHIRABE_DECLARE_INTERFACE(IWindowFactory)
 
         public_api:
             /**

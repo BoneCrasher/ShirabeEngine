@@ -43,7 +43,7 @@ namespace engine
              */
             class IX11Adapter
             {
-                SHIRABE_DECLARE_INTERFACE(IX11Adapter);
+                SHIRABE_DECLARE_INTERFACE(IX11Adapter)
 
             public_api:
                 /**

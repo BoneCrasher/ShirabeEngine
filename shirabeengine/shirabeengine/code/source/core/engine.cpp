@@ -14,7 +14,7 @@
 #include <textures/assetloader.h>
 #include <util/crc32.h>
 #include <renderer/rendererconfiguration.h>
-#include <renderer/framegraph/framegraphcontexts.h>
+#include <renderer/rendergraph/framegraphcontexts.h>
 #include <vulkan_integration/rendering/vulkanrendercontext.h>
 #include <vulkan_integration/vulkandevicecapabilities.h>
 
@@ -33,7 +33,7 @@
 #include <material/assetloader.h>
 #include "core/engine.h"
 #include "../../../modules/textures/code/include/textures/loader.h"
-#include "../../../../_deploy/linux64/debug/include/renderer/framegraph/framegraphrendercontext.h"
+#include "../../../../_deploy/linux64/debug/include/renderer/rendergraph/framegraphrendercontext.h"
 
 namespace engine
 {

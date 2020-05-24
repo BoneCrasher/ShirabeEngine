@@ -26,7 +26,7 @@ namespace engine
         class IJSONSerializer
                 : public ISerializer<T>
         {
-        SHIRABE_DECLARE_INTERFACE(IJSONSerializer);
+        SHIRABE_DECLARE_INTERFACE(IJSONSerializer)
 
         public_api:
             /**
@@ -87,7 +87,7 @@ namespace engine
         class IJSONDeserializer
                 : public IDeserializer<T>
         {
-        SHIRABE_DECLARE_INTERFACE(IJSONDeserializer);
+        SHIRABE_DECLARE_INTERFACE(IJSONDeserializer)
 
         public_api:
             /**

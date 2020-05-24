@@ -1,11 +1,11 @@
-﻿#include <renderer/framegraph/framegraphdata.h>
-#include "renderer/framegraph/graphbuilder.h"
-#include "renderer/framegraph/passbuilder.h"
-#include "renderer/framegraph/modules/gbuffergeneration.h"
-#include "renderer/framegraph/modules/lighting.h"
-#include "renderer/framegraph/modules/compositing.h"
-#include "renderer/framegraph/framegraphcontexts.h"
-#include "renderer/framegraph/framegraphserialization.h"
+﻿#include <renderer/rendergraph/rendergraphdata.h>
+#include "renderer/rendergraph/graphbuilder.h"
+#include "renderer/rendergraph/passbuilder.h"
+#include "renderer/rendergraph/modules/gbuffergeneration.h"
+#include "renderer/rendergraph/modules/lighting.h"
+#include "renderer/rendergraph/modules/compositing.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
+#include "renderer/rendergraph/rendergraphserialization.h"
 
 #include "renderer/renderer.h"
 
@@ -133,7 +133,7 @@ namespace engine
             CEngineResult<Unique<engine::framegraph::CGraph>> compilation = graphBuilder.compile();
             if(not compilation.successful())
             {
-                CLog::Error(logTag(), "Failed to compile the framegraph.");
+                CLog::Error(logTag(), "Failed to compile the rendergraph.");
                 return EEngineStatus::Ok;
             }
 

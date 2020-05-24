@@ -10,7 +10,9 @@
 
 #include <platform/platform.h>
 #include <base/declaration.h>
+
 #include <fmt/format.h>
+
 #include <base/string.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS

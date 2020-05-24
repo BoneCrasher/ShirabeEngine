@@ -4,7 +4,7 @@
 #include <asset/material/loader.h>
 #include <asset/material/declaration.h>
 #include <asset/material/serialization.h>
-#include "renderer/framegraph/framegraphcontexts.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
 #include "renderer/vulkan_rendering/rendering/vulkanresourcecontext.h"
 
 #include <base/string.h>
@@ -879,7 +879,9 @@ namespace engine
             auto createPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
                                 , Shared<CResourceManager>      aResourceManager
                                 , Shared<asset::CAssetStorage>  aAssetStorage
-                                , SRenderGraphPipeline    const &aPipeline) -> EEngineStatus
+                                , SRenderGraphPipeline    const &aPipeline
+                                , resources::ResourceId_t const &aRenderPassResourceId
+                                , uint32_t const                &aSubpassIndex) -> EEngineStatus
             {
                 // Create a pipline descriptor here and invoke creation in the resource manager.
                 // Initialize immediately.
@@ -946,27 +948,27 @@ namespace engine
             // Textures
             // --------------------------------------------------------------------------------------------
             context.createTransientTexture =
-                [&](SRenderGraphDynamicImage const &aTexture)
+                [&](SRenderGraphImage const &aTexture)
                     { return detail::createTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                             , aTexture); };
             context.destroyTransientTexture =
-                [&](SRenderGraphDynamicImage const &aTexture)
+                [&](SRenderGraphImage const &aTexture)
                     { return detail::destroyTransientTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
-            context.initializePersistentTexture =
-                [&](SRenderGraphPersistentImage const &aTexture)
+            context.initializePersistentImage =
+                [&](SRenderGraphImage const &aTexture)
                     { return detail::initializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.updatePersistentTexture =
-                [&](SRenderGraphPersistentImage const &aTexture)
+                [&](SRenderGraphImage const &aTexture)
                     { return detail::updatePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.deinitializePersistentTexture =
-                [&](SRenderGraphPersistentImage const &aTexture)
+                [&](SRenderGraphImage const &aTexture)
                     { return detail::deinitializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.createTextureView =
-                [&](SRenderGraphImage const &aTexture
+                [&](resources::ResourceId_t const   &aTexture
                      , SRenderGraphImageView  const &aView)
                     { return detail::createTextureView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                       , aTexture
@@ -980,28 +982,28 @@ namespace engine
             // Buffers
             // --------------------------------------------------------------------------------------------
             context.createTransientBuffer =
-                [&](SRenderGraphTransientBuffer const &aBuffer)
+                [&](SRenderGraphBuffer const &aBuffer)
                     { return detail::createTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                          , aBuffer); };
             context.destroyTransientBuffer =
-                [&](SRenderGraphTransientBuffer const &aBuffer)
+                [&](SRenderGraphBuffer const &aBuffer)
                     { return detail::destroyTransientBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                           , aBuffer); };
             context.initializePersistentBuffer =
-                [&](SRenderGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphBuffer const &aBuffer)
                     { return detail::initializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                               , aBuffer); };
             context.updatePersistentBuffer =
-                [&](SRenderGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphBuffer const &aBuffer)
                     { return detail::updatePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                           , aBuffer); };
             context.deinitializePersistentBuffer =
-                [&](SRenderGraphPersistentBuffer const &aBuffer)
+                [&](SRenderGraphBuffer const &aBuffer)
                     { return detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                                 , aBuffer); };
             context.createBufferView =
-                [&] (SRenderGraphBuffer const &aBuffer
-                     , SRenderGraphBufferView  const &aView)
+                [&] (resources::ResourceId_t const  &aBuffer
+                     , SRenderGraphBufferView const &aView)
                     { return detail::createBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                     , aBuffer
                                                     , aView); };
@@ -1047,9 +1049,11 @@ namespace engine
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
             context.createPipeline =
-                [&] (SRenderGraphPipeline const &aPipeline)
+                [&] (SRenderGraphPipeline const      &aPipeline
+                     , resources::ResourceId_t const &aRenderPassResourceId
+                     , uint32_t const                &aSubpassIndex)
                     { return detail::createPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
-                                                   , aPipeline); };
+                                                   , aPipeline, aRenderPassResourceId, aSubpassIndex); };
             context.destroyPipeline =
                 [&] (SRenderGraphPipeline const &aPipeline)
                     { return detail::destroyPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage

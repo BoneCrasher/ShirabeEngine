@@ -1,9 +1,9 @@
 #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
 
-#include "renderer/framegraph/framegraphdata.h"
-#include "renderer/framegraph/framegraph.h"
-#include "renderer/framegraph/pass.h"
-#include "renderer/framegraph/framegraphserialization.h"
+#include "renderer/rendergraph/framegraphdata.h"
+#include "renderer/rendergraph/framegraph.h"
+#include "renderer/rendergraph/pass.h"
+#include "renderer/rendergraph/framegraphserialization.h"
 
 namespace engine
 {

@@ -133,6 +133,13 @@ namespace engine
             virtual ~CQuaternion() final;
 
         public_operators:
+		    CQuaternion &operator=(CQuaternion const &aOther)
+            {
+		        BaseType_t::operator=(aOther);
+
+		        return (*this);
+            };
+
             /**
              * Add 'aOther' quaternion to this quaternion instance.
              *

@@ -1,4 +1,4 @@
-#include "renderer/framegraph/modules/gbuffergeneration.h"
+#include "renderer/rendergraph/modules/gbuffergeneration.h"
 
 namespace engine
 {

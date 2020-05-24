@@ -8,7 +8,7 @@
 
 #include "renderer/resource_management/cresourcemanager.h"
 #include "renderer/vulkan_rendering/rendering/vulkanrendercontext.h"
-#include "renderer/framegraph/framegraphcontexts.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
 
 namespace engine::vulkan
 {

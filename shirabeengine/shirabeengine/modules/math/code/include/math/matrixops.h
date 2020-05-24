@@ -416,7 +416,7 @@ namespace engine
                         }
                     }
                 }
-			};
+			}
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -463,7 +463,7 @@ namespace engine
                 //__shirabe_math__matrix_determinant_gauss_jordan<_m - 1, m_n - 1, TValue>(minor, &det);
 
                 *aOutCofactor = powf(-1, (aRowIndex + aColumnIndex)) * determinant;
-			};
+			}
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -487,7 +487,7 @@ namespace engine
                         aOutCofactorMatrix[(i * N) + j] = cofactor;
 					}
 				}
-			};
+			}
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -708,7 +708,7 @@ namespace engine
                     __shirabe_math__matrix_get_cofactor<TValue>(aMatrix, aRowCount, aColumnCount, 0, j, &cofactor);
                     *aOutDeterminant += (aMatrix[j] * cofactor);
 				}
-			};
+			}
             //<-----------------------------------------------------------------------------
 
 #if defined(PLATFORM_WINDOWS)

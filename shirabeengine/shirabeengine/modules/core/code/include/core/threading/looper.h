@@ -36,7 +36,7 @@ namespace engine
         template <typename TTaskResult>
         class ILooper
         {
-            SHIRABE_DECLARE_INTERFACE(ILooper);
+            SHIRABE_DECLARE_INTERFACE(ILooper)
 
         public_classes:
             /**

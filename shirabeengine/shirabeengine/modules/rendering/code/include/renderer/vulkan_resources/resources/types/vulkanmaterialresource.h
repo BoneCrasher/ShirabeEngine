@@ -26,7 +26,7 @@ namespace engine
 
     namespace material_log
     {
-        SHIRABE_DECLARE_LOG_TAG(SVulkanMaterialResource);
+        SHIRABE_DECLARE_LOG_TAG(SVulkanMaterialResource)
     }
 
     namespace vulkan

@@ -16,7 +16,7 @@ namespace engine
 {
     namespace helpers
     {
-        SHIRABE_DECLARE_LOG_TAG(ShirabeHelpers);
+        SHIRABE_DECLARE_LOG_TAG(ShirabeHelpers)
     }
 
     /**

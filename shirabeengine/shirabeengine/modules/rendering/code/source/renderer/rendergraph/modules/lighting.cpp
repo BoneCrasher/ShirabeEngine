@@ -1,4 +1,4 @@
-#include "renderer/framegraph/modules/lighting.h"
+#include "renderer/rendergraph/modules/lighting.h"
 #include <util/crc32.h>
 
 namespace engine

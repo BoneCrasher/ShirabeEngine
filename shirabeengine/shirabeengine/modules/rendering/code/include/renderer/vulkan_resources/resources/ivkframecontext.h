@@ -16,7 +16,7 @@ namespace engine
 
         class SHIRABE_TEST_EXPORT IVkFrameContext
         {
-            SHIRABE_DECLARE_INTERFACE(IVkFrameContext);
+            SHIRABE_DECLARE_INTERFACE(IVkFrameContext)
 
         public_api:
             virtual VkCommandBuffer getGraphicsCommandBuffer()      = 0;

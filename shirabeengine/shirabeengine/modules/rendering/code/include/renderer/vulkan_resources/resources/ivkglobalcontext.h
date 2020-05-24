@@ -22,7 +22,7 @@ namespace engine
 
         class SHIRABE_TEST_EXPORT IVkGlobalContext
         {
-            SHIRABE_DECLARE_INTERFACE(IVkGlobalContext);
+            SHIRABE_DECLARE_INTERFACE(IVkGlobalContext)
 
         public_api:
             virtual VkDevice                       getLogicalDevice()         = 0;

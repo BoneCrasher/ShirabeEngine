@@ -31,7 +31,7 @@ namespace engine
 
         namespace buffer_log
         {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanBufferResource);
+            SHIRABE_DECLARE_LOG_TAG(SVulkanBufferResource)
         }
 
         struct

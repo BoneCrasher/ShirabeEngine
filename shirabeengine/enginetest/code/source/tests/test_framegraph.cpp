@@ -10,14 +10,14 @@
 
 
 #include <renderer/irenderer.h>
-#include <renderer/framegraph/framegraph.h>
-#include <renderer/framegraph/graphbuilder.h>
-#include <renderer/framegraph/passbuilder.h>
-#include <renderer/framegraph/modules/gbuffergeneration.h>
-#include <renderer/framegraph/modules/lighting.h>
-#include <renderer/framegraph/modules/compositing.h>
-#include <renderer/framegraph/framegraphrendercontext.h>
-#include <renderer/framegraph/framegraphserialization.h>
+#include <renderer/rendergraph/framegraph.h>
+#include <renderer/rendergraph/graphbuilder.h>
+#include <renderer/rendergraph/passbuilder.h>
+#include <renderer/rendergraph/modules/gbuffergeneration.h>
+#include <renderer/rendergraph/modules/lighting.h>
+#include <renderer/rendergraph/modules/compositing.h>
+#include <renderer/rendergraph/framegraphrendercontext.h>
+#include <renderer/rendergraph/framegraphserialization.h>
 
 #include <resource_management/resourcemanager.h>
 
