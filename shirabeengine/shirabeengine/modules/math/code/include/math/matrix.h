@@ -27,7 +27,7 @@ namespace engine
 		 * operator[] : for direct access, throws invalid_argument exception!
          * operator do access the current value this way : value = *Iterator_t;
 		 *
-         * May derive from the STL-Iterator_t.
+         * May adapt from the STL-Iterator_t.
 		 */
 
         /**

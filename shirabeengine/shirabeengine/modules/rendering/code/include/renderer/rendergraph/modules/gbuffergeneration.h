@@ -34,7 +34,9 @@ namespace engine
              * GBufferGeneration pass.
              */
             struct SGBufferGenerationImportData
-            { };
+            {
+                std::vector<SRenderGraphRenderObject> renderObjects;
+            };
 
             /**
              * The SGBufferGenerationExportData struct describes all exported data for the

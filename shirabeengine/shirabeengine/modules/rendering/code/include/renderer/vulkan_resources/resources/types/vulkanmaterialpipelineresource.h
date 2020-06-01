@@ -16,17 +16,20 @@
 #include "renderer/vulkan_resources/resources/types/vulkanrenderpassresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanshadermoduleresource.h"
 #include "renderer/vulkan_core/vulkandevicecapabilities.h"
+#include "vulkanmaterialresource.h"
 
 namespace engine
 {
     namespace vulkan
     {
+        struct SVulkanBasePipelineResource;
         struct SVulkanPipelineResource;
     }
 
     namespace resources
     {
-        template <> struct SLogicalToGpuApiResourceTypeMap<SPipeline> { using TGpuApiResource = vulkan::SVulkanPipelineResource; };
+        template <> struct SLogicalToGpuApiResourceTypeMap<SPipeline>     { using TGpuApiResource = vulkan::SVulkanPipelineResource; };
+        template <> struct SLogicalToGpuApiResourceTypeMap<SBasePipeline> { using TGpuApiResource = vulkan::SVulkanBasePipelineResource; };
     }
 
     namespace vulkan
@@ -38,7 +41,7 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanPipelineResource
+        struct SVulkanBasePipelineResource
         {
             static constexpr bool is_loadable      = false;
             static constexpr bool is_unloadable    = false;
@@ -46,85 +49,54 @@ namespace engine
 
             struct Handles_t
             {
-                VkPipeline       pipeline;
-                VkPipelineLayout pipelineLayout;
+                VkPipelineLayout                   pipelineLayout;
                 std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
             };
 
             template <typename TResourceManager>
-            static EEngineStatus initialize(SMaterialPipelineDescriptor const &aDescription
-                                          , Handles_t                         &aGpuApiHandles
-                                          , TResourceManager                  *aResourceManager
-                                          , IVkGlobalContext                  *aVulkanEnvironment);
+            static EEngineStatus initialize(SMaterialBasePipelineDescriptor const &aDescription
+                                          , Handles_t                             &aGpuApiHandles
+                                          , TResourceManager                      *aResourceManager
+                                          , IVkGlobalContext                      *aVulkanEnvironment);
 
             template <typename TResourceManager>
-            static EEngineStatus deinitialize(SMaterialPipelineDescriptor const &aDescription
-                                            , Handles_t                         &aGpuApiHandles
-                                            , TResourceManager                  *aResourceManager
-                                            , IVkGlobalContext                  *aVulkanEnvironment);
-
+            static EEngineStatus deinitialize(SMaterialBasePipelineDescriptor const &aDescription
+                                            , Handles_t                             &aGpuApiHandles
+                                            , TResourceManager                      *aResourceManager
+                                            , IVkGlobalContext                      *aVulkanEnvironment);
         };
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        using PipelineResourceState_t = SResourceState<SPipeline>;
+        using BasePipelineResourceState_t = SResourceState<SBasePipeline>;
+
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanPipelineResource::initialize(SMaterialPipelineDescriptor const &aDescription
-                                                        , Handles_t                         &aGpuApiHandles
-                                                        , TResourceManager                  *aResourceManager
-                                                        , IVkGlobalContext                  *aVulkanEnvironment)
+        EEngineStatus SVulkanBasePipelineResource::initialize(SMaterialBasePipelineDescriptor const &aDescription
+                                                              , Handles_t                           &aGpuApiHandles
+                                                              , TResourceManager                    *aResourceManager
+                                                              , IVkGlobalContext                    *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-            auto const &[fetchSystemPipelineSuccess, systemPipelineOptRef] = aResourceManager->template getResource<PipelineResourceState_t>(aDescription.systemBasePipelineId, aVulkanEnvironment);
+            auto const &[fetchSystemPipelineSuccess, systemPipelineOptRef] = aResourceManager->template getResource<BasePipelineResourceState_t>(aDescription.systemBasePipelineId, aVulkanEnvironment);
             if(CheckEngineError(fetchSystemPipelineSuccess))
             {
                 return fetchSystemPipelineSuccess;
             }
 
-            auto const &[fetchRenderPassSuccess, renderPassOptRef] = aResourceManager->template getResource<RenderPassResourceState_t>(aDescription.referenceRenderPassId, aVulkanEnvironment);
-            if(CheckEngineError(fetchRenderPassSuccess))
-            {
-                return fetchRenderPassSuccess;
-            }
-            RenderPassResourceState_t const &renderPass = *renderPassOptRef;
-
-            // Create the shader modules here...
-            // IMPORTANT: The task backend receives access to the asset system to not have the raw data stored in the descriptors and requests...
-
-            VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo {};
-            vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-            vertexInputStateCreateInfo.pNext                           = nullptr;
-            vertexInputStateCreateInfo.flags                           = 0;
-            vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(aDescription.vertexInputAttributes.size());
-            vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(aDescription.vertexInputBindings  .size());
-            vertexInputStateCreateInfo.pVertexAttributeDescriptions    = aDescription.vertexInputAttributes.data();
-            vertexInputStateCreateInfo.pVertexBindingDescriptions      = aDescription.vertexInputBindings  .data();
-
-            VkRect2D scissor {};
-            scissor.offset = { 0, 0 };
-            scissor.extent = { (uint32_t)aDescription.viewPort.width, (uint32_t)aDescription.viewPort.height };
-
-            VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
-            viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-            viewPortStateCreateInfo.pNext          = nullptr;
-            viewPortStateCreateInfo.flags          = 0;
-            viewPortStateCreateInfo.viewportCount  = 1;
-            viewPortStateCreateInfo.pViewports     = &(aDescription.viewPort);
-            viewPortStateCreateInfo.scissorCount   = 1;
-            viewPortStateCreateInfo.pScissors      = &(scissor);
-
-            std::vector<VkDescriptorSetLayout> setLayouts {};
-
+            //
+            // Derive descriptor set layouts based on a pipeline descriptor's signature data.
+            //
             auto const createDescriptorSetLayouts =
-                [&device] (SMaterialPipelineDescriptor const &aDescriptor, std::vector<VkDescriptorSetLayout> &aTargetSet) -> EEngineStatus
+                [&device] (SMaterialBasePipelineDescriptor const &aDescriptor, std::vector<VkDescriptorSetLayout> &aTargetSet) -> EEngineStatus
             {
                 for(uint64_t k=0; k<aDescriptor.descriptorSetLayoutCreateInfos.size(); ++k)
                 {
@@ -158,7 +130,7 @@ namespace engine
             //
             if(systemPipelineOptRef.has_value())
             {
-                PipelineResourceState_t const &systemUBOPipeline = *systemPipelineOptRef;
+                BasePipelineResourceState_t const &systemUBOPipeline = *systemPipelineOptRef;
 
                 // Add the system UBO layouts in order to have them included in the pipeline layout
                 EEngineStatus const status = createDescriptorSetLayouts(systemUBOPipeline.description, systemSets);
@@ -170,8 +142,12 @@ namespace engine
             EEngineStatus const status = createDescriptorSetLayouts(aDescription, materialSets);
             if(CheckEngineError(status))
             {
-                return { EEngineStatus::Error };
+                return EEngineStatus::Error;
             }
+
+            std::vector<VkDescriptorSetLayout> setLayouts {};
+            setLayouts.insert(setLayouts.end(), systemSets.begin(),   systemSets.end());
+            setLayouts.insert(setLayouts.end(), materialSets.begin(), materialSets.end());
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo {};
             pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -188,13 +164,126 @@ namespace engine
                 if( VkResult::VK_SUCCESS!=result )
                 {
                     CLog::Error("SVulkanMaterialPipelineResource::initialize", "Failed to create pipeline layout. Result {}", result);
-                    return {EEngineStatus::Error};
+                    return EEngineStatus::Error;
                 }
             }
 
+            aGpuApiHandles.pipelineLayout       = vkPipelineLayout;
+            aGpuApiHandles.descriptorSetLayouts = materialSets; // System-Sets won't be stored, as they are joined back in on descriptor set update and binding.
+
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBasePipelineResource::deinitialize(SMaterialBasePipelineDescriptor const &aDescription
+                                                          , Handles_t                                 &aGpuApiHandles
+                                                          , TResourceManager                          *aResourceManager
+                                                          , IVkGlobalContext                          *aVulkanEnvironment)
+        {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            for(auto const &setLayout : aGpuApiHandles.descriptorSetLayouts)
+            {
+                vkDestroyDescriptorSetLayout(device, setLayout, nullptr);
+            }
+            vkDestroyPipelineLayout(device, aGpuApiHandles.pipelineLayout, nullptr);
+
+            return EEngineStatus::Ok;
+        }
+
+        /**
+         * The SVulkanTextureResource struct describes the relevant data to deal
+         * with textures inside the vulkan API.
+         */
+        struct SVulkanPipelineResource
+        {
+            static constexpr bool is_loadable      = false;
+            static constexpr bool is_unloadable    = false;
+            static constexpr bool is_transferrable = false;
+
+            struct Handles_t
+            {
+                VkPipeline pipeline;
+            };
+
+            template <typename TResourceManager>
+            static EEngineStatus initialize(SMaterialPipelineDescriptor const &aDescription
+                                            , Handles_t                         &aGpuApiHandles
+                                            , TResourceManager                  *aResourceManager
+                                            , IVkGlobalContext                  *aVulkanEnvironment);
+
+            template <typename TResourceManager>
+            static EEngineStatus deinitialize(SMaterialPipelineDescriptor const &aDescription
+                                              , Handles_t                         &aGpuApiHandles
+                                              , TResourceManager                  *aResourceManager
+                                              , IVkGlobalContext                  *aVulkanEnvironment);
+
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        using PipelineResourceState_t = SResourceState<SPipeline>;
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TResourceManager>
+        EEngineStatus SVulkanPipelineResource::initialize(SMaterialPipelineDescriptor const &aDescription
+                                                          , Handles_t                       &aGpuApiHandles
+                                                          , TResourceManager                *aResourceManager
+                                                          , IVkGlobalContext                *aVulkanEnvironment)
+        {
+            VkDevice device = aVulkanEnvironment->getLogicalDevice();
+
+            auto const &[fetchSharedMaterialStatus, sharedMaterialOptRef] = aResourceManager->template getResource<BasePipelineResourceState_t>(aDescription.sharedMaterialId, aVulkanEnvironment);
+            if(CheckEngineError(fetchSharedMaterialStatus))
+            {
+                return fetchSharedMaterialStatus;
+            }
+            BasePipelineResourceState_t const &sharedMaterial = *sharedMaterialOptRef;
+
+            auto const &[fetchRenderPassSuccess, renderPassOptRef] = aResourceManager->template getResource<RenderPassResourceState_t>(aDescription.referenceRenderPassId, aVulkanEnvironment);
+            if(CheckEngineError(fetchRenderPassSuccess))
+            {
+                return fetchRenderPassSuccess;
+            }
+            RenderPassResourceState_t const &renderPass = *renderPassOptRef;
+
+            // Create the shader modules here...
+            // IMPORTANT: The task backend receives access to the asset system to not have the raw data stored in the descriptors and requests...
+
+            VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo {};
+            vertexInputStateCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+            vertexInputStateCreateInfo.pNext                           = nullptr;
+            vertexInputStateCreateInfo.flags                           = 0;
+            vertexInputStateCreateInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(aDescription.vertexInputAttributes.size());
+            vertexInputStateCreateInfo.vertexBindingDescriptionCount   = static_cast<uint32_t>(aDescription.vertexInputBindings  .size());
+            vertexInputStateCreateInfo.pVertexAttributeDescriptions    = aDescription.vertexInputAttributes.data();
+            vertexInputStateCreateInfo.pVertexBindingDescriptions      = aDescription.vertexInputBindings  .data();
+
+            VkRect2D scissor {};
+            scissor.offset = { 0, 0 };
+            scissor.extent = { (uint32_t)aDescription.viewPort.width, (uint32_t)aDescription.viewPort.height };
+
+            VkPipelineViewportStateCreateInfo viewPortStateCreateInfo {};
+            viewPortStateCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+            viewPortStateCreateInfo.pNext          = nullptr;
+            viewPortStateCreateInfo.flags          = 0;
+            viewPortStateCreateInfo.viewportCount  = 1;
+            viewPortStateCreateInfo.pViewports     = &(aDescription.viewPort);
+            viewPortStateCreateInfo.scissorCount   = 1;
+            viewPortStateCreateInfo.pScissors      = &(scissor);
+
             std::vector<VkPipelineShaderStageCreateInfo> shaderStageCreateInfos {};
 
-            auto const &[shaderModuleFetchSuccess, shaderModuleOptRef] = aResourceManager->template getResource<RenderPassResourceState_t>(aDescription.shaderModuleId, aVulkanEnvironment);
+            auto const &[shaderModuleFetchSuccess, shaderModuleOptRef] = aResourceManager->template getResource<ShaderModuleResourceState_t>(sharedMaterial.description.shaderModuleId, aVulkanEnvironment);
             if(CheckEngineError(shaderModuleFetchSuccess))
             {
                 return shaderModuleFetchSuccess;
@@ -232,7 +321,7 @@ namespace engine
             pipelineCreateInfo.pColorBlendState    = &(colorBlending);
             pipelineCreateInfo.pDynamicState       = nullptr;
             pipelineCreateInfo.pTessellationState  = nullptr;
-            pipelineCreateInfo.layout              = vkPipelineLayout;
+            pipelineCreateInfo.layout              = sharedMaterial.gpuApiHandles.pipelineLayout;
             pipelineCreateInfo.renderPass          = renderPass.gpuApiHandles.handle;
             pipelineCreateInfo.subpass             = aDescription.subpass;
             pipelineCreateInfo.stageCount          = shaderStageCreateInfos.size();
@@ -244,13 +333,11 @@ namespace engine
                 if( VkResult::VK_SUCCESS != result )
                 {
                     CLog::Error("SVulkanMaterialPipelineResource::initialize", "Failed to create pipeline. Result {}", result);
-                    return {EEngineStatus::Error};
+                    return EEngineStatus::Error;
                 }
             }
 
-            aGpuApiHandles.pipeline             = pipelineHandle;
-            aGpuApiHandles.pipelineLayout       = vkPipelineLayout;
-            aGpuApiHandles.descriptorSetLayouts = materialSets; // System-Sets won't be stored, as they are not relevant for further operation.
+            aGpuApiHandles.pipeline = pipelineHandle;
 
             return EEngineStatus::Ok;
         }
@@ -261,16 +348,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
         EEngineStatus SVulkanPipelineResource::deinitialize(SMaterialPipelineDescriptor const &aDescription
-                                                          , Handles_t                         &aGpuApiHandles
-                                                          , TResourceManager                  *aResourceManager
-                                                          , IVkGlobalContext                  *aVulkanEnvironment)
+                                                            , Handles_t                         &aGpuApiHandles
+                                                            , TResourceManager                  *aResourceManager
+                                                            , IVkGlobalContext                  *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
-            for(auto const &setLayout : aGpuApiHandles.descriptorSetLayouts)
-            {
-                vkDestroyDescriptorSetLayout(device, setLayout, nullptr);
-            }
             vkDestroyPipeline(device, aGpuApiHandles.pipeline, nullptr);
 
             return EEngineStatus::Ok;

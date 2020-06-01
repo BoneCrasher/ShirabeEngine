@@ -274,7 +274,7 @@ namespace engine
         };
 
         /**
-         * The EFillMode enum describes, how the rasterizer should derive fragments from transformed output patches.
+         * The EFillMode enum describes, how the rasterizer should adapt fragments from transformed output patches.
          */
         enum class EFillMode
         {

@@ -95,7 +95,7 @@ namespace materials
 
         if(EShadingLanguage::Unknown == language)
         {
-            CLog::Error(logTag(), CString::format("Invalid extension '{}'. Cannot derive language.", stageName));
+            CLog::Error(logTag(), CString::format("Invalid extension '{}'. Cannot adapt language.", stageName));
             return { EShadingLanguage::Unknown, VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM };
         }
 
@@ -550,7 +550,7 @@ namespace materials
         auto [generationSuccessful, unit] = generateCompilationUnit(aConfig, inputFiles, outputModulePathAbsolute, assetData);
         if(not generationSuccessful)
         {
-            CLog::Error(logTag(), "Failed to derive shader compilation units and configuration");
+            CLog::Error(logTag(), "Failed to adapt shader compilation units and configuration");
             return EResult::InputInvalid;
         }
 

@@ -1,0 +1,66 @@
+Shirabe-Engine Materialsystem - Rework Droelfhundert...
+
+Going bindless...
+
+//---------------------------------------------------------------------------
+// Shader
+//---------------------------------------------------------------------------
+
+Every non-core-shader needs the subsequent structure:
+
+layout(set=2, binding=0)
+uniform SShaderData
+{
+    uint idx_transform;
+    uint idx_tex_albedo;
+    uint idx_tex_normal;
+} shaderdata[MAX_INSTANCES];
+
+layout(push_constant)
+uniform SConstants
+{
+    uint idx_shaderdata;
+};
+
+// Access, e.g.:
+fixed4 albedo = sample(textures[shaderdata[idx_shaderdata].idx_tex_albedo], sampler);
+
+
+//---------------------------------------------------------------------------
+// Engine-Material-System
+//---------------------------------------------------------------------------
+This permits integration in the current material-system-design:
+
+MaterialSystem
+  .ShaderDataBuffer <ByteBuffer>
+                         ^
+SharedMaterial           |
+  .Signature             |
+  .DataBuffer       <Subrange of one of 1..N ShaderDataBuffers>
+      ^                  ^
+      |                  |
+      |                  |
+MaterialInstance         |
+  .Config           <Subrange of DataBuffer>
+  
+The MaterialSystem itself will manage all shared materials and material instances and (pre)allocate 1..N ByteBuffers up to 256MB each.
+  
+A SharedMaterial is the common nominator of all instances based on a specific combination of shaders, yielding a single shader module.
+Derived from this, there's a merged signature of the pipeline, which knows it's size and alignment requirements.
+If a shared material is spawned the first time, it will request a subrange of aligned memory to hold it's signature's shaderdata and constants.
+If the material is not the core material, this excludes the core-structures, as they are 
+included from the core-material instance.
+
+A Config-Instance is a view into the shared-materials databuffer, which is accompanied by an instance-index assigned to the material index
+and which is ultimately being provided to the render calls via push constants (mapped to idx_shaderdata in the shader).
+
+//---------------------------------------------------------------------------
+// Renderer
+//---------------------------------------------------------------------------
+In the renderer-resource-system, there'll be one or more very large VkBuffer instances, congruent to the material system's allocations, which are permanently mapped and into which the current material-data will be pushed to once per frame as 
+a huge bulk-copy.
+
+Each material will consequently require it's descriptors (for shaderdata-block) to be updated only once after each change (if any...).
+This will perfectly integrate in the current renderer-resources setup :P.
+
+Bindless go BRRRRR

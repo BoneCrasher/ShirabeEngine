@@ -332,7 +332,7 @@ namespace engine::resources
         if(resourceOpt.has_value())
         {
             TResource &resource = *resourceOpt;
-            auto const &[result] = transferResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
+            auto const result = transferResourceImpl(resource, this, std::forward<TArgs>(aArgs)...);
             switch(result)
             {
                 case EEngineStatus::Ok:

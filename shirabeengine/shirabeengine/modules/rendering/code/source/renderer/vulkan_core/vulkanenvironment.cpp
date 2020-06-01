@@ -25,7 +25,7 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     namespace Debug
     {
-        SHIRABE_DECLARE_LOG_TAG(ValidationLayers);
+        SHIRABE_DECLARE_LOG_TAG(ValidationLayers)
     }
     //<-----------------------------------------------------------------------------
 
@@ -1228,7 +1228,7 @@ namespace engine::vulkan
         std::rotate(state.transferCompletedSemaphores.begin(), state.transferCompletedSemaphores.begin() + 1, state.transferCompletedSemaphores.end());
         std::rotate(state.renderCompletedSemaphores  .begin(), state.renderCompletedSemaphores  .begin() + 1, state.renderCompletedSemaphores  .end());
 
-        bindSwapChain(); // Will derive the currentSwapChainImageIndex;
+        bindSwapChain(); // Will adapt the currentSwapChainImageIndex;
 
         VkCommandBuffer transferCmdBuffer = state.commandBuffers.at(sTransferAspectIndex).at(state.swapChain.currentSwapChainImageIndex);
         VkCommandBuffer graphicsCmdBuffer = state.commandBuffers.at(sGraphicsAspectIndex).at(state.swapChain.currentSwapChainImageIndex);

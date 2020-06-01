@@ -22,60 +22,64 @@ namespace engine::framegraph
     void CRenderPass::collectSubpasses(CGraphBuilder &aGraphBuilder)
     {
         for(auto const subpass : mSubpasses)
-        {asdfasfdj;kl
+        {
             CRenderGraphResourceReferences_t const subpassResourceReferences = subpass.second->mutableResourceReferences();
-            for(RenderGraphResourceId_t const &resourceId : subpassResourceReferences)
+            for(auto const &imageId : subpassResourceReferences.images())
             {
-                CEngineResult<Shared<SRenderGraphResource>> resourceFetch = mAccumulatedResourceData.getResourceMutable<SRenderGraphResource>(resourceId);
-                if(not resourceFetch.successful())
+                auto const &[status, resourcePtr] = mAccumulatedResourceData.getResourceMutable<SRenderGraphImage>(imageId);
+                if(CheckEngineError(status))
                 {
-                    CLog::Error(logTag(), "Could not fetch subpass resource data.");
+                    CLog::Error(logTag(), "Could not fetch render graph image.");
                     return;
                 }
-                SRenderGraphResource &resource = *(resourceFetch.data());
 
-                // For each underlying OR imported resource (textures/buffers or whatever importable)
-                if(SHIRABE_FRAMEGRAPH_UNDEFINED_RESOURCE == resource.parentResource)
-                {
-                    if(ERenderGraphResourceType::Image == resource.type)
-                    {
-                        #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
-                        // Map the resources to it's pass appropriately
+                #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
+                // Map the resources to it's pass appropriately
                         bool const alreadyRegistered = alreadyRegisteredFn<RenderGraphResourceId_t>(mPassToResourceAdjacency[aPass->passUID()], resource.resourceId);
                         if(!alreadyRegistered)
                         {
                             mPassToResourceAdjacency[aPass->passUID()].push_back(resource.resourceId);
                         }
-                        #endif
-                        continue;
-                    }
-                }
-                    // For each derived resource (views)
-                else
-                {
-                    // Avoid internal references for passes!
-                    // If the edge from pass k to pass k+1 was not added yet.
-                    // Create edge: Parent-->Source
-                    CEngineResult<Shared<SRenderGraphResource>> parentResourceFetch = mAccumulatedResourceData.getResource<SRenderGraphResource>(resource.parentResource);
-                    if(not parentResourceFetch.successful())
-                    {
-                        CLog::Error(logTag(), "Could not fetch pass data.");
-                        return;
-                    }
-                    SRenderGraphResource const &parentResource = *(parentResourceFetch.data());
+                #endif
 
-                    RenderPassUID_t const &renderPassUid = getRenderPassUid();
-                    if(parentResource.assignedRenderpassUID != renderPassUid)
+                mAccumulatedResourceReferences.push_back(imageId);
+            }
+
+            for(auto const &imageViewId : subpassResourceReferences.imageViews())
+            {
+                auto const &[status, resourcePtr] = mAccumulatedResourceData.getResourceMutable<SRenderGraphImageView>(imageViewId);
+                if(CheckEngineError(status))
+                {
+                    CLog::Error(logTag(), "Could not fetch render graph image view.");
+                    return;
+                }
+
+                {
+                    auto const &[status, parentResourcePtr] = mAccumulatedResourceData.getResourceMutable<SRenderGraphResource>(resourcePtr->parentResource);
+                    if(CheckEngineError(status))
                     {
-                        aGraphBuilder.createRenderPassDependencyByUID(parentResource.assignedRenderpassUID, renderPassUid);
+                        CLog::Error(logTag(), "Could not fetch parent render graph resource.");
+                        return;
                     }
 
                     // Create a pass dependency used for topologically sorting the graph
-                    // to derive the pass execution order.
-                    PassUID_t const &passUid = subpass.second->getSubpassUid();
-                    if(parentResource.assignedPassUID != passUid)
+                    // to adapt the pass execution order.
+                    RenderPassUID_t const &renderPassUid = getRenderPassUid();
+                    if(parentResourcePtr->assignedRenderpassUID != renderPassUid)
                     {
-                        mSubpassAdjacency.connect(parentResource.assignedPassUID, passUid);
+                        auto const &[creationStatus] = aGraphBuilder.createRenderPassDependencyByUID(parentResourcePtr->assignedRenderpassUID, renderPassUid);
+                        if(CheckEngineError(creationStatus))
+                        {
+                            CLog::Error(logTag(), "Failed to create subpass dependency.");
+                            return;
+                        }
+                    }
+
+                    // Map subpass adjacency information for intra-renderpass sorting.
+                    PassUID_t const &passUid = subpass.second->getSubpassUid();
+                    if(parentResourcePtr->assignedPassUID != passUid)
+                    {
+                        mSubpassAdjacency.connect(parentResourcePtr->assignedPassUID, passUid);
                     }
 
                     #if defined SHIRABE_FRAMEGRAPH_ENABLE_SERIALIZATION
@@ -95,35 +99,46 @@ namespace engine::framegraph
                     }
                     #endif
 
-                    if(ERenderGraphResourceType::ImageView == resource.type)
+                    auto const &[subjacentStatus, subjacentPtr] = mAccumulatedResourceData.getResourceMutable<SRenderGraphImage>(resourcePtr->subjacentResource);
+                    if(CheckEngineError(subjacentStatus))
                     {
-                        CEngineResult<Shared<SRenderGraphImage>>     textureFetch     = mAccumulatedResourceData.getResourceMutable<SRenderGraphImage>(resource.subjacentResource);
-                        CEngineResult<Shared<SRenderGraphImageView>> textureViewFetch = mAccumulatedResourceData.getResourceMutable<SRenderGraphImageView>(resource.resourceId);
-                        if(not (textureFetch.successful() and textureViewFetch.successful()))
-                        {
-                            CLog::Error(logTag(), "Could not fetch texture and/or texture view from resource registry.");
-                            return;
-                        }
-                        SRenderGraphImage     &texture     = *(textureFetch.data());
-                        SRenderGraphImageView &textureView = *(textureViewFetch.data());
-
-                        // Auto adjust format if requested
-                        if(RenderGraphFormat_t::Automatic == textureView.description.format)
-                        {
-                            textureView.description.format = texture.description.dynamicImage.format;
-                        }
+                        CLog::Error(logTag(), "Could not fetch subjacent render graph resource.");
+                        return;
                     }
-                    else if(ERenderGraphResourceType::BufferView == resource.type)
+
+                    // Auto adjust format if requested
+                    if(RenderGraphFormat_t::Automatic == resourcePtr->description.format)
                     {
-                        // TODO
+                        resourcePtr->description.format = subjacentPtr->description.dynamicImage.format;
                     }
                 }
+
+                mAccumulatedResourceReferences.push_back(imageViewId);
             }
 
-            // Now that the internal resource references were adjusted and duplicates removed, confirm the index in the graph builder
-            for(RenderGraphResourceId_t const &id : subpass.second->resourceReferences())
+            for(auto const &bufferId : subpassResourceReferences.buffers())
             {
-                mAccumulatedResourceReferences.push_back(id);
+                mAccumulatedResourceReferences.push_back(bufferId);
+            }
+
+            for(auto const &bufferViewId : subpassResourceReferences.bufferViews())
+            {
+                mAccumulatedResourceReferences.push_back(bufferViewId);
+            }
+
+            for(auto const &meshId : subpassResourceReferences.meshes())
+            {
+                mAccumulatedResourceReferences.push_back(meshId);
+            }
+
+            for(auto const &materialId : subpassResourceReferences.materials())
+            {
+                mAccumulatedResourceReferences.push_back(materialId);
+            }
+
+            for(auto const &pipelineId : subpassResourceReferences.pipelines())
+            {
+                mAccumulatedResourceReferences.push_back(pipelineId);
             }
         }
     }

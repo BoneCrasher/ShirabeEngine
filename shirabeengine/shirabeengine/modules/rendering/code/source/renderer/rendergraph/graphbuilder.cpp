@@ -26,14 +26,15 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CGraphBuilder::CGraphBuilder()
+        CGraphBuilder::CGraphBuilder(CResourceManager const &aResourceManager)
             : mGraphMode              (framegraph::CGraph::EGraphMode::Compute                                        )
             , mRenderToBackBuffer     (false                                                                          )
             , mOutputResourceId       (0                                                                              )
             , mApplicationEnvironment (nullptr                                                                        )
             , mDisplay                (nullptr                                                                        )
-            , mRenderPassUIDGenerator (std::make_shared<CSequenceUIDGenerator<RenderPassUID_t>>(0))
-            , mSubpassUIDGenerator    (std::make_shared<CSequenceUIDGenerator<PassUID_t>>(0))
+            , mResourceManager        (aResourceManager                                                               )
+            , mRenderPassUIDGenerator (std::make_shared<CSequenceUIDGenerator<RenderPassUID_t>>(0         ))
+            , mSubpassUIDGenerator    (std::make_shared<CSequenceUIDGenerator<PassUID_t>>(0               ))
             , mResourceUIDGenerator   (std::make_shared<CSequenceUIDGenerator<RenderGraphResourceId_t >>(1))
             , mRenderPasses           (                                                                               )
             , mResources              (                                                                               )

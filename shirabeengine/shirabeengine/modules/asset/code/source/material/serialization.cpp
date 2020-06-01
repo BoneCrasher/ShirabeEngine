@@ -1,4 +1,6 @@
 #include "asset/material/declaration.h"
+#include "asset/material/source.h"
+#include "asset/material/asset.h"
 #include "asset/material/serialization.h"
 #include <util/documents/json.h>
 

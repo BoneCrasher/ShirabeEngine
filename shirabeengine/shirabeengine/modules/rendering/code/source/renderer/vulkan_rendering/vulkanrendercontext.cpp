@@ -27,7 +27,7 @@ namespace engine::vulkan
 
     namespace local
     {
-        SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphRenderContext);
+        SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphRenderContext)
     }
 
     namespace detail
@@ -97,7 +97,7 @@ namespace engine::vulkan
 
             vkCmdClearAttachments(commandBuffer, clearAttachments.size(), clearAttachments.data(), clearRects.size(), clearRects.data());
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace engine::vulkan
             ++(aState.currentSubpassIndex);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -132,7 +132,7 @@ namespace engine::vulkan
             SHIRABE_UNUSED(aTargetImageId);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ namespace engine::vulkan
                                                 , aAspectFlags
                                                 , aSourceLayout
                                                 , aTargetLayout);
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -250,7 +250,7 @@ namespace engine::vulkan
                            &vkRegion);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -284,7 +284,7 @@ namespace engine::vulkan
             begin(graphicsCommandBuffer);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -402,7 +402,7 @@ namespace engine::vulkan
             vkRenderPassBeginInfo.pClearValues      = clearValues.data();
 
             vkCmdBeginRenderPass(aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(), &vkRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -422,7 +422,7 @@ namespace engine::vulkan
             vkCmdEndRenderPass(aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer());
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -434,7 +434,7 @@ namespace engine::vulkan
                               , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             return aVulkanEnvironment->beginGraphicsFrame().result();
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -446,7 +446,7 @@ namespace engine::vulkan
                             , SRenderGraphRenderContextState &aState) -> EEngineStatus
         {
             return aVulkanEnvironment->endGraphicsFrame().result();
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -554,7 +554,7 @@ namespace engine::vulkan
             }
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -598,7 +598,7 @@ namespace engine::vulkan
             vkCmdBindIndexBuffer(vkCommandBuffer, dataBuffer.gpuApiHandles.handle, firstIndexByteOffset, VkIndexType::VK_INDEX_TYPE_UINT16);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -636,7 +636,7 @@ namespace engine::vulkan
                                     , 0, nullptr);
 
             return EEngineStatus::Ok;
-        };
+        }
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
@@ -826,6 +826,6 @@ namespace engine::vulkan
                 { return detail::drawFullscreenQuadWithMaterial(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                               , aState, aMaterial); };
 
-        //<-----------------------------------------------------------------------------
+        return context;
     }
 }

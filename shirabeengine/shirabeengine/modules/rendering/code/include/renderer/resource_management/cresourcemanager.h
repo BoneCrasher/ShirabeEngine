@@ -8,6 +8,11 @@
 #include "renderer/resource_management/cresourcemanagerbase.h"
 #include "renderer/resource_management/resourcetypes.h"
 
+#include "renderer/resource_management/resourcedescderivers/descderiver_buffer.h"
+#include "renderer/resource_management/resourcedescderivers/descderiver_texture.h"
+#include "renderer/resource_management/resourcedescderivers/descderiver_mesh.h"
+#include "renderer/resource_management/resourcedescderivers/descderiver_material.h"
+
 namespace engine::resources
 {
     //<-----------------------------------------------------------------------------
@@ -23,6 +28,7 @@ namespace engine::resources
                                                  , SShaderModule
                                                  , SRenderPass
                                                  , SFrameBuffer
+                                                 , SBasePipeline
                                                  , SPipeline
                                                  , SMesh
                                                  , SMaterial>;

@@ -602,7 +602,7 @@ namespace engine
             {
                 auto [bufferCreationResult, buffer] = importBuffer(bufferDesc.bufferResourceId, bufferDesc);
 
-                auto const [result, bufferResource] = readBuffer(buffer, { 0, buffer.description.dynamicBuffer.sizeInBytes });
+                auto const [result, bufferResource] = readBuffer(buffer, { 0, static_cast<int32_t>(buffer.description.dynamicBuffer.sizeInBytes) });
                 materialResource.buffers.push_back(bufferResource);
             }
 
@@ -822,11 +822,11 @@ namespace engine
 
             bool const arraySliceRangeOutOfBounds =
                            (aAdjustedArraySliceRange.length > aTargetArraySliceRange.length)
-                           or ((aAdjustedArraySliceRange.offset + static_cast<uint32_t>(aAdjustedArraySliceRange.length)) > aSubjacentArraySliceRange.length);
+                           or ((static_cast<int32_t>(aAdjustedArraySliceRange.offset) + static_cast<int32_t>(aAdjustedArraySliceRange.length)) > aSubjacentArraySliceRange.length);
 
             bool const mipSliceRangeOutOfBounds =
                            (aAdjustedMipSliceRange.length   > aTargetMipSliceRange.length)
-                           or ((aAdjustedMipSliceRange.offset + static_cast<uint32_t>(aAdjustedMipSliceRange.length)) > aSubjacentMipSliceRange.length);
+                           or ((static_cast<int32_t>(aAdjustedMipSliceRange.offset) + static_cast<int32_t>(aAdjustedMipSliceRange.length)) > aSubjacentMipSliceRange.length);
 
             if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
             {

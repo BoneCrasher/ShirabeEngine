@@ -24,7 +24,7 @@ namespace engine
 
         namespace local
         {
-            SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphResourceContext);
+            SHIRABE_DECLARE_LOG_TAG(VulkanRenderGraphResourceContext)
         }
         //<-----------------------------------------------------------------------------
 
@@ -370,7 +370,7 @@ namespace engine
                 }
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------F------------------------------------------
@@ -384,7 +384,7 @@ namespace engine
                 CEngineResult<> const deinitialized = aResourceManager->discardResource<RenderPassResourceState_t>(aRenderPassId, aVulkanEnvironment.get());
                 EngineStatusPrintOnError(deinitialized.result(), logTag(), "Failed to destroy render pass.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -406,7 +406,7 @@ namespace engine
                 }
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -422,7 +422,7 @@ namespace engine
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -468,7 +468,7 @@ namespace engine
                         EngineStatusPrintOnError(textureObject.result(), logTag(), "Failed to create texture.");
                     }
                 }
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -484,7 +484,7 @@ namespace engine
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -562,7 +562,7 @@ namespace engine
                 SHIRABE_RETURN_RESULT_ON_ERROR(textureViewObject.result());
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -578,16 +578,16 @@ namespace engine
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialized.result());
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto createTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
-                                     , Shared<CResourceManager>          aResourceManager
-                                     , Shared<asset::CAssetStorage>      aAssetStorage
-                                     , SRenderGraphTransientBuffer const &aBuffer) -> EEngineStatus
+            auto createTransientBuffer(Shared<CVulkanEnvironment>   aVulkanEnvironment
+                                     , Shared<CResourceManager>     aResourceManager
+                                     , Shared<asset::CAssetStorage> aAssetStorage
+                                     , SRenderGraphBuffer const    &aBuffer) -> EEngineStatus
             {
                 SBufferDescription desc = { };
                 desc.name = aBuffer.readableName;
@@ -596,8 +596,8 @@ namespace engine
                 createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
                 createInfo.pNext                 = nullptr;
                 createInfo.flags                 = 0;
-                createInfo.usage                 = aBuffer.description.bufferUsage;
-                createInfo.size                  = aBuffer.description.sizeInBytes;
+                createInfo.usage                 = aBuffer.description.dynamicBuffer.bufferUsage;
+                createInfo.size                  = aBuffer.description.dynamicBuffer.sizeInBytes;
                 // Determined in backend
                 // createInfo.sharingMode           = ...;
                 // createInfo.queueFamilyIndexCount = ...;
@@ -607,31 +607,31 @@ namespace engine
                 EngineStatusPrintOnError(bufferObject.result(), logTag(), "Failed to create buffer.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(bufferObject.result());
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto destroyTransientBuffer(Shared<CVulkanEnvironment>        aVulkanEnvironment
-                                      , Shared<CResourceManager>          aResourceManager
-                                      , Shared<asset::CAssetStorage>      aAssetStorage
-                                      , SRenderGraphTransientBuffer const &aBuffer) -> EEngineStatus
+            auto destroyTransientBuffer(Shared<CVulkanEnvironment>    aVulkanEnvironment
+                                      , Shared<CResourceManager>      aResourceManager
+                                      , Shared<asset::CAssetStorage>  aAssetStorage
+                                      , SRenderGraphBuffer const     &aBuffer) -> EEngineStatus
             {
                 CEngineResult<> const deinitialization = aResourceManager->discardResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to destroy buffer.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialization.result());
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto initializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
-                                          , Shared<CResourceManager>           aResourceManager
-                                          , Shared<asset::CAssetStorage>       aAssetStorage
-                                          , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+            auto initializePersistentBuffer(Shared<CVulkanEnvironment>   aVulkanEnvironment
+                                          , Shared<CResourceManager>     aResourceManager
+                                          , Shared<asset::CAssetStorage> aAssetStorage
+                                          , SRenderGraphBuffer const    &aBuffer) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->initializeResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
@@ -646,26 +646,26 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto updatePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
-                                      , Shared<CResourceManager>           aResourceManager
-                                      , Shared<asset::CAssetStorage>       aAssetStorage
-                                      , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+            auto updatePersistentBuffer(Shared<CVulkanEnvironment>   aVulkanEnvironment
+                                      , Shared<CResourceManager>     aResourceManager
+                                      , Shared<asset::CAssetStorage> aAssetStorage
+                                      , SRenderGraphBuffer const    &aBuffer) -> EEngineStatus
             {
                 CEngineResult<> const bufferTransfer = aResourceManager->uploadResource<BufferResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
                 EngineStatusPrintOnError(bufferTransfer.result(), logTag(), "Buffer initialization failed.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(bufferTransfer.result());
 
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto deinitializePersistentBuffer(Shared<CVulkanEnvironment>         aVulkanEnvironment
-                                            , Shared<CResourceManager>           aResourceManager
-                                            , Shared<asset::CAssetStorage>       aAssetStorage
-                                            , SRenderGraphPersistentBuffer const &aBuffer) -> EEngineStatus
+            auto deinitializePersistentBuffer(Shared<CVulkanEnvironment>   aVulkanEnvironment
+                                            , Shared<CResourceManager>     aResourceManager
+                                            , Shared<asset::CAssetStorage> aAssetStorage
+                                            , SRenderGraphBuffer const    &aBuffer) -> EEngineStatus
             {
                 {
                     auto const &[successCode] = aResourceManager->deinitializeResource<TextureResourceState_t>(aBuffer.readableName, aVulkanEnvironment);
@@ -702,7 +702,7 @@ namespace engine
                 EngineStatusPrintOnError(success, logTag(), "Failed to create buffer view.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(success);
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -717,7 +717,7 @@ namespace engine
                 EngineStatusPrintOnError(deinitialization.result(), logTag(), "Failed to deinitialize buffer.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(deinitialization.result());
                 return EEngineStatus::Ok;
-            };
+            }
             //<-----------------------------------------------------------------------------
 
             //<-----------------------------------------------------------------------------
@@ -821,13 +821,13 @@ namespace engine
                                   , Shared<asset::CAssetStorage>  aAssetStorage
                                   , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                aResourceManager->initializeResource<PipelineResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
-                aResourceManager->initializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
+                auto const result0 = aResourceManager->initializeResource<PipelineResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                auto const result1 = aResourceManager->initializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
                 for(auto const &buffer : aMaterial.description.buffers)
-                    aResourceManager->initializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                    auto const result2 = aResourceManager->initializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
                 for(auto const &image : aMaterial.description.images)
-                    aResourceManager->initializeResource<TextureResourceState_t>(image.imageId);
+                    auto const result3 = aResourceManager->initializeResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -841,13 +841,13 @@ namespace engine
                               , Shared<asset::CAssetStorage>  aAssetStorage
                               , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
-                aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
+                auto const result0 = aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                auto const result1 = aResourceManager->updateResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
                 for(auto const &buffer : aMaterial.description.buffers)
-                    aResourceManager->updateResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                    auto const result2 = aResourceManager->updateResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
                 for(auto const &image : aMaterial.description.images)
-                    aResourceManager->updateResource<TextureResourceState_t>(image.imageId);
+                    auto const result3 = aResourceManager->updateResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -861,13 +861,13 @@ namespace engine
                                     , Shared<asset::CAssetStorage>  aAssetStorage
                                     , SRenderGraphMaterial    const &aMaterial) -> EEngineStatus
             {
-                aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
-                aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
+                auto const result0 = aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.sharedMaterialResourceId, aVulkanEnvironment);
+                auto const result1 = aResourceManager->deinitializeResource<MaterialResourceState_t>(aMaterial.description.materialResourceId, aVulkanEnvironment);
 
                 for(auto const &buffer : aMaterial.description.buffers)
-                    aResourceManager->deinitializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
+                    auto const result2 = aResourceManager->deinitializeResource<BufferResourceState_t>(buffer.bufferResourceId, aVulkanEnvironment);
                 for(auto const &image : aMaterial.description.images)
-                    aResourceManager->deinitializeResource<TextureResourceState_t>(image.imageId);
+                    auto const result3 = aResourceManager->deinitializeResource<TextureResourceState_t>(image.imageId);
 
                 return EEngineStatus::Ok;
             }
@@ -876,15 +876,303 @@ namespace engine
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto createPipeline(Shared<CVulkanEnvironment>      aVulkanEnvironment
-                                , Shared<CResourceManager>      aResourceManager
-                                , Shared<asset::CAssetStorage>  aAssetStorage
+            auto createPipeline(Shared<CVulkanEnvironment>       aVulkanEnvironment
+                                , Shared<CResourceManager>       aResourceManager
+                                , Shared<asset::CAssetStorage>   aAssetStorage
                                 , SRenderGraphPipeline    const &aPipeline
                                 , resources::ResourceId_t const &aRenderPassResourceId
                                 , uint32_t const                &aSubpassIndex) -> EEngineStatus
             {
-                // Create a pipline descriptor here and invoke creation in the resource manager.
-                // Initialize immediately.
+                auto const configureInputAssembly =
+                               [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                                   {
+                                       aPipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+                                       aPipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
+                                       aPipelineDescriptor.inputAssemblyState.flags                  = 0;
+                                       aPipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+                                       aPipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
+                                   };
+
+                auto const configureRasterizer =
+                               [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                                   {
+                                       aPipelineDescriptor.rasterizerState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+                                       aPipelineDescriptor.rasterizerState.pNext                   = nullptr;
+                                       aPipelineDescriptor.rasterizerState.flags                   = 0;
+                                       aPipelineDescriptor.rasterizerState.cullMode                = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+                                       aPipelineDescriptor.rasterizerState.frontFace               = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
+                                       aPipelineDescriptor.rasterizerState.polygonMode             = VkPolygonMode::VK_POLYGON_MODE_FILL;
+                                       aPipelineDescriptor.rasterizerState.lineWidth               = 1.0f;
+                                       aPipelineDescriptor.rasterizerState.rasterizerDiscardEnable = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
+                                       aPipelineDescriptor.rasterizerState.depthClampEnable        = VK_FALSE;
+                                       aPipelineDescriptor.rasterizerState.depthBiasEnable         = VK_FALSE;
+                                       aPipelineDescriptor.rasterizerState.depthBiasSlopeFactor    = 0.0f;
+                                       aPipelineDescriptor.rasterizerState.depthBiasConstantFactor = 0.0f;
+                                       aPipelineDescriptor.rasterizerState.depthBiasClamp          = 0.0f;
+                                   };
+
+                auto const configureMultisampler =
+                               [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                                   {
+                                       aPipelineDescriptor.multiSampler.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+                                       aPipelineDescriptor.multiSampler.pNext                 = nullptr;
+                                       aPipelineDescriptor.multiSampler.flags                 = 0;
+                                       aPipelineDescriptor.multiSampler.sampleShadingEnable   = VK_FALSE;
+                                       aPipelineDescriptor.multiSampler.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
+                                       aPipelineDescriptor.multiSampler.minSampleShading      = 1.0f;
+                                       aPipelineDescriptor.multiSampler.pSampleMask           = nullptr;
+                                       aPipelineDescriptor.multiSampler.alphaToCoverageEnable = VK_FALSE;
+                                       aPipelineDescriptor.multiSampler.alphaToOneEnable      = VK_FALSE;
+                                   };
+
+                auto const configureDepthStencil =
+                               [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                                   {
+                                       aPipelineDescriptor.depthStencilState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+                                       aPipelineDescriptor.depthStencilState.pNext                 = nullptr;
+                                       aPipelineDescriptor.depthStencilState.flags                 = 0;
+                                       aPipelineDescriptor.depthStencilState.depthTestEnable       = VK_TRUE;
+                                       aPipelineDescriptor.depthStencilState.depthWriteEnable      = VK_TRUE;
+                                       aPipelineDescriptor.depthStencilState.depthCompareOp        = VkCompareOp::VK_COMPARE_OP_LESS;
+                                       aPipelineDescriptor.depthStencilState.stencilTestEnable     = VK_FALSE;
+                                       aPipelineDescriptor.depthStencilState.front.passOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                                       aPipelineDescriptor.depthStencilState.front.failOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                                       aPipelineDescriptor.depthStencilState.front.depthFailOp     = VkStencilOp::VK_STENCIL_OP_KEEP;
+                                       aPipelineDescriptor.depthStencilState.front.compareOp       = VkCompareOp::VK_COMPARE_OP_ALWAYS;
+                                       aPipelineDescriptor.depthStencilState.front.compareMask     = 0;
+                                       aPipelineDescriptor.depthStencilState.front.writeMask       = 0;
+                                       aPipelineDescriptor.depthStencilState.front.reference       = 0;
+                                       aPipelineDescriptor.depthStencilState.back                  = aPipelineDescriptor.depthStencilState.front;
+                                       aPipelineDescriptor.depthStencilState.depthBoundsTestEnable = VK_FALSE;
+                                       aPipelineDescriptor.depthStencilState.minDepthBounds        = 0.0f;
+                                       aPipelineDescriptor.depthStencilState.maxDepthBounds        = 1.0f;
+                                   };
+
+                SMaterialPipelineDescriptor descriptor;
+                descriptor.name                  = aPipeline.readableName;
+                descriptor.includesSystemBuffers = true; // This function will only create pipelines of non-core materials.
+
+                configureInputAssembly(descriptor);
+                configureRasterizer(descriptor);
+                configureMultisampler(descriptor);
+                configureDepthStencil(descriptor);
+
+                auto const &[fetchSharedMaterialStatus, sharedMaterialOptRef] = aResourceManager->template getResource<BasePipelineResourceState_t>(aPipeline.sharedMaterialResourceId, aVulkanEnvironment);
+                if(CheckEngineError(fetchSharedMaterialStatus))
+                {
+                    return fetchSharedMaterialStatus;
+                }
+                BasePipelineResourceState_t const &sharedMaterial = *sharedMaterialOptRef;
+
+                // for(auto const &[stageKey, stage] : aMaster.stages())
+                // {
+                //     if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
+                //     {
+                //         std::vector<SStageInput> stageInputs(stage.inputs);
+                //         std::sort(stageInputs.begin(), stageInputs.end(), [] (SStageInput const &aLHS, SStageInput const &aRHS) -> bool { return aLHS.location < aRHS.location; });
+//
+                //         for(std::size_t k=0; k<stage.inputs.size(); ++k)
+                //         {
+                //             SStageInput const &input = stageInputs.at(k);
+//
+                //             // This number has to be equal to the VkVertexInputBindingDescription::binding index which data should be taken from!
+                //             VkVertexInputBindingDescription binding;
+                //             binding.binding   = input.location;
+                //             binding.stride    = (input.type->byteSize * input.type->vectorSize);
+                //             binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+//
+                //             VkVertexInputAttributeDescription attribute;
+                //             attribute.binding  = k;
+                //             attribute.location = input.location;
+                //             attribute.offset   = 0;
+                //             attribute.format   = (8 == binding.stride)
+                //                                  ? VkFormat::VK_FORMAT_R32G32_SFLOAT
+                //                                  : (12 == binding.stride)
+                //                                    ? VkFormat::VK_FORMAT_R32G32B32_SFLOAT
+                //                                    : (16 == binding.stride)
+                //                                      ? VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT
+                //                                      : VkFormat::VK_FORMAT_UNDEFINED;
+//
+                //             pipelineDescriptor.vertexInputBindings  .push_back(binding);
+                //             pipelineDescriptor.vertexInputAttributes.push_back(attribute);
+                //         }
+                //     }
+//
+                //     if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT == stageKey)
+                //     {
+                //         std::vector<VkPipelineColorBlendAttachmentState> outputs {};
+                //         outputs.resize(stage.outputs.size());
+//
+                //         for(auto const &output : stage.outputs)
+                //         {
+                //             VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
+                //             colorBlendAttachmentState.blendEnable         = VK_TRUE;
+                //             colorBlendAttachmentState.colorWriteMask      = VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT|
+                //                                                             VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT|
+                //                                                             VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT|
+                //                                                             VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
+                //             colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;  // VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
+                //             colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO; // VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                //             colorBlendAttachmentState.colorBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                //             colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
+                //             colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
+                //             colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+//
+                //             outputs[output.location] = colorBlendAttachmentState;
+                //         }
+//
+                //         pipelineDescriptor.colorBlendAttachmentStates = outputs;
+//
+                //         VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
+                //         colorBlendCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+                //         colorBlendCreateInfo.pNext             = nullptr;
+                //         colorBlendCreateInfo.flags             = 0;
+                //         colorBlendCreateInfo.logicOpEnable     = VK_FALSE;
+                //         colorBlendCreateInfo.logicOp           = VK_LOGIC_OP_COPY;
+                //         colorBlendCreateInfo.blendConstants[0] = 0.0f;
+                //         colorBlendCreateInfo.blendConstants[1] = 1.0f;
+                //         colorBlendCreateInfo.blendConstants[2] = 2.0f;
+                //         colorBlendCreateInfo.blendConstants[3] = 3.0f;
+//
+                //         pipelineDescriptor.colorBlendState = colorBlendCreateInfo;
+                //     }
+//
+                //     //
+                //     // Derive data accessors for shader module creation from sharedMaterial material
+                //     //
+                //     std::filesystem::path const  stageSpirVFilename = stage.filename;
+                //     bool                  const  isEmptyFilename    = stageSpirVFilename.empty();
+                //     if(not isEmptyFilename)
+                //     {
+                //         DataSourceAccessor_t dataAccessor = [=] () -> ByteBuffer
+                //             {
+                //                 asset::AssetID_t const assetUid = asset::assetIdFromUri(stageSpirVFilename);
+//
+                //                 auto const [result, buffer] = aAssetStorage->loadAssetData(assetUid);
+                //                 if(CheckEngineError(result))
+                //                 {
+                //                     CLog::Error("DataSourceAccessor_t::ShaderModule", "Failed to load shader module asset data. Result: {}", result);
+                //                     return {};
+                //                 }
+//
+                //                 return buffer;
+                //             };
+//
+                //         shaderModuleDescriptor.shaderStages[stageKey] = dataAccessor;
+                //     }
+                // }
+//
+                // uint32_t const setSubtractionValue = aIncludeSystemBuffers ? 0 : 2;
+                // uint32_t const setCount            = aMaster.layoutInfo().setCount - setSubtractionValue;
+//
+                // std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
+                // descriptorSets.resize(setCount);
+                // pipelineDescriptor.descriptorSetLayoutBindings.resize(setCount);
+//
+                // for(std::size_t k=0; k<descriptorSets.size(); ++k)
+                // {
+                //     VkDescriptorSetLayoutCreateInfo &info = descriptorSets[k];
+//
+                //     info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+                //     info.pNext        = nullptr;
+                //     info.flags        = 0;
+                //     info.bindingCount = aMaster.layoutInfo().setBindingCount[k + setSubtractionValue];
+//
+                //     pipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
+                // }
+//
+                // pipelineDescriptor.descriptorSetLayoutCreateInfos = descriptorSets;
+//
+                // for(SSubpassInput const &input : aMaster.subpassInputs())
+                // {
+                //     if(not aIncludeSystemBuffers && 2 > input.set)
+                //     {
+                //         continue;
+                //     }
+//
+                //     VkDescriptorSetLayoutBinding layoutBinding {};
+                //     layoutBinding.binding            = input.binding;
+                //     layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+                //     layoutBinding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT; // Subpass inputs are only accessibly in fragment shaders.
+                //     layoutBinding.descriptorCount    = 1;
+                //     layoutBinding.pImmutableSamplers = nullptr;
+                //     pipelineDescriptor.descriptorSetLayoutBindings[input.set - setSubtractionValue][input.binding] = layoutBinding;
+                // }
+//
+                // for(SUniformBuffer const &uniformBuffer : aMaster.uniformBuffers())
+                // {
+                //     if(not aIncludeSystemBuffers && 2 > uniformBuffer.set)
+                //     {
+                //         continue;
+                //     }
+//
+                //     VkDescriptorSetLayoutBinding layoutBinding {};
+                //     layoutBinding.binding            = uniformBuffer.binding;
+                //     layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+                //     layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL; // serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
+                //     layoutBinding.descriptorCount    = uniformBuffer.array.layers;
+                //     layoutBinding.pImmutableSamplers = nullptr;
+                //     pipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set - setSubtractionValue][uniformBuffer.binding] = layoutBinding;
+//
+                //     CEngineResult<void const *const> bufferDataFetch = aInstance.config().getBuffer(uniformBuffer.name);
+                //     if(CheckEngineError(bufferDataFetch.result()))
+                //     {
+                //         CLog::Debug("AssetLoader - Materials", "Can't find buffer w/ name {} in config.", uniformBuffer.name);
+                //         continue;
+                //     }
+//
+                //     auto  const *const data = static_cast<uint8_t const *const>(bufferDataFetch.data());
+                //     std::size_t  const size = uniformBuffer.location.length;
+//
+                //     auto const dataSource =  [data, size] () -> ByteBuffer
+                //         {
+                //             return ByteBuffer(data, size);
+                //         };
+//
+                //     SBufferDescription desc {};
+                //     desc.name                             = fmt::format("{}_uniformbuffer_{}", aMaterialName, uniformBuffer.name);
+                //     desc.dataSource                       = dataSource;
+                //     desc.createInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+                //     desc.createInfo.pNext                 = nullptr;
+                //     desc.createInfo.flags                 = 0;
+                //     desc.createInfo.size                  = uniformBuffer.location.length;
+                //     desc.createInfo.pQueueFamilyIndices   = nullptr;
+                //     desc.createInfo.queueFamilyIndexCount = 0;
+                //     desc.createInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+                //     desc.createInfo.usage                 = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+//
+                //     bufferDescriptions.push_back(desc);
+                // }
+//
+                // for(SSampledImage const &sampledImage : aMaster.sampledImages())
+                // {
+                //     if(not aIncludeSystemBuffers && 2 > sampledImage.set)
+                //     {
+                //         continue;
+                //     }
+//
+                //     VkDescriptorSetLayoutBinding layoutBinding {};
+                //     layoutBinding.binding            = sampledImage.binding;
+                //     layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+                //     layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(sampledImage.stageBinding.value());
+                //     layoutBinding.descriptorCount    = 1;
+                //     layoutBinding.pImmutableSamplers = nullptr;
+                //     pipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set - setSubtractionValue][sampledImage.binding] = layoutBinding;
+                // }
+//
+                // VkViewport viewPort = {};
+                // viewPort.x        = 0.0;
+                // viewPort.y        = 0.0;
+                // viewPort.width    = 1920.0;
+                // viewPort.height   = 1080.0;
+                // viewPort.minDepth = 0.0;
+                // viewPort.maxDepth = 1.0;
+                // pipelineDescriptor.viewPort = viewPort;
+//
+                // return {true, pipelineDescriptor, shaderModuleDescriptor, bufferDescriptions };
+
+
+                return EEngineStatus::Ok;
             }
             //<-----------------------------------------------------------------------------
 

@@ -47,7 +47,7 @@ Introduction
 
 Notes in general
 
-1. Any resource type is reuquired to derive from descriptor adapter holding the effective descriptor.
+1. Any resource type is reuquired to adapt from descriptor adapter holding the effective descriptor.
 
    It should expose a full, limited and/or possibly extended derivative adaption of the underlying descriptor.
 

@@ -149,6 +149,14 @@ namespace engine
 
         struct
             [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SBasePipeline
+            : public CResourceObject<SMaterialBasePipelineDescriptor>
+        {
+            using CResourceObject<SMaterialBasePipelineDescriptor>::CResourceObject;
+        };
+
+        struct
+            [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SPipeline
             : public CResourceObject<SMaterialPipelineDescriptor>
         {

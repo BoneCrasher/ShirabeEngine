@@ -12,6 +12,8 @@ namespace engine
 {
     namespace rendering
     {
+        using engine::framegraph::SRenderGraphPlatformContext;
+        using engine::framegraph::SRenderGraphResourceContext;
         using engine::framegraph::SRenderGraphRenderContext;
         using engine::framegraph::SRenderGraphDataSource;
         using engine::framegraph::CGraph;
@@ -87,8 +89,10 @@ namespace engine
              * Render an entire scene... (format not specified yet..)
              * @return
              */
-            EEngineStatus renderSceneDeferred(SRenderGraphDataSource    &aDataSource
-                                            , SRenderGraphRenderContext &aRenderContext);
+            EEngineStatus renderSceneDeferred(SRenderGraphPlatformContext   &aPlatformContext
+                                              , SRenderGraphDataSource      &aDataSource
+                                              , SRenderGraphResourceContext &aResourceContext
+                                              , SRenderGraphRenderContext   &aRenderContext);
 
         private_members:
             Shared<os::SApplicationEnvironment> mAppEnvironment;

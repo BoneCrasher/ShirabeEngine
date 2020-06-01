@@ -68,8 +68,8 @@ namespace engine
              * @returns EEngineStatus::Error On error
              */
             std::function<EEngineStatus(SRenderGraphRenderContextState &/* aState         */
-                                      , SRenderGraphImage const&/* aSourceTexture */
-                                      , SRenderGraphImage const&/* aTargetTexture */)> copyImage;
+                                      , SRenderGraphImage const        &/* aSourceTexture */
+                                      , SRenderGraphImage const        &/* aTargetTexture */)> copyImage;
             /**
              * Copy aTexture to the currently bound back buffer.
              *
@@ -78,7 +78,7 @@ namespace engine
              * @returns EEngineStatus::Error On error
              */
             std::function<EEngineStatus(SRenderGraphRenderContextState  &/* aState */
-                                        , SRenderGraphImage const&/* aTexture */)> copyImageToBackBuffer;
+                                        , SRenderGraphImage const       &/* aTexture */)> copyImageToBackBuffer;
 
             /**
              * Transfers an image from one layout into another.

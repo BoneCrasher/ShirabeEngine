@@ -37,7 +37,7 @@ namespace engine
             /**
              * Default-Construct an empty graph builder.
              */
-            CGraphBuilder();
+            CGraphBuilder(CResourceManager const &aResourceManager);
 
         public_destructors:
             /**
@@ -292,14 +292,16 @@ EST_EXPORT CGraphBuilder
 
             framegraph::CGraph::EGraphMode                  mGraphMode;
             bool                                            mRenderToBackBuffer;
-            RenderGraphResourceId_t                          mOutputResourceId;
+            RenderGraphResourceId_t                         mOutputResourceId;
 
             Shared<os::SApplicationEnvironment>             mApplicationEnvironment;
             Shared<wsi::CWSIDisplay>                        mDisplay;
 
+            CResourceManager const                         &mResourceManager;
+
             Shared<IUIDGenerator<RenderPassUID_t>>          mRenderPassUIDGenerator;
             Shared<IUIDGenerator<PassUID_t>>                mSubpassUIDGenerator;
-            Shared<IUIDGenerator<RenderGraphResourceId_t>>   mResourceUIDGenerator;
+            Shared<IUIDGenerator<RenderGraphResourceId_t>>  mResourceUIDGenerator;
 
             RenderGraphResourceIdList                        mResources;
             CRenderGraphMutableResources                     mResourceData;
@@ -355,10 +357,10 @@ EST_EXPORT CGraphBuilder
                 Shared<TPass> &pass = passCreation.data();
 
                 // Link the pass providing the import and export resources for the passes from the variadic argument list.
-                CPassBuilder passBuilder(uid, pass, mRenderPassUnderConstruction, mResourceData);
+                CPassBuilder passBuilder(uid, pass, mRenderPassUnderConstruction, mResourceManager, mResourceData);
 
-                CEngineResult<> const passSetup = pass->setup(passBuilder);
-                if(not passSetup.successful())
+                auto const &status = pass->setup(passBuilder);
+                if(CheckEngineError(status))
                 {
                     CLog::Error(logTag(), "Cannot setup pass instance.");
                     return { EEngineStatus::Error };
@@ -369,7 +371,7 @@ EST_EXPORT CGraphBuilder
 
                 return { EEngineStatus::Ok, pass };
             }
-            catch(std::exception e)
+            catch(std::exception const &e)
             {
                 CLog::Error(logTag(), e.what());
                 return { EEngineStatus::Error };

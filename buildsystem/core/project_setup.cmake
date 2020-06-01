@@ -4,7 +4,7 @@ cmake_policy (SET CMP0022 NEW)
 # PROJECT ID
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 
-# This line will derive the actual "directory" of a subproject as 
+# This line will adapt the actual "directory" of a subproject as
 # the project ID. 
 # E.g: ~/SmartRaySDK/Base/SHIRABE_kernel --> SHIRABE_kernel
 get_filename_component(SHIRABE_PROJECT_ID ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -96,7 +96,7 @@ LogStatus(
     "#### PROJECT TARGET CONFIG ####"
     " ")
 
-# Determine, wether we build a static lib or a shared lib and derive properties
+# Determine, wether we build a static lib or a shared lib and adapt properties
 set(SHIRABE_BUILD_APPLICATION OFF)
 set(SHIRABE_BUILD_STATICLIB   OFF)
 set(SHIRABE_BUILD_SHAREDLIB   OFF)

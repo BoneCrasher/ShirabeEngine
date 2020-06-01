@@ -621,6 +621,11 @@ namespace engine
             std::vector<SRenderGraphImageView>  images;
         };
 
+        struct SRenderGraphMeshInfo
+        {
+            uint32_t indexCount;
+        };
+
         struct SRenderGraphMeshDescription
         {
             resources::ResourceId_t meshResourceId;
@@ -628,12 +633,26 @@ namespace engine
 
         struct SRenderGraphMesh
             : SRenderGraphTypedResource<SRenderGraphMeshDescription>
-        { };
+        {
+            SRenderGraphMeshInfo meshInfo;
+        };
 
         struct SRenderGraphRenderable
         {
             SRenderGraphMeshDescription                    mesh;
             std::array<SRenderGraphMaterialDescription, 4> materials;
+        };
+
+        struct SRenderGraphRenderObjectMaterial
+        {
+            SRenderGraphMaterial material;
+            SRenderGraphPipeline pipeline;
+        };
+
+        struct SRenderGraphRenderObject
+        {
+            SRenderGraphMesh mesh;
+            std::vector<SRenderGraphRenderObjectMaterial> materials;
         };
 
         #define SHIRABE_FRAMEGRAPH_SUPPORTED_RESOURCE_TYPES \
@@ -701,7 +720,7 @@ namespace engine
         };
 
         /**
-         * Variadic parameter pack unpacking helper to derive a RenderGraphResourcesRef<T>
+         * Variadic parameter pack unpacking helper to adapt a RenderGraphResourcesRef<T>
          * for each type provided in TTypes
          *
          * @tparam TTypes List of types to implement RenderGraphResourcesRef<T> for.

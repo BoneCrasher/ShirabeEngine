@@ -567,12 +567,12 @@ namespace engine
 
         /**
          * The CVector-class is the public interface of any kind of vector and accepts a
-         * TDerived-implementation class to derive from, to avoid redundancy with dimension
+         * TDerived-implementation class to adapt from, to avoid redundancy with dimension
          * independent functionality common in any kind of vector.
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          */
         template <
@@ -844,7 +844,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aLHS     The left summand.
          * @param  aRHS     The right summand.
@@ -875,7 +875,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aLHS     The minuend.
          * @param  aRHS     The subtrahend.
@@ -905,7 +905,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aLHS     The vector to be scaled.
          * @param  aFactor  The factor to multiply with.
@@ -933,7 +933,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aFactor  The factor to multiply with.
          * @param  aLHS     The vector to be scaled.
@@ -956,7 +956,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aLHS     The dividend vector.
          * @param  aFactor  The divisor factor.
@@ -984,7 +984,7 @@ namespace engine
          *
          * @tparam T        Defines the underlying data type of the vector.
          * @tparam N        Defines the number of elements in the vector.
-         * @tparam TDerived Defines the vector implementation class to derive from, which
+         * @tparam TDerived Defines the vector implementation class to adapt from, which
          *                  is required to store type T and must have N elements.
          * @param  aFactor  The divisor factor.
          * @param  aLHS     The dividend vector.

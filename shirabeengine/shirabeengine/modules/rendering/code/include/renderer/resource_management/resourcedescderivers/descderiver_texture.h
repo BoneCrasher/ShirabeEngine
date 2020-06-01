@@ -18,10 +18,10 @@ namespace engine::resources
     using namespace textures;
 
     template<>
-    class CResourceDescDeriver<CTextureInstance, STextureDescription>
+    class CResourceAdapter<CTextureInstance, STextureDescription>
     {
     public:
-        static STextureDescription derive(Shared<CAssetStorage> aAssetStorage, Shared<CTextureInstance> aTextureInstance)
+        static STextureDescription adapt(Shared <CAssetStorage> aAssetStorage, std::shared_ptr <TResource> aTextureInstance)
         {
             DataSourceAccessor_t initialData = [=]() -> ByteBuffer
             {

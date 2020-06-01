@@ -5,6 +5,7 @@
 #include "renderer/rendergraph/modules/lighting.h"
 #include "renderer/rendergraph/modules/compositing.h"
 #include "renderer/rendergraph/framegraphcontexts.h"
+#include "renderer/rendergraph/platformcontext.h"
 #include "renderer/rendergraph/rendergraphserialization.h"
 
 #include "renderer/renderer.h"
@@ -65,9 +66,15 @@ namespace engine
                     height = displayDesc.bounds.size.y();
 
             CGraphBuilder graphBuilder{ };
-            graphBuilder.initialize(mAppEnvironment, mDisplay);
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
+
+            auto const &[initResult] = graphBuilder.initialize(mAppEnvironment, mDisplay);
+            if(CheckEngineError(initResult))
+            {
+                CLog::Error(logTag(), "GraphBuilder initialization failed");
+                return initResult;
+            }
 
             CRenderGraphModule<SGBufferModuleTag_t>     gbufferModule          { };
             CRenderGraphModule<SLightingModuleTag_t>    lightingModule         { };
@@ -77,44 +84,65 @@ namespace engine
             static std::string const sLightingPassID          = "LightingPass";
             static std::string const sCompositingPassID       = "CompositingPass";
 
-            graphBuilder.beginRenderPass("DeferredPipeline");
+            static constexpr char const* sDeferredPipelineId = "DeferredPipeline";
+
+            auto const &[renderPassBeginResult, renderPassPtr] = graphBuilder.beginRenderPass("DeferredPipeline");
+            if(CheckEngineError(renderPassBeginResult))
+            {
+                CLog::Error(logTag(), "Failed to begin render pass w/ name %s", sDeferredPipelineId);
+                return EEngineStatus::Error;
+            }
 
             // GBuffer
+
+            CRenderGraphModule<SGBufferModuleTag_t>::SBufferGenerationInputData   gbufferInput { };
             CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData gbufferExportData{ };
             gbufferExportData =
                     gbufferModule.addGBufferGenerationPass(
                                          sGBufferGenerationPassID,
-                                         graphBuilder).data();
+                                         graphBuilder,
+                                         gbufferInput).data();
 
             // Link SwapChain pass and GBuffer
             // graphBuilder.createPassDependency(sPrePassID, sGBufferGenerationPassID);
 
             // Lighting
-            CRenderGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData{ };
+            CRenderGraphModule<SLightingModuleTag_t>::SLightingPassInputData lightingInput { };
+             lightingInput.gbuffer0     = gbufferExportData.gbuffer0;
+             lightingInput.gbuffer1     = gbufferExportData.gbuffer1;
+             lightingInput.gbuffer2     = gbufferExportData.gbuffer2;
+             lightingInput.gbuffer3     = gbufferExportData.gbuffer3;
+             lightingInput.depthStencil = gbufferExportData.depthStencil;
+
+            CRenderGraphModule<SLightingModuleTag_t>::SLightingExportData lightingExportData { };
             lightingExportData =
                     lightingModule.addLightingPass(
                                           sLightingPassID,
                                           graphBuilder,
-                                          gbufferExportData.gbuffer0,
-                                          gbufferExportData.gbuffer1,
-                                          gbufferExportData.gbuffer2,
-                                          gbufferExportData.gbuffer3,
-                                          gbufferExportData.depthStencil).data();
+                                          lightingInput).data();
 
             // Compositing
+            CRenderGraphModule<SCompositingModuleTag_t>::SInputData compositingInput { };
+            compositingInput.gbuffer0                = gbufferExportData.gbuffer0;
+            compositingInput.gbuffer1                = gbufferExportData.gbuffer1;
+            compositingInput.gbuffer2                = gbufferExportData.gbuffer2;
+            compositingInput.gbuffer3                = gbufferExportData.gbuffer3;
+            compositingInput.depthStencil            = gbufferExportData.depthStencil;
+            compositingInput.lightAccumulationBuffer = lightingExportData.lightAccumulationBuffer;
+
             CRenderGraphModule<SCompositingModuleTag_t>::SExportData compositingExportData{ };
             compositingExportData =
                     compositingModule.addDefaultCompositingPass(
                                              sCompositingPassID,
                                              graphBuilder,
-                                             gbufferExportData.gbuffer0,
-                                             gbufferExportData.gbuffer1,
-                                             gbufferExportData.gbuffer2,
-                                             gbufferExportData.gbuffer3,
-                                             gbufferExportData.depthStencil,
-                                             lightingExportData.lightAccumulationBuffer).data();
+                                         compositingInput).data();
 
-            graphBuilder.endRenderPass();
+            auto const &[renderPassEndResult] = graphBuilder.endRenderPass();
+            if(CheckEngineError(renderPassEndResult))
+            {
+                CLog::Error(logTag(), "Failed to end render pass w/ name %s", sDeferredPipelineId);
+                return EEngineStatus::Error;
+            }
 
             graphBuilder.setOutputTextureResourceId(compositingExportData.output.resourceId);
 
@@ -134,7 +162,7 @@ namespace engine
             if(not compilation.successful())
             {
                 CLog::Error(logTag(), "Failed to compile the rendergraph.");
-                return EEngineStatus::Ok;
+                return EEngineStatus::Error;
             }
 
             mDeferredGraph = std::move(compilation.data());
@@ -165,6 +193,7 @@ namespace engine
                 }
             #endif
 
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -248,12 +277,14 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::renderSceneDeferred(SRenderGraphDataSource    &aDataSource
-                                                   , SRenderGraphRenderContext &aRenderContext)
+        EEngineStatus CRenderer::renderSceneDeferred(SRenderGraphPlatformContext   &aPlatformContext
+                                                     , SRenderGraphDataSource      &aDataSource
+                                                     , SRenderGraphResourceContext &aResourceContext
+                                                     , SRenderGraphRenderContext   &aRenderContext)
         {
             if(mDeferredGraph)
             {
-                CEngineResult<> const execution = mDeferredGraph->execute(aDataSource, aRenderContext);
+                CEngineResult<> const execution = mDeferredGraph->execute(aPlatformContext, aDataSource, aResourceContext, aRenderContext);
                 if(not execution.successful())
                 {
                     // TODO: Log

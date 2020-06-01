@@ -200,29 +200,12 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SMaterialPipelineDescriptor
+            SHIRABE_TEST_EXPORT SMaterialBasePipelineDescriptor
         {
             std::string name;
 
             ResourceId_t systemBasePipelineId;
             ResourceId_t shaderModuleId;
-            ResourceId_t materialResourceId;
-            ResourceId_t referenceRenderPassId;
-            uint32_t     subpass;
-
-            VkViewport   viewPort;
-            VkRect2D     scissor;
-            bool         includesSystemBuffers;
-
-            VkPipelineInputAssemblyStateCreateInfo                 inputAssemblyState;
-            std::vector<VkVertexInputBindingDescription>           vertexInputBindings;
-            std::vector<VkVertexInputAttributeDescription>         vertexInputAttributes;
-
-            VkPipelineRasterizationStateCreateInfo                 rasterizerState;
-            VkPipelineMultisampleStateCreateInfo                   multiSampler;
-            VkPipelineDepthStencilStateCreateInfo                  depthStencilState;
-            std::vector<VkPipelineColorBlendAttachmentState>       colorBlendAttachmentStates;
-            VkPipelineColorBlendStateCreateInfo                    colorBlendState;
 
             VkPipelineLayoutCreateInfo                             pipelineLayout;
             std::vector<VkDescriptorSetLayoutCreateInfo>           descriptorSetLayoutCreateInfos;
@@ -231,14 +214,52 @@ namespace engine
 
         struct
             [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMaterialPipelineDescriptor
+        {
+            std::string name;
+
+            ResourceId_t sharedMaterialId;
+            ResourceId_t referenceRenderPassId;
+            uint32_t     subpass;
+
+            VkViewport   viewPort;
+            VkRect2D     scissor;
+            bool         includesSystemBuffers;
+
+            VkPipelineInputAssemblyStateCreateInfo           inputAssemblyState;
+            std::vector<VkVertexInputBindingDescription>     vertexInputBindings;
+            std::vector<VkVertexInputAttributeDescription>   vertexInputAttributes;
+
+            VkPipelineRasterizationStateCreateInfo           rasterizerState;
+            VkPipelineMultisampleStateCreateInfo             multiSampler;
+            VkPipelineDepthStencilStateCreateInfo            depthStencilState;
+            std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachmentStates;
+            VkPipelineColorBlendStateCreateInfo              colorBlendState;
+        };
+
+        struct
+            [[nodiscard]]
             SHIRABE_TEST_EXPORT SMaterialDescription
         {
-            std::string                  name;
-            ResourceId_t                 systemMaterialId;
-            SMaterialPipelineDescriptor  basePipelineDescriptor;
-            SShaderModuleDescriptor      shaderModuleDescriptor;
-            Vector<SBufferDescription>   uniformBufferDescriptors;
-            Vector<STextureDescription>  sampledImages;
+            std::string  name;
+            ResourceId_t systemMaterialId;
+            ResourceId_t basePipelineId;
+            ResourceId_t shaderModuleId;
+
+            Vector<ResourceId_t> bufferIds;
+            Vector<ResourceId_t> sampledImageIds;
+        };
+
+        struct
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SMeshInfo
+        {
+            uint32_t                                  attributeCount;
+            Vector<VkVertexInputBindingDescription>   bindingDescriptions;
+            Vector<VkVertexInputAttributeDescription> attributeDescriptions;
+            Vector<VkDeviceSize>                      offsets;
+            VkDeviceSize                              firstIndexOffset;
+            uint32_t                                  indexSampleCount;
         };
 
         /**
@@ -249,33 +270,16 @@ namespace engine
             [[nodiscard]]
             SHIRABE_TEST_EXPORT SMeshDescriptor
         {
-            std::string                               name;
-            uint32_t                                  attributeCount;
-            Vector<VkVertexInputBindingDescription>   bindingDescriptions;
-            Vector<VkVertexInputAttributeDescription> attributeDescriptions;
-            Vector<VkDeviceSize>                      offsets;
-            VkDeviceSize                              firstIndexOffset;
-            uint32_t                                  indexSampleCount;
-
-            SBufferDescription                        attributeBufferDesc;
-        };
-
-        struct
-            [[nodiscard]]
-            SHIRABE_TEST_EXPORT SMeshDependencies
-        {
-            SHIRABE_INLINE
-            Vector<ResourceId_t> const resolve() const
-            {
-                return {};
-            }
+            std::string  name;
+            SMeshInfo    meshInfo;
+            ResourceId_t attributeBufferId;
         };
 
         template<typename TResource, typename TResourceDesc>
-        class CResourceDescDeriver
+        class CResourceAdapter
         {
         public:
-            static TResourceDesc derive(Shared<asset::CAssetStorage> aAssetStorage, Shared<TResource> aTextureInstance);
+            static TResourceDesc adapt(Shared<asset::CAssetStorage> aAssetStorage, Shared<TResource> aTextureInstance);
         };
     }
 }

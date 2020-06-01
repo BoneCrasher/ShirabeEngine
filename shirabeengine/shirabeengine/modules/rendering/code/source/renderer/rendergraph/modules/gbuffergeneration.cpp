@@ -141,24 +141,35 @@ namespace engine
                                    aOutPassData.exportData.gbuffer3     = aBuilder.writeAttachment(aOutPassData.state.gbufferTexture2And3Id, write3).data();
                                    aOutPassData.exportData.depthStencil = aBuilder.writeAttachment(aOutPassData.state.depthStencilTextureId, depthFlags).data();
 
-                                   std::vector<SRenderGraphRenderable> renderables = aDataSource.fetchRenderables({});
+                                   std::vector<SRenderGraphRenderable>   renderables = aDataSource.fetchRenderables({});
+                                   std::vector<SRenderGraphRenderObject> renderObjects;
+                                   // Configure the pipeline to be used for all the objects...
+                                   SRenderGraphPipelineConfig config;
 
-                                   // Render-Loop
                                    for(auto const &renderableResources : renderables)
                                    {
-                                       auto [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
+                                       auto const [result, mesh] = aBuilder.useMesh(renderableResources.mesh); // Will trace down the component hierarchies...
+
+                                       SRenderGraphRenderObject object;
+                                       object.mesh = mesh;
 
                                        auto const materials = renderableResources.materials;
                                        for(std::size_t k=0; k<materials.size(); ++k)
                                        {
                                            auto const renderableMaterial = materials[k];
 
-                                           auto [result, material] = aBuilder.useMaterial(renderableMaterial);
-
-                                           SRenderGraphPipelineConfig config;
+                                           auto const [result, material]         = aBuilder.useMaterial(renderableMaterial);
                                            auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, config);
+
+                                           SRenderGraphRenderObjectMaterial objectMaterial;
+                                           objectMaterial.material = material;
+                                           objectMaterial.pipeline = pipeline;
+                                           object.materials.push_back(objectMaterial);
+                                           renderObjects.push_back(object);
                                        }
                                    }
+
+                                   aOutPassData.importData.renderObjects = renderObjects;
 
                                    return { EEngineStatus::Ok };
                                };
@@ -177,34 +188,18 @@ namespace engine
 
                 CLog::Verbose(logTag(), "GBufferGeneration");
 
-                std::vector<SRenderGraphRenderable> renderables = aDataSource.fetchRenderables({});
-
-                // Render-Loop
-                for(SRenderGraphRenderable const &renderableResources : renderables)
+                for(auto const &renderObject : aPassData.importData.renderObjects)
                 {
-                    for(auto const &[id, mesh] : renderableResources.meshes)
+                    SRenderGraphMesh const &mesh = renderObject.mesh;
+
+                    aRenderContext.useMesh(aRenderContextState, mesh);
+
+                    for(uint32_t k=0; k<renderObject.materials.size(); ++k)
                     {
-                        EEngineStatus const meshInitState = aResourceContext.initializeMesh(mesh);
-                        if(EEngineStatus::Ok != meshInitState) { continue; }
-                        EEngineStatus const meshLoadState = aResourceContext.updateMesh(mesh);
-                        if(EEngineStatus::Ok != meshLoadState) { continue; }
+                        SRenderGraphRenderObjectMaterial const &material = renderObject.materials[k];
 
-                        aRenderContext.useMesh(aRenderContextState, mesh);
-
-                        for(SRenderGraphMaterial const &material : mesh.materials)
-                        {
-
-
-                            EEngineStatus const pipelineInitState = aResourceContext.createPipeline(material.basePipeline);
-                            if(EEngineStatus::Ok != pipelineInitState) { continue; }
-
-                            EEngineStatus const materialInitState = aResourceContext.initializeMaterial(material);
-                            if(EEngineStatus::Ok != materialInitState) { continue; }
-                            EEngineStatus const materialLoadState = aResourceContext.updateMaterial(material);
-                            if(EEngineStatus::Ok != materialLoadState) { continue; }
-
-                            aRenderContext.drawIndexed(aRenderContextState, renderableResources.meshResource.indexCount);
-                        }
+                        aRenderContext.useMaterialWithPipeline(aRenderContextState, material.material, material.pipeline);
+                        aRenderContext.drawIndexed(aRenderContextState, mesh.meshInfo.indexCount);
                     }
                 }
 

@@ -152,6 +152,8 @@ namespace engine
                     continue;
                 }
             }
+
+            return true;
         }
         //<-----------------------------------------------------------------------------
 
@@ -160,7 +162,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         bool CGraph::deinitializeGraphGlobalResources(SRenderGraphResourceContext &aResourceContext)
         {
-
+            return true;
         }
         //<-----------------------------------------------------------------------------
 
@@ -206,6 +208,8 @@ namespace engine
 
                 aResourceContext.createTextureView(*subjacentResourcePtr, *resourcePtr);
             }
+
+            return true;
         }
 
         bool CGraph::deinitializeRenderPassResources(SRenderGraphResourceContext &aResourceContext, Shared<CRenderPass> aRenderPass)
@@ -225,6 +229,8 @@ namespace engine
 
                 aResourceContext.destroyTextureView(*resourcePtr);
             }
+
+            return true;
         }
 
         bool CGraph::initializeSubpassResources(SRenderGraphResourceContext &aResourceContext
@@ -240,15 +246,19 @@ namespace engine
                 auto const &[fetchStatus, resourcePtr] = mResourceData.getResource<SRenderGraphPipeline>(pipelineId);
                 if(EEngineStatus::Ok != fetchStatus)
                 {
-
+                    CLog::Error(logTag(), "Failed to rendergraph pipeline w/ id %d", pipelineId);
+                    continue;
                 }
 
                 EEngineStatus const state = aResourceContext.createPipeline(*resourcePtr, aRenderPass->getRenderPassName(), aSubpassIndex);
                 if (EEngineStatus::Ok != state)
                 {
-
+                    CLog::Error(logTag(), "Failed to create resource w/ id %d", pipelineId);
+                    continue;
                 }
             }
+
+            return true;
         }
 
         bool CGraph::deinitializeSubpassResources(SRenderGraphResourceContext &aResourceContext
@@ -256,7 +266,7 @@ namespace engine
                                                   , Shared<CPassBase>          aSubpass
                                                   , uint32_t const            &aSubpassIndex)
         {
-
+            return true;
         }
         //<-----------------------------------------------------------------------------
     }

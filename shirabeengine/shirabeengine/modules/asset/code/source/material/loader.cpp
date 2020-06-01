@@ -4,7 +4,9 @@
 #include <util/crc32.h>
 #include <util/documents/json.h>
 
+#include "asset/material/asset.h"
 #include "asset/material/declaration.h"
+#include "asset/material/source.h"
 #include "asset/material/serialization.h"
 #include "asset/material/loader.h"
 
@@ -101,50 +103,6 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        using MasterMaterialReturn_t = std::tuple<bool, std::string, SMaterialAsset, CMaterialConfig>;
-
-        static
-        auto loadMasterMaterialFiles(std::string                                    const &aLogTag,
-                                     Shared<asset::IAssetStorage>                   const &aAssetStorage,
-                                     Map<asset::AssetID_t, Shared<CSharedMaterial>>       &aMasterMaterialIndex,
-                                     asset::AssetID_t                               const &aMasterMaterialAssetId)
-            -> MasterMaterialReturn_t
-        {
-            SHIRABE_UNUSED(aMasterMaterialIndex);
-
-            AssetID_t              const masterIndexId    = aMasterMaterialAssetId; // Needs to be here, since it will be shared across both case-blocks.
-            CResult<SMaterialAsset> masterIndexFetch = {};
-
-            MasterMaterialReturn_t const failureReturnValue = { false, {}, {}, {} };
-
-            auto const [assetDataFetchResult, assetData] = readMaterialAsset(aLogTag, aAssetStorage, masterIndexId);
-            {
-                PrintEngineError(assetDataFetchResult, aLogTag, "Could not fetch sharedMaterial asset data.");
-                SHIRABE_RETURN_VALUE_ON_ERROR(assetDataFetchResult, failureReturnValue);
-            }
-
-            // auto const [configAssetFetchResult, configAsset] = aAssetStorage->loadAsset(metaData.configurationAssetUid);
-            // {
-            //     PrintEngineError(configAssetFetchResult, aLogTag, "Could not fetch configuration asset data.");
-            //     SHIRABE_RETURN_VALUE_ON_ERROR(configAssetFetchResult, failureReturnValue);
-            // }
-
-            //auto const [configFetchResult, config] = readMaterialConfig(aLogTag, aAssetStorage, configAsset.id);
-            //{
-            //    PrintEngineError(configFetchResult, aLogTag, "Could not fetch configuration data.");
-            //    SHIRABE_RETURN_VALUE_ON_ERROR(configFetchResult, failureReturnValue);
-            //}
-
-            std::string        const  masterName      = assetData.name;
-            CMaterialConfig    const &masterConfig    = {}; // config;
-
-            return { true, masterName, assetData, masterConfig };
-        }
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
         CEngineResult<Shared<CMaterialInstance>> CMaterialLoader::createInstance(asset::AssetID_t const &aMasterMaterialAssetId)
         {
             return { EEngineStatus::Ok };
@@ -199,45 +157,38 @@ namespace engine
             //--------------------------------------------------------------------------------------------------------------------
             // Fetch sharedMaterial data
             //--------------------------------------------------------------------------------------------------------------------
-            AssetID_t masterIndexId = aMaterialInstanceAssetId; // instanceIndexAsset.parent;
-            // if(0_uid == masterIndexId)
-            // {
-            //     return { EEngineStatus::Error };
-            // }
+            AssetID_t materialAssetId = aMaterialInstanceAssetId;
 
-            //
-            // If the material has been loaded already, return it!
-            //
-            Shared<CSharedMaterial> master = nullptr;
+            Shared<CSharedMaterial> sharedMaterial = nullptr;
 
-            if(mSharedMaterials.end() != mSharedMaterials.find(masterIndexId))
+            if(mSharedMaterials.end() != mSharedMaterials.find(materialAssetId))
             {
-                master = mSharedMaterials.at(masterIndexId);
+                sharedMaterial = mSharedMaterials.at(materialAssetId);
             }
             else
             {
-                auto[successful, masterName, masterAsset, masterConfig] = loadMasterMaterialFiles(logTag(), aAssetStorage, mSharedMaterials, masterIndexId);
+                auto const [assetDataFetchResult, assetData] = readMaterialAsset(logTag(), aAssetStorage, materialAssetId);
                 {
-                    PrintEngineError(not successful, logTag(), "Couldn't fetch sharedMaterial material data.");
-                    SHIRABE_RETURN_RESULT_ON_ERROR(not successful);
+                    PrintEngineError(assetDataFetchResult, logTag(), "Could not fetch sharedMaterial asset data.");
+                    SHIRABE_RETURN_RESULT_ON_ERROR(assetDataFetchResult)
                 }
 
-                master = CSharedMaterial::fromAsset(masterAsset);
-                mSharedMaterials[masterAsset.uid] = master;
+                sharedMaterial = CSharedMaterial::fromAsset(assetData);
+                mSharedMaterials[assetData.uid] = sharedMaterial;
             }
 
-            if(nullptr == master)
+            if(nullptr == sharedMaterial)
             {
                 return { EEngineStatus::Error, nullptr };
             }
 
             static uint64_t sInstanceIndex = 0;
-            std::string instanceName = fmt::format("{}_instance_{}", master->name(), ++sInstanceIndex);
+            std::string instanceName = fmt::format("{}_instance_{}", sharedMaterial->name(), ++sInstanceIndex);
 
-            Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceName, master);
+            Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceName, sharedMaterial);
             if(aAutoCreateConfiguration)
             {
-                instance->createConfiguration(*master, aIncludeSystemBuffers);
+                instance->createConfiguration(*sharedMaterial, aIncludeSystemBuffers);
             }
 
             mMaterialInstances.insert({instanceName, instance });
