@@ -17,10 +17,10 @@
 #include <base/stl_container_helpers.h>
 #include <core/enginestatus.h>
 #include <core/bitfield.h>
+#include <core/memory/allocators/allocators.h>
 #include <core/serialization/serialization.h>
 #include <asset/assettypes.h>
-
-#include "asset/material/asset.h"
+#include <asset/material/asset.h>
 
 namespace engine
 {
@@ -110,13 +110,14 @@ namespace engine
             }
 
         public_methods:
-            SHIRABE_INLINE
-            std::string                 const &name()           const { return mName; }
-            SMaterialLayoutInfo         const &layoutInfo()     const { return mLayoutInfo; }
-            StageMap_t                  const &stages()         const { return mStages; }
-            std::vector<SUniformBuffer> const &uniformBuffers() const { return mUniformBuffers; }
-            std::vector<SSampledImage>  const &sampledImages()  const { return mSampledImages; }
-            std::vector<SSubpassInput>  const &subpassInputs()  const { return mSubpassInputs; }
+            EEngineStatus initializeMemory(Shared<memory::allocators::CAllocator> aAllocator);
+
+            SHIRABE_INLINE std::string                 const &name()           const { return mName; }
+            SHIRABE_INLINE SMaterialLayoutInfo         const &layoutInfo()     const { return mLayoutInfo; }
+            SHIRABE_INLINE StageMap_t                  const &stages()         const { return mStages; }
+            SHIRABE_INLINE std::vector<SUniformBuffer> const &uniformBuffers() const { return mUniformBuffers; }
+            SHIRABE_INLINE std::vector<SSampledImage>  const &sampledImages()  const { return mSampledImages; }
+            SHIRABE_INLINE std::vector<SSubpassInput>  const &subpassInputs()  const { return mSubpassInputs; }
 
         private_methods:
             friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...

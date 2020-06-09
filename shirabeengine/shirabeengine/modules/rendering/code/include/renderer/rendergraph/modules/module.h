@@ -5,8 +5,8 @@
 #include <asset/assetstorage.h>
 #include <asset/mesh/loader.h>
 #include <asset/mesh/declaration.h>
-#include <asset/material/loader.h>
-#include <asset/material/declaration.h>
+#include "../../../../../../../code/include/materialsystem/loader.h"
+#include "../../../../../../../code/include/materialsystem/declaration.h"
 #include <asset/textures/loader.h>
 #include <asset/textures/declaration.h>
 

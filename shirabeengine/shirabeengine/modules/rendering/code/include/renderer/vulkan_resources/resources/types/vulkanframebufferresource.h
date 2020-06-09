@@ -51,8 +51,8 @@ namespace engine
             template <typename TResourceManager>
             static EEngineStatus deinitialize(SFrameBufferDescription const &aDescription
                                             , Handles_t                     &aGpuApiHandles
-                                          , TResourceManager                *aResourceManager
-                                          , IVkGlobalContext                *aVulkanEnvironment);
+                                           , TResourceManager               *aResourceManager
+                                           , IVkGlobalContext               *aVulkanEnvironment);
         };
         using FrameBufferResourceState_t = SResourceState<SFrameBuffer>;
 

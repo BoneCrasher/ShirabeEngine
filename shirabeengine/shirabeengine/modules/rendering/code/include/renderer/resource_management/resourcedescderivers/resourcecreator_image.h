@@ -18,7 +18,7 @@ namespace engine::resources
     using namespace textures;
 
     template<>
-    class CResourceAdapter<CTextureInstance, STextureDescription>
+    class CResourceCreator<CTextureInstance, STextureDescription>
     {
     public:
         static STextureDescription adapt(Shared <CAssetStorage> aAssetStorage, std::shared_ptr <TResource> aTextureInstance)

@@ -1,5 +1,7 @@
-﻿#include "asset/material/declaration.h"
+﻿#include "materialsystem/declaration.h"
+
 #include <util/documents/json.h>
+
 
 namespace engine::material
 {
@@ -7,6 +9,18 @@ namespace engine::material
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    EEngineStatus CSharedMaterial::initializeMemory(Shared<memory::allocators::CAllocator> aAllocator)
+    {
+        if(nullptr == aAllocator)
+        {
+            return EEngineStatus::Error;
+        }
+
+        // Read size requirements
+        // Allocate data
+
+        return EEngineStatus::Ok;
+    }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------

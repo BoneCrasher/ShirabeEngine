@@ -2,8 +2,8 @@
 #include <core/enginetypehelper.h>
 #include <asset/mesh/loader.h>
 #include <asset/mesh/declaration.h>
-#include <asset/material/loader.h>
-#include <asset/material/declaration.h>
+#include "../../../../../../code/include/materialsystem/loader.h"
+#include "../../../../../../code/include/materialsystem/declaration.h"
 #include <asset/material/serialization.h>
 
 #include "renderer/resource_management/cresourcemanager.h"

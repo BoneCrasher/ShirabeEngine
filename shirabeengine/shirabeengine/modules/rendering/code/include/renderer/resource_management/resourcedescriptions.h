@@ -242,12 +242,8 @@ namespace engine
             SHIRABE_TEST_EXPORT SMaterialDescription
         {
             std::string  name;
-            ResourceId_t systemMaterialId;
             ResourceId_t basePipelineId;
             ResourceId_t shaderModuleId;
-
-            Vector<ResourceId_t> bufferIds;
-            Vector<ResourceId_t> sampledImageIds;
         };
 
         struct
@@ -276,7 +272,7 @@ namespace engine
         };
 
         template<typename TResource, typename TResourceDesc>
-        class CResourceAdapter
+        class CResourceCreator
         {
         public:
             static TResourceDesc adapt(Shared<asset::CAssetStorage> aAssetStorage, Shared<TResource> aTextureInstance);

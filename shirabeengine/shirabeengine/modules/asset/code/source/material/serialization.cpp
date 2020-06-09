@@ -1,8 +1,7 @@
-#include "asset/material/declaration.h"
+#include "../../../../../code/include/materialsystem/declaration.h"
 #include "asset/material/source.h"
 #include "asset/material/asset.h"
 #include "asset/material/serialization.h"
-#include <util/documents/json.h>
 
 namespace engine
 {
@@ -634,6 +633,15 @@ namespace engine
             // aDeserializer.endObject();
 
             return true;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        CEngineResult<SMaterialMasterIndex> readMaterialMasterIndexFile(std::string const &aLogTag, Shared<asset::IAssetStorage> const &aAssetStorage, asset::AssetId_t const &aAssetUID)
+        {
+            return serialization::readMaterialFile<SMaterialMasterIndex>(aLogTag, aAssetStorage, aAssetUID);
         }
         //<-----------------------------------------------------------------------------
 

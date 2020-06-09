@@ -8,10 +8,7 @@
 #include "renderer/resource_management/cresourcemanagerbase.h"
 #include "renderer/resource_management/resourcetypes.h"
 
-#include "renderer/resource_management/resourcedescderivers/descderiver_buffer.h"
-#include "renderer/resource_management/resourcedescderivers/descderiver_texture.h"
-#include "renderer/resource_management/resourcedescderivers/descderiver_mesh.h"
-#include "renderer/resource_management/resourcedescderivers/descderiver_material.h"
+#include "renderer/vulkan_resources/resources/types/all.h"
 
 namespace engine::resources
 {

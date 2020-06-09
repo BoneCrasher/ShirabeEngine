@@ -6,11 +6,11 @@
 #define __SHIRABEDEVELOPMENT_BUFFERS_ASSETLOADER_H__
 
 #include <asset/assetstorage.h>
-#include <resources/resourcedescriptions.h>
-#include <resources/resourcetypes.h>
-#include <resources/cresourcemanager.h>
-#include "buffers/loader.h"
-#include "buffers/declaration.h"
+#include <renderer/resource_management/resourcedescriptions.h>
+#include <renderer/resource_management/resourcetypes.h>
+#include <renderer/resource_management/cresourcemanager.h>
+#include <asset/buffers/loader.h>
+#include <asset/buffers/declaration.h>
 
 namespace engine
 {
