@@ -31,8 +31,8 @@
 #include <core/enginetypehelper.h>
 #include <core/result.h>
 #include <core/helpers.h>
-#include <material/serialization.h>
-#include <material/declaration.h>
+#include <asset/material/serialization.h>
+#include <asset/material/source.h>
 #include <util/documents/json.h>
 
 #include "common/config.h"
@@ -413,7 +413,7 @@ public_methods:
                                   , a.uri.string());
         }
         ss << "</Index>";
-        writeFile(mConfig.outputPath / "game.assetindex.xml", ss.str());
+        SHIRABE_EXPLICIT_DISCARD(writeFile(mConfig.outputPath / "game.assetindex.xml", ss.str()));
 
         return EResult::Success;
     }

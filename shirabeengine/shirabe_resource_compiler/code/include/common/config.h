@@ -5,6 +5,7 @@
 #ifndef __SHIRABEDEVELOPMENT_CONFIG_H__
 #define __SHIRABEDEVELOPMENT_CONFIG_H__
 
+#include <vector>
 #include <core/bitfield.h>
 
 /**

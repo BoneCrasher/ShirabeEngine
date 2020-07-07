@@ -16,6 +16,7 @@ buildOne ()
     local glslang_dir=${DEPLOY_BASE_DIR}/glslang/${target_config}
     local spirv_tools_dir=${DEPLOY_BASE_DIR}/spirv_tools
     local vulkan_headers_dir=${DEPLOY_BASE_DIR}/vulkan_headers/linux${addressmode}/${configuration}/include
+    local spirv_headers_dir=${DEPLOY_BASE_DIR}/spirv_headers/linux${addressmode}/${configuration}
 
     local spirv_tools_bin=${spirv_tools_dir}/${target_config}/bin
     local spirv_tools_inc=${spirv_tools_dir}/${target_config}/include
@@ -30,6 +31,7 @@ buildOne ()
         -DBUILD_WSI_XCB_SUPPORT=ON                        \
         -DBUILD_WSI_WAYLAND_SUPPORT=OFF                   \
         -DVulkanHeaders_INCLUDE_DIR=${vulkan_headers_dir} \
+        -DSPIRV_HEADERS_INSTALL_DIR=${spirv_headers_dir}  \
         -DGLSLANG_INSTALL_DIR=${glslang_dir}              \
         -DSPIRV_TOOLS_INCLUDE_DIR=${spirv_tools_inc}      \
         -DSPIRV_TOOLS_LIB=${spirv_tools_lib}              \

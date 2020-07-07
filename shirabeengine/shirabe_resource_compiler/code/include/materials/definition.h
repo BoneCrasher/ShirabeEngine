@@ -12,7 +12,7 @@
 
 namespace materials
 {
-    SHIRABE_DECLARE_LOG_TAG(MaterialProcessor);
+    SHIRABE_DECLARE_LOG_TAG(MaterialProcessor)
 
     using namespace engine;
 

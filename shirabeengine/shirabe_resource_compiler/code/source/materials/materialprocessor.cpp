@@ -8,7 +8,7 @@
 
 #include <core/helpers.h>
 #include <util/documents/json.h>
-#include <material/declaration.h>
+#include <asset/material/source.h>
 
 namespace materials
 {
@@ -277,7 +277,7 @@ namespace materials
     static CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("{}/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
-        std::string       options     = "-v -d -g -Od -V --target-env vulkan1.1";
+        std::string       options     = "-v -d -g -Od -V -H --target-env vulkan1.1";
 
         auto const appendIncludes = [&options] (std::string const &aInclude) -> void
         {
@@ -454,44 +454,6 @@ namespace materials
         return EResult::Success;
     }
 
-    /**
-     * @brief serializeMaterialConfig
-     * @param aMaterialConfig
-     * @param aOutSerializedData
-     * @return
-     */
-    static CResult<EResult> serializeMaterialConfig(CMaterialConfig const &aMaterialConfig, std::string &aOutSerializedData)
-    {
-        using namespace resource_compiler::serialization;
-
-        Unique<IJSONSerializer<CMaterialConfig>> serializer = makeUnique<CJSONSerializer<CMaterialConfig>>();
-        bool const initialized = serializer->initialize();
-        if(false == initialized)
-        {
-            return EResult::SerializationFailed;
-        }
-        CResult<Shared<serialization::ISerializer<CMaterialConfig>::IResult>> const serialization = serializer->serialize(aMaterialConfig);
-        if(not serialization.successful())
-        {
-            return EResult::SerializationFailed;
-        }
-
-        CResult<std::string> data = serialization.data()->asString();
-        aOutSerializedData = data.data();
-
-        bool const deinitialized = serializer->deinitialize();
-        if(false == deinitialized)
-        {
-            return EResult::SerializationFailed;
-        }
-
-        serializer = nullptr;
-
-        CLog::Debug(logTag(), aOutSerializedData);
-
-        return EResult::Success;
-    }
-
     CResult<EResult> processMaterial(std::filesystem::path const &aMaterialFile, SConfiguration const &aConfig)
     {
         std::filesystem::path const &materialPathAbs  = std::filesystem::current_path() / aMaterialFile;
@@ -578,7 +540,7 @@ namespace materials
             return EResult::SerializationFailed;
         }
 
-        writeFile(outputIndexPathAbsolute, serializedData);
+        SHIRABE_EXPLICIT_DISCARD(writeFile(outputIndexPathAbsolute, serializedData));
 
         //CMaterialConfig        config                    = CMaterialConfig::fromMaterialDesc(extractionResult.data(), );
         //CResult<EResult> const configSerializationResult = serializeMaterialConfig(config, serializedData);

@@ -73,7 +73,7 @@ namespace engine
 
             for(auto const &[stage, stageFileReferences] : stages)
             {
-                std::string const stageName = serialization::stageToString(stage);
+                std::string const stageName = stageToString(stage);
                 aSerializer.beginObject(stageName);
                 aSerializer.writeValue("glslSourceFilename", stageFileReferences.glslSourceFilename);
                 aSerializer.endObject();
@@ -107,7 +107,7 @@ namespace engine
 
             for(auto const stage : stageList)
             {
-                std::string const stageName         = serialization::stageToString(stage);
+                std::string const stageName         = stageToString(stage);
                 std::string       glslFilename      = std::string();
                 asset::AssetId_t  spvModuleAssetId  = 0;
 
@@ -264,6 +264,67 @@ namespace engine
                 };
                 std::for_each(this->uniformBuffers.begin(), this->uniformBuffers.end(), iterateUniformBuffers);
                 aSerializer.endArray(); // uniformBuffers
+
+                //
+                // Serialize storage buffers
+                //
+                aSerializer.beginArray("storageBuffers");
+                auto const iterateStorageBuffers = [&] (SUniformBuffer const &aBuffer) -> void
+                    {
+                        aSerializer.beginObject(aBuffer.name);
+                        {
+                            aSerializer.writeValue("name",        aBuffer.name);
+                            aSerializer.writeValue("offset",      aBuffer.location.offset);
+                            aSerializer.writeValue("size",        aBuffer.location.length);
+                            aSerializer.writeValue("padding",     aBuffer.location.padding);
+                            aSerializer.writeValue("set",         aBuffer.set);
+                            aSerializer.writeValue("binding",     aBuffer.binding);
+
+                            aSerializer.beginObject("array");
+                            aSerializer.writeValue("layers", aBuffer.array.layers);
+                            aSerializer.writeValue("stride", aBuffer.array.stride);
+                            aSerializer.endObject();
+
+                            std::function<void(BufferMemberMap_t const &)> iterateStorageBufferMembers = nullptr;
+                            iterateStorageBufferMembers = [&] (BufferMemberMap_t const &aMembers) -> void
+                                {
+                                    aSerializer.beginArray("members");
+                                    auto const iterate = [&] (BufferMemberMap_t::value_type const &aMember)
+                                        {
+                                            std::string                 const  aKey   = aMember.first;
+                                            Shared<SBufferMember const> const &aValue = aMember.second;
+
+                                            aSerializer.beginObject(aKey);
+                                            aSerializer.writeValue("name",    aKey);
+                                            aSerializer.writeValue("offset",  aValue->location.offset);
+                                            aSerializer.writeValue("size",    aValue->location.length);
+                                            aSerializer.writeValue("padding", aValue->location.padding);
+
+                                            aSerializer.beginObject("array");
+                                            aSerializer.writeValue("layers", aValue->array.layers);
+                                            aSerializer.writeValue("stride", aValue->array.stride);
+                                            aSerializer.endObject();
+
+                                            if(not aValue->members.empty())
+                                            {
+                                                iterateStorageBufferMembers(aValue->members);
+                                            }
+
+                                            aSerializer.endObject(); // aKey
+                                        };
+                                    std::for_each(aMembers.begin(), aMembers.end(), iterate);
+                                    aSerializer.endArray(); // members
+                                };
+
+                            //if(not aBuffer.members.empty())
+                            //{
+                            iterateStorageBufferMembers(aBuffer.members);
+                            //}
+                        }
+                        aSerializer.endObject(); // aBuffer.Name
+                    };
+                std::for_each(this->storageBuffers.begin(), this->storageBuffers.end(), iterateStorageBuffers);
+                aSerializer.endArray(); // storageBuffers
 
                 //
                 // Serialize sampled images
@@ -559,7 +620,7 @@ namespace engine
                     {
                         aDeserializer.readValue("name",     aStage.stageName);
                         aDeserializer.readValue("filename", aStage.filename);
-                        aStage.stage = serialization::stageFromString(aStage.stageName);
+                        aStage.stage = stageFromString(aStage.stageName);
 
                         uint32_t inputCount = 0;
                         aDeserializer.beginArray("inputs", inputCount);

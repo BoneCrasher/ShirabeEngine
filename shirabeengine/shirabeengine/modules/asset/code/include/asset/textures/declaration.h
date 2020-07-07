@@ -270,21 +270,6 @@ namespace engine
             asset::AssetId_t    mImageLayersBinaryAssetUid;
         };
         //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        Shared<CTextureInstance> CTextureInstance::fromAsset(STextureAsset const &aAsset)
-        {
-            auto texture = makeShared<CTextureInstance>();
-
-            texture->mName                      = aAsset.name;
-            texture->mTextureInfo               = aAsset.textureInfo;
-            texture->mImageLayersBinaryAssetUid = aAsset.imageLayersBinaryUid;
-
-            return texture;
-        }
-        //<-----------------------------------------------------------------------------
     }
 }
 

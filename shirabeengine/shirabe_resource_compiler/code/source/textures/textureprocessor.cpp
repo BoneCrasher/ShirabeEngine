@@ -1,14 +1,17 @@
 #include "textures/textureprocessor.h"
 
+#pragma GCC diagnostic ignored "-Wtype-limits"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+#pragma GCC diagnostic error "-Wtype-limits"
+
 #include <core/databuffer.h>
 #include <core/result.h>
 #include <core/helpers.h>
 #include <core/enginetypehelper.h>
 #include <util/documents/json.h>
 #include <util/crc32.h>
-#include <textures/declaration.h>
+#include <asset/textures/declaration.h>
 
 #include "common/functions.h"
 
@@ -289,7 +292,7 @@ namespace texture
             memcpy(buffer.mutableDataVector().data() + (k * input.data.size()), input.data.dataVector().data(), input.data.size());
         }
 
-        engine::writeFile(outputDataFilePathAbs, buffer.dataVector());
+        auto const result = engine::writeFile(outputDataFilePathAbs, buffer.dataVector());
 
         std::string serializedData = {};
 
@@ -307,7 +310,7 @@ namespace texture
             return EResult::SerializationFailed;
         }
 
-        engine::writeFile(outputMetaFilePathAbs, serializedData);
+        auto const result2 = engine::writeFile(outputMetaFilePathAbs, serializedData);
 
         return EResult::Success;
     }

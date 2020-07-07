@@ -17,6 +17,8 @@ namespace engine::material
         }
 
         // Read size requirements
+
+
         // Allocate data
 
         return EEngineStatus::Ok;
@@ -34,6 +36,7 @@ namespace engine::material
         }
 
         Shared<CSharedMaterial> m = sharedMaterial();
+        m->
 
         CMaterialConfig config = CMaterialConfig::fromMaterialDesc(aMaterial, aIncludeSystemBuffers);
 

@@ -5,6 +5,10 @@
 #ifndef __SHIRABEDEVELOPMENT_EXTENSIBILITY_H__
 #define __SHIRABEDEVELOPMENT_EXTENSIBILITY_H__
 
+#include <string>
+#include <base/declaration.h>
+#include <core/bitfield.h>
+
 namespace engine::resources
 {
     enum class

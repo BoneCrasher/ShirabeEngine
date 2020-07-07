@@ -33,16 +33,13 @@ namespace engine
 
                 Shared<CSharedMaterial> const &sharedMaterial = aInstance->sharedMaterial();
 
-                // bool const isCoreMaterial       = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == sharedMaterial->name());
-                // bool const includeSystemBuffers = (not isCoreMaterial);
+                bool const isCoreMaterial = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == sharedMaterial->name());
 
                 SMaterialBasePipelineDescriptor basePipelineDescriptor {};
                 SShaderModuleDescriptor         shaderModuleDescriptor {};
 
                 basePipelineDescriptor.name = fmt::format("{}_{}", sharedMaterial->name(), "basepipeline");
                 shaderModuleDescriptor.name = fmt::format("{}_{}", sharedMaterial->name(), "shadermodule");
-
-                // basePipelineDescriptor.systemBasePipelineId = (isCoreMaterial ? "" : fmt::format("{}_{}", SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID, "basepipeline"));
 
                 for(auto const &[stageKey, stage] : sharedMaterial->stages())
                 {
@@ -94,10 +91,8 @@ namespace engine
 
                 for(SSubpassInput const &input : sharedMaterial->subpassInputs())
                 {
-                    // if(not includeSystemBuffers && 2 > input.set)
-                    // {
-                    //     continue;
-                    // }
+                    if(not isCoreMaterial && 2 > input.set)
+                        continue;
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = input.binding;
@@ -110,10 +105,8 @@ namespace engine
 
                 for(SUniformBuffer const &uniformBuffer : sharedMaterial->uniformBuffers())
                 {
-                    // if(not includeSystemBuffers && 2 > uniformBuffer.set)
-                    // {
-                    //     continue;
-                    // }
+                    if(not isCoreMaterial && 2 > uniformBuffer.set)
+                        continue;
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = uniformBuffer.binding;
@@ -124,12 +117,24 @@ namespace engine
                     basePipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set /* - setSubtractionValue */][uniformBuffer.binding] = layoutBinding;
                 }
 
+                for(SUniformBuffer const &storageBuffer : sharedMaterial->storageBuffers())
+                {
+                    if(not isCoreMaterial && 2 > storageBuffer.set)
+                        continue;
+
+                    VkDescriptorSetLayoutBinding layoutBinding {};
+                    layoutBinding.binding            = storageBuffer.binding;
+                    layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+                    layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+                    layoutBinding.descriptorCount    = storageBuffer.array.layers;
+                    layoutBinding.pImmutableSamplers = nullptr;
+                    basePipelineDescriptor.descriptorSetLayoutBindings[storageBuffer.set /* - setSubtractionValue */][storageBuffer.binding] = layoutBinding;
+                }
+
                 for(SSampledImage const &sampledImage : sharedMaterial->sampledImages())
                 {
-                    // if(not includeSystemBuffers && 2 > sampledImage.set)
-                    // {
-                    //     continue;
-                    // }
+                    if(not isCoreMaterial && 2 > sampledImage.set)
+                        continue;
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = sampledImage.binding;
@@ -141,14 +146,16 @@ namespace engine
                 }
 
                 Vector <SSampledImage> sampledImages = sharedMaterial->sampledImages();
-                std::sort(sampledImages.begin(), sampledImages.end(), [](SSampledImage const &aLHS
-                                                                         , SSampledImage const &aRHS) -> bool
+                auto const pred = [](SSampledImage const   &aLHS
+                                     , SSampledImage const &aRHS) -> bool
                     {
                         return (aLHS.binding < aRHS.binding);
-                    });
+                    };
+
+                std::sort(sampledImages.begin(), sampledImages.end(), pred);
 
                 Vector <asset::AssetId_t> sampledImageResources{};
-                for( auto const           &sampledImage : sampledImages )
+                for(auto const &sampledImage : sampledImages)
                 {
                     CMaterialConfig::SampledImageMap_t const &assignment = aInstance->config().getSampledImageAssignment();
                     if( assignment.end() == assignment.find(sampledImage.name))
@@ -164,7 +171,6 @@ namespace engine
 
                 SMaterialDescription materialDescriptor{};
                 materialDescriptor.name = aInstance->name();
-
                 {
                     auto const &[status, resourceState] =
                         aResourceManager->useResource<BasePipelineResourceState_t>(basePipelineDescriptor.name, basePipelineDescriptor);

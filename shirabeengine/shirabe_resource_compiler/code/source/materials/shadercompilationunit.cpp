@@ -1,5 +1,5 @@
 #include "materials/shadercompilationunit.h"
-#include <material/serialization.h>
+#include <asset/material/serialization.h>
 
 namespace materials
 {

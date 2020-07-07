@@ -203,7 +203,6 @@ namespace engine
             SHIRABE_INLINE uint32_t                               const  indexSampleCount()     const { return mIndexSampleCount;     }
             SHIRABE_INLINE std::filesystem::path                  const  binaryFilename()       const { return mBinaryFilename;       }
 
-
         private_methods:
             friend class CMeshLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
 
@@ -215,24 +214,6 @@ namespace engine
             uint32_t                               mIndexSampleCount;
             std::filesystem::path                  mBinaryFilename;
         };
-        //<-----------------------------------------------------------------------------
-
-        //<-----------------------------------------------------------------------------
-        //
-        //<-----------------------------------------------------------------------------
-        Shared<CMeshInstance> CMeshInstance::fromAsset(SMeshAsset const &aMeshAsset)
-        {
-            auto mesh = makeShared<CMeshInstance>();
-
-            mesh->mName                 = aMeshAsset.name;
-            mesh->mAttributes           = aMeshAsset.attributes;
-            mesh->mIndices              = aMeshAsset.indices;
-            mesh->mAttributeSampleCount = aMeshAsset.attributeSampleCount;
-            mesh->mIndexSampleCount     = aMeshAsset.indexSampleCount;
-            mesh->mBinaryFilename       = aMeshAsset.binaryFilename;
-
-            return mesh;
-        }
     }
 }
 

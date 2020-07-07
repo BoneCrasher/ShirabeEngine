@@ -55,6 +55,7 @@ namespace engine
                 , mLayoutInfo    ({})
                 , mStages        ({})
                 , mUniformBuffers({})
+                , mStorageBuffers({})
                 , mSampledImages ({})
                 , mSubpassInputs ({})
             {}
@@ -65,6 +66,7 @@ namespace engine
                 , mLayoutInfo     (aOther.mLayoutInfo)
                 , mStages         (aOther.mStages)
                 , mUniformBuffers (aOther.mUniformBuffers)
+                , mStorageBuffers (aOther.mStorageBuffers)
                 , mSampledImages  (aOther.mSampledImages)
                 , mSubpassInputs  (aOther.mSubpassInputs)
             {}
@@ -75,6 +77,7 @@ namespace engine
                 , mLayoutInfo    (aOther.mLayoutInfo)
                 , mStages        (std::move(aOther.mStages))
                 , mUniformBuffers(aOther.mUniformBuffers)
+                , mStorageBuffers(aOther.mStorageBuffers)
                 , mSampledImages (aOther.mSampledImages)
                 , mSubpassInputs (aOther.mSubpassInputs)
             {}
@@ -90,6 +93,7 @@ namespace engine
                 mLayoutInfo     = aOther.mLayoutInfo;
                 mStages         = aOther.mStages;
                 mUniformBuffers = aOther.mUniformBuffers;
+                mStorageBuffers = aOther.mStorageBuffers;
                 mSampledImages  = aOther.mSampledImages;
                 mSubpassInputs  = aOther.mSubpassInputs;
 
@@ -103,6 +107,7 @@ namespace engine
                 mLayoutInfo     = aOther.mLayoutInfo;
                 mStages         = std::move(aOther.mStages);
                 mUniformBuffers = aOther.mUniformBuffers;
+                mStorageBuffers = aOther.mStorageBuffers;
                 mSampledImages  = aOther.mSampledImages;
                 mSubpassInputs  = aOther.mSubpassInputs;
 
@@ -116,6 +121,7 @@ namespace engine
             SHIRABE_INLINE SMaterialLayoutInfo         const &layoutInfo()     const { return mLayoutInfo; }
             SHIRABE_INLINE StageMap_t                  const &stages()         const { return mStages; }
             SHIRABE_INLINE std::vector<SUniformBuffer> const &uniformBuffers() const { return mUniformBuffers; }
+            SHIRABE_INLINE std::vector<SUniformBuffer> const &storageBuffers() const { return mStorageBuffers; }
             SHIRABE_INLINE std::vector<SSampledImage>  const &sampledImages()  const { return mSampledImages; }
             SHIRABE_INLINE std::vector<SSubpassInput>  const &subpassInputs()  const { return mSubpassInputs; }
 
@@ -130,9 +136,12 @@ namespace engine
             // Although each stage defines uniform buffers individually, they are shared
             // across all stages, due to indexing them with set and binding.
             std::vector<SUniformBuffer> mUniformBuffers;
+            std::vector<SUniformBuffer> mStorageBuffers;
             std::vector<SSampledImage>  mSampledImages;
             // Fragment shader only
             std::vector<SSubpassInput>  mSubpassInputs;
+
+            Shared<memory::allocators::CPoolAllocator> mConfigPoolAllocator;
         };
 
         Shared<CSharedMaterial> CSharedMaterial::fromAsset(SMaterialAsset const &aAsset)
@@ -143,12 +152,12 @@ namespace engine
             instance->mLayoutInfo     = aAsset.layoutInfo;
             instance->mStages         = aAsset.stages;
             instance->mUniformBuffers = aAsset.uniformBuffers;
+            instance->mStorageBuffers = aAsset.storageBuffers;
             instance->mSampledImages  = aAsset.sampledImages;
             instance->mSubpassInputs  = aAsset.subpassInputs;
 
             return instance;
         }
-
 
         // Fwd-Declare for friending...
         class CMaterialConfig;

@@ -253,11 +253,11 @@ function build
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "                                                                        \n"
 
-                    export CC=gcc-8
-                    export CPP=cpp-8 
-                    export CXX=g++-8 
-                    export LD=g++-8
-                    export CFLAGS="-m${addressmode} -std=c++17"
+                    export CC=gcc-9
+                    export CPP=cpp-9 
+                    export CXX=g++-9
+                    export LD=g++-9
+                    export CFLAGS="-m${addressmode}"
                     export CXXFLAGS="-m${addressmode} -std=c++17"
                     export LDFLAGS=
                     export ASFLAGS=

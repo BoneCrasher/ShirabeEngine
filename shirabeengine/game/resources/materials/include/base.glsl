@@ -40,7 +40,7 @@ struct struct_modelMatrices_default
     mat4 inverseTransposeWorld;
 };
 
-#define SHIRABE_MAXNUM_SKIN_MATRICES 72
+layout (constant_id = 0) const int SHIRABE_MAXNUM_SKIN_MATRICES = 72;
 struct struct_modelMatrices_skin
 {
     mat4 skin[SHIRABE_MAXNUM_SKIN_MATRICES];
@@ -63,25 +63,43 @@ uniform struct_systemData
 //
 // Uniform Buffer to hold the camera matrices
 //
-layout (std140, set = 1, binding = 0)
-uniform struct_graphicsData
+layout (constant_id = 1) const int  SHIRABE_MAXNUM_CAMERAS = 64;
+layout (std140, set = 0, binding = 1)
+readonly buffer struct_graphicsData
 {
-    struct_cameraMatrices primaryCamera;
+    struct_cameraMatrices cameras[SHIRABE_MAXNUM_CAMERAS];
 } graphicsData;
 
 //
 // Set 1: Reserved for future use
 //
-layout (std140, set = 1, binding = 1)
-uniform Reserved
+layout (constant_id = 2) const int  SHIRABE_MAXNUM_OBJECT_TRANSFORMS = 2048;
+layout (std140, set = 0, binding = 2)
+readonly buffer ObjectTransformStorage
 {
-    float  _UNUSED;
-    vec2   _UNUSED2;
-    vec3   _UNUSED3;
-    vec4   _UNUSED4;
-    mat4   _UNUSED5;
+    mat4 storage[SHIRABE_MAXNUM_OBJECT_TRANSFORMS];
 }
-reserved;
+transforms;
+
+layout (constant_id = 3) const int  SHIRABE_MAXNUM_BINDPOSE_TRANSFORMS = 2048;
+layout (std140, set = 0, binding = 3)
+readonly buffer BindPoseTransformStorage
+{
+    mat4 storage[SHIRABE_MAXNUM_BINDPOSE_TRANSFORMS];
+}
+bindposes;
+
+layout (constant_id = 4) const int  SHIRABE_MAXNUM_ANIMATION_TRANSFORMS = 2048;
+layout (std140, set = 0, binding = 4)
+readonly buffer AnimationTransformStorage
+{
+    mat4 storage[SHIRABE_MAXNUM_ANIMATION_TRANSFORMS];
+}
+animations;
+
+layout (constant_id = 5) const int  SHIRABE_MAXNUM_TEXTURES = 256;
+layout (set = 0, binding = 5)
+uniform sampler2D textures[SHIRABE_MAXNUM_TEXTURES];
 
 vec3 unpack_normal(vec3 aInput)
 {

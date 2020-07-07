@@ -35,5 +35,5 @@ namespace resource_compiler
                 CLog::Error(logTag(), "Cant create directory '{}'. Error: {}", path.string(), fserr.what());
             }
         }
-    };
+    }
 }

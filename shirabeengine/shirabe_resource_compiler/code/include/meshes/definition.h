@@ -12,7 +12,7 @@
 
 namespace meshes
 {
-    SHIRABE_DECLARE_LOG_TAG(MeshProcessor);
+    SHIRABE_DECLARE_LOG_TAG(MeshProcessor)
 
 }
 

@@ -5,10 +5,9 @@
 #ifndef __SHIRABEDEVELOPMENT_CRESOURCEMANAGER_H__
 #define __SHIRABEDEVELOPMENT_CRESOURCEMANAGER_H__
 
-#include "renderer/resource_management/cresourcemanagerbase.h"
 #include "renderer/resource_management/resourcetypes.h"
-
 #include "renderer/vulkan_resources/resources/types/all.h"
+#include "renderer/resource_management/cresourcemanagerbase.h"
 
 namespace engine::resources
 {

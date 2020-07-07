@@ -950,7 +950,7 @@ namespace engine
 
                 SMaterialPipelineDescriptor descriptor;
                 descriptor.name                  = aPipeline.readableName;
-                descriptor.includesSystemBuffers = false; // This function will only create pipelines of non-core materials.
+                descriptor.includesSystemBuffers = true;
 
                 configureInputAssembly(descriptor);
                 configureRasterizer(descriptor);

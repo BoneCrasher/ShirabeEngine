@@ -30,7 +30,7 @@ void main()
 {
     vec4 position = vec4(vertex_position.xyz, 1.0);
 
-    mat4 view_transform     = (graphicsData.primaryCamera.view * modelMatrices.world);
+    mat4 view_transform     = (graphicsData.cameras[0].view * modelMatrices.world);
     mat3 view_transform_3x3 = mat3(view_transform);
 
     vec4 position_viewspace  = (view_transform * position);
@@ -38,7 +38,7 @@ void main()
     vec3 tangent_viewspace   = normalize(view_transform_3x3 * vertex_tangent.xyz);
     vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace) * vertex_tangent.w);
 
-    gl_Position   = (graphicsData.primaryCamera.projection * position_viewspace);
+    gl_Position   = (graphicsData.cameras[0].projection * position_viewspace);
     // gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     shader_output.vertex_position  = position_viewspace.xyz;

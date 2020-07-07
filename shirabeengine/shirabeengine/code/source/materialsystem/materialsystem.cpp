@@ -108,10 +108,10 @@ namespace engine
         std::string instanceName = fmt::format("{}_instance_{}", sharedMaterial->name(), ++sInstanceIndex);
 
         Shared<CMaterialInstance> instance = makeShared<CMaterialInstance>(instanceName, sharedMaterial);
-        if(aAutoCreateConfiguration)
-        {
+        // if(aAutoCreateConfiguration)
+        // {
             instance->createConfiguration(*sharedMaterial, aIncludeSystemBuffers);
-        }
+        // }
 
         mMaterialInstances.insert({instanceName, instance });
 

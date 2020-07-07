@@ -47,7 +47,8 @@ namespace engine
                     Shared<wsi::CWSIDisplay>            const &aDisplay,
                     SRendererConfiguration              const &aConfig);
 
-            EEngineStatus createDeferredPipeline(framegraph::SRenderGraphResourceContext &aResourceContext);
+            EEngineStatus createDeferredPipeline(resources::CResourceManager const         &acResourceManager
+                                                 , framegraph::SRenderGraphResourceContext &aResourceContext);
 
             /**
              * Deinitialize and clear the renderer.

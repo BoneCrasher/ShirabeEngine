@@ -8,12 +8,13 @@
 
 #include <spirv_cross/spirv_cross.hpp>
 #include <core/helpers.h>
-#include <material/declaration.h>
+#include <asset/material/asset.h>
 
 
 namespace materials
 {
     using namespace engine::material;
+    using namespace engine::asset;
 
     //<-----------------------------------------------------------------------------
     //
@@ -169,7 +170,7 @@ namespace materials
         }
 
         return {};
-    };
+    }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
@@ -380,6 +381,112 @@ namespace materials
             }
 
             //
+            // Read StorageBuffers
+            //
+            for (spirv_cross::Resource const &storageBuffer : resources.storage_buffers)
+            {
+                uint32_t const location = compiler.get_decoration(storageBuffer.id, spv::DecorationLocation);
+                uint32_t const set      = compiler.get_decoration(storageBuffer.id, spv::DecorationDescriptorSet);
+                uint32_t const binding  = compiler.get_decoration(storageBuffer.id, spv::DecorationBinding);
+
+                updateLayoutInfoFn(set, binding);
+
+                spirv_cross::SPIRType const &baseType   = compiler.get_type(storageBuffer.base_type_id);
+                spirv_cross::SPIRType const &type       = compiler.get_type(storageBuffer.type_id);
+                size_t                const  bufferSize = compiler.get_declared_struct_size(baseType);
+
+                // Shared<SMaterialType  const> baseTypeExtracted = reflectType(compiler, baseType);
+                // Shared<SMaterialType  const> typeExtracted     = reflectType(compiler, type);
+
+                // SMaterialType const baseTypeData = *baseTypeExtracted;
+                // SMaterialType const typeData     = *typeExtracted;
+
+                SUniformBuffer bufferExtracted{};
+                bufferExtracted.name             = storageBuffer.name;
+                bufferExtracted.set              = set;
+                bufferExtracted.binding          = binding;
+                bufferExtracted.array.layers     = type.array.empty() ? 1 : type.array[0];
+                bufferExtracted.array.stride     = compiler.get_declared_struct_size(baseType);
+                bufferExtracted.location.offset  = 0;
+                bufferExtracted.location.length  = bufferSize * bufferExtracted.array.layers;
+                bufferExtracted.location.padding = 0;
+                bufferExtracted.stageBinding.set(stageExtracted.stage);
+
+                CLog::Debug(logTag(),
+                            "\nStorageBuffer: "
+                            "\n  ID:              {}"
+                            "\n  Name:            {}"
+                            "\n  Set:             {}"
+                            "\n  Binding:         {}"
+                            "\n  Buf.-Size:       {}",
+                            storageBuffer.id,
+                            storageBuffer.name,
+                            set,
+                            binding,
+                            bufferSize);
+
+                std::function<BufferMemberMap_t(spirv_cross::Compiler const&, spirv_cross::SPIRType const &)> deriveBufferMembers = nullptr;
+                deriveBufferMembers = [&] (spirv_cross::Compiler const&aCompiler, spirv_cross::SPIRType const &aParent) -> BufferMemberMap_t
+                {
+                    BufferMemberMap_t map {};
+
+                    uint64_t memberCount = aParent.member_types.size();
+                    for(uint64_t k=0; k<memberCount; ++k)
+                    {
+                        spirv_cross::SPIRType const &memberType = aCompiler.get_type(aParent.member_types[k]);
+                        SHIRABE_UNUSED(memberType);
+
+                        // Fetch basic information
+                        std::string const &name   = aCompiler.get_member_name(aParent.self, k);
+                        uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
+                        uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
+                        // spirv_cross::SPIRType const  &memberBaseType = memberType.basetype;
+                        // Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
+
+                        Shared<SBufferMember> bufferMemberExtracted = makeShared<SBufferMember>();
+                        bufferMemberExtracted->name             = name;
+                        bufferMemberExtracted->location.offset  = offset;
+                        bufferMemberExtracted->location.length  = size;
+                        bufferMemberExtracted->location.padding = 0;
+                        bufferMemberExtracted->array.layers     = memberType.array.empty() ? 1 : memberType.array[0];
+                        bufferMemberExtracted->array.stride     = size / bufferMemberExtracted->array.layers;
+
+                        if(not memberType.member_types.empty())
+                        {
+                            bufferMemberExtracted->members = deriveBufferMembers(aCompiler, memberType);
+                        }
+
+                        map.insert({ name, std::move(bufferMemberExtracted) });
+
+                        CLog::Debug(logTag(),
+                                    "\n    StorageBuffer-Member : "
+                                    "\n      Name:            {}"
+                                    "\n      Offset:          {}"
+                                    "\n      Size:            {}",
+                                    name, offset, size);
+                    }
+
+                    return map;
+                };
+
+                bufferExtracted.members = deriveBufferMembers(compiler, type);
+
+                // separate_samplers
+                // separate_images
+
+                auto possiblyDuplicateBufferOrEmpty = checkForDuplicateBoundResource(aInOutAsset.storageBuffers, bufferExtracted);
+                if(possiblyDuplicateBufferOrEmpty.has_value())
+                {
+                    possiblyDuplicateBufferOrEmpty->get().stageBinding.set(bufferExtracted.stageBinding); // Append the additional stage binding.
+                    CLog::Warning(logTag(), "Storage buffer '{}' already added. Adjusting...", bufferExtracted.name);
+                }
+                else
+                {
+                    aInOutAsset.storageBuffers.push_back(bufferExtracted);
+                }
+            }
+
+            //
             // Read UBOs
             //
             for (spirv_cross::Resource const &uniformBuffer : resources.uniform_buffers)
@@ -412,61 +519,61 @@ namespace materials
                 uniformBufferExtracted.stageBinding.set(stageExtracted.stage);
 
                 CLog::Debug(logTag(),
-                            "\nUniformBuffer: "
-                            "\n  ID:              {}"
-                            "\n  Name:            {}"
-                            "\n  Set:             {}"
-                            "\n  Binding:         {}"
-                            "\n  Buf.-Size:       {}",
-                            uniformBuffer.id,
-                            uniformBuffer.name,
-                            set,
-                            binding,
-                            bufferSize);
+                    "\nUniformBuffer: "
+                    "\n  ID:              {}"
+                    "\n  Name:            {}"
+                    "\n  Set:             {}"
+                    "\n  Binding:         {}"
+                    "\n  Buf.-Size:       {}",
+                    uniformBuffer.id,
+                    uniformBuffer.name,
+                    set,
+                    binding,
+                    bufferSize);
 
                 std::function<BufferMemberMap_t(spirv_cross::Compiler const&, spirv_cross::SPIRType const &)> deriveUniformBufferMembers = nullptr;
                 deriveUniformBufferMembers = [&] (spirv_cross::Compiler const&aCompiler, spirv_cross::SPIRType const &aParent) -> BufferMemberMap_t
-                {
-                    BufferMemberMap_t map {};
-
-                    uint64_t memberCount = aParent.member_types.size();
-                    for(uint64_t k=0; k<memberCount; ++k)
                     {
-                        spirv_cross::SPIRType const &memberType = aCompiler.get_type(aParent.member_types[k]);
-                        SHIRABE_UNUSED(memberType);
+                        BufferMemberMap_t map {};
 
-                        // Fetch basic information
-                        std::string const &name   = aCompiler.get_member_name(aParent.self, k);
-                        uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
-                        uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
-                        // spirv_cross::SPIRType const  &memberBaseType = memberType.basetype;
-                        // Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
-
-                        Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
-                        uniformBufferMemberExtracted->name             = name;
-                        uniformBufferMemberExtracted->location.offset  = offset;
-                        uniformBufferMemberExtracted->location.length  = size;
-                        uniformBufferMemberExtracted->location.padding = 0;
-                        uniformBufferMemberExtracted->array.layers     = memberType.array.empty() ? 1 : memberType.array[0];
-                        uniformBufferMemberExtracted->array.stride     = size / uniformBufferMemberExtracted->array.layers;
-
-                        if(not memberType.member_types.empty())
+                        uint64_t memberCount = aParent.member_types.size();
+                        for(uint64_t k=0; k<memberCount; ++k)
                         {
-                            uniformBufferMemberExtracted->members = deriveUniformBufferMembers(aCompiler, memberType);
+                            spirv_cross::SPIRType const &memberType = aCompiler.get_type(aParent.member_types[k]);
+                            SHIRABE_UNUSED(memberType);
+
+                            // Fetch basic information
+                            std::string const &name   = aCompiler.get_member_name(aParent.self, k);
+                            uint64_t    const  offset = aCompiler.type_struct_member_offset(aParent, k);
+                            uint64_t    const  size   = aCompiler.get_declared_struct_member_size(aParent, k);
+                            // spirv_cross::SPIRType const  &memberBaseType = memberType.basetype;
+                            // Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
+
+                            Shared<SBufferMember> uniformBufferMemberExtracted = makeShared<SBufferMember>();
+                            uniformBufferMemberExtracted->name             = name;
+                            uniformBufferMemberExtracted->location.offset  = offset;
+                            uniformBufferMemberExtracted->location.length  = size;
+                            uniformBufferMemberExtracted->location.padding = 0;
+                            uniformBufferMemberExtracted->array.layers     = memberType.array.empty() ? 1 : memberType.array[0];
+                            uniformBufferMemberExtracted->array.stride     = size / uniformBufferMemberExtracted->array.layers;
+
+                            if(not memberType.member_types.empty())
+                            {
+                                uniformBufferMemberExtracted->members = deriveUniformBufferMembers(aCompiler, memberType);
+                            }
+
+                            map.insert({ name, std::move(uniformBufferMemberExtracted) });
+
+                            CLog::Debug(logTag(),
+                                "\n    UniformBuffer-Member : "
+                                "\n      Name:            {}"
+                                "\n      Offset:          {}"
+                                "\n      Size:            {}",
+                                name, offset, size);
                         }
 
-                        map.insert({ name, std::move(uniformBufferMemberExtracted) });
-
-                        CLog::Debug(logTag(),
-                                    "\n    UniformBuffer-Member : "
-                                    "\n      Name:            {}"
-                                    "\n      Offset:          {}"
-                                    "\n      Size:            {}",
-                                    name, offset, size);
-                    }
-
-                    return map;
-                };
+                        return map;
+                    };
 
                 uniformBufferExtracted.members = deriveUniformBufferMembers(compiler, type);
 

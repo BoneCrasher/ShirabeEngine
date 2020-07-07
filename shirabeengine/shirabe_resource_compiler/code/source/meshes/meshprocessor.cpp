@@ -8,7 +8,7 @@
 #include <core/enginetypehelper.h>
 #include <util/documents/json.h>
 #include <util/crc32.h>
-#include <mesh/declaration.h>
+#include <asset/mesh/declaration.h>
 
 #include "common/functions.h"
 
@@ -215,15 +215,15 @@ namespace meshes
                 {
                     auto const &[accessor, bufferView, buffer, data, stride, totalSize] = __getData(document, accessorIndex);
 
-                    if("POSITION"   == attributeName) { append(positions,     accessor, data, stride); positionBufferInfo = { .count = accessor.count, .stride = stride, .byteSize = totalSize}; }
-                    if("NORMAL"     == attributeName) { append(normals,       accessor, data, stride); normalBufferInfo   = { .count = accessor.count, .stride = stride, .byteSize = totalSize}; }
-                    if("TANGENT"    == attributeName) { append(tangents,      accessor, data, stride); tangentBufferInfo  = { .count = accessor.count, .stride = stride, .byteSize = totalSize}; }
-                    if("TEXCOORD_0" == attributeName) { append(uvcoordinates, accessor, data, stride); texcoordBufferInfo = { .count = accessor.count, .stride = stride, .byteSize = totalSize}; }
+                    if("POSITION"   == attributeName) { append(positions,     accessor, data, stride); positionBufferInfo = { /* .count = */ accessor.count, /* .stride = */ stride, /* .byteSize = */ totalSize}; }
+                    if("NORMAL"     == attributeName) { append(normals,       accessor, data, stride); normalBufferInfo   = { /* .count = */ accessor.count, /* .stride = */ stride, /* .byteSize = */ totalSize}; }
+                    if("TANGENT"    == attributeName) { append(tangents,      accessor, data, stride); tangentBufferInfo  = { /* .count = */ accessor.count, /* .stride = */ stride, /* .byteSize = */ totalSize}; }
+                    if("TEXCOORD_0" == attributeName) { append(uvcoordinates, accessor, data, stride); texcoordBufferInfo = { /* .count = */ accessor.count, /* .stride = */ stride, /* .byteSize = */ totalSize}; }
                 }
 
                 auto const &[accessor, bufferView, buffer, data, stride, totalSize] = __getData(document, primitive.indices);
                 append(indices, accessor, data, stride);
-                indexBufferInfo = { .count = accessor.count, .stride = stride, .byteSize = totalSize};
+                indexBufferInfo = { /* .count = */ accessor.count, /* .stride = */ stride, /* .byteSize = */ totalSize};
             }
         }
 
@@ -257,10 +257,10 @@ namespace meshes
         writeBufferToString(tangents,      4, "Tangents",  ss);
         writeBufferToString(uvcoordinates, 2, "Texcoords", ss);
         writeBufferToString(indices,       2, "Indices",   ss);
-        engine::writeFile(std::filesystem::path(outputAttributeBufferPathAbs).concat(".cleartext"), ss.str());
+        SHIRABE_EXPLICIT_DISCARD(engine::writeFile(std::filesystem::path(outputAttributeBufferPathAbs).concat(".cleartext"), ss.str()));
         #endif
 
-        engine::writeFile(outputAttributeBufferPathAbs, attributeBuffer);
+        SHIRABE_EXPLICIT_DISCARD(engine::writeFile(outputAttributeBufferPathAbs, attributeBuffer));
 
         engine::mesh::SMeshAsset asset {};
         asset.uid                  = 1234;
@@ -321,7 +321,7 @@ namespace meshes
             return EResult::SerializationFailed;
         }
 
-        engine::writeFile(outputMetaFilePathAbs, serializedData);
+        SHIRABE_EXPLICIT_DISCARD(engine::writeFile(outputMetaFilePathAbs, serializedData));
 
         return EResult::Success;
     }

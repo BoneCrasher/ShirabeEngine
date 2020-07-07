@@ -16,7 +16,7 @@ static constexpr bool const OPTIMIZATION_ENABLED = false;
 
 namespace resource_compiler
 {
-    SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler);
+    SHIRABE_DECLARE_LOG_TAG(ShirabeEngineShaderPrecompiler)
 
     using namespace engine;
 

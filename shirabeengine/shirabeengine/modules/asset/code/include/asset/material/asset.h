@@ -316,6 +316,7 @@ namespace engine
                     , layoutInfo           ({})
                     , stages               (sEmptyMetaMap)
                     , uniformBuffers       ({})
+                    , storageBuffers       ({})
                     , sampledImages        ({})
                     , subpassInputs        ({})
             {}
@@ -331,6 +332,7 @@ namespace engine
                     , layoutInfo           (aOther.layoutInfo)
                     , stages               (aOther.stages               )
                     , uniformBuffers       (aOther.uniformBuffers)
+                    , storageBuffers       (aOther.storageBuffers)
                     , sampledImages        (aOther.sampledImages)
                     , subpassInputs        (aOther.subpassInputs)
             {}
@@ -346,6 +348,7 @@ namespace engine
                     , layoutInfo           (aOther.layoutInfo)
                     , stages               (std::move(aOther.stages    ))
                     , uniformBuffers       (aOther.uniformBuffers)
+                    , storageBuffers       (aOther.storageBuffers)
                     , sampledImages        (aOther.sampledImages)
                     , subpassInputs        (aOther.subpassInputs)
             {}
@@ -361,6 +364,7 @@ namespace engine
                 layoutInfo            = aOther.layoutInfo;
                 stages                = aOther.stages;
                 uniformBuffers        = aOther.uniformBuffers;
+                storageBuffers        = aOther.storageBuffers;
                 sampledImages         = aOther.sampledImages;
                 subpassInputs         = aOther.subpassInputs;
 
@@ -377,6 +381,7 @@ namespace engine
                 layoutInfo            = aOther.layoutInfo;
                 stages                = std::move(aOther.stages);
                 uniformBuffers        = aOther.uniformBuffers;
+                storageBuffers        = aOther.storageBuffers;
                 sampledImages         = aOther.sampledImages;
                 subpassInputs         = aOther.subpassInputs;
 
@@ -394,6 +399,7 @@ namespace engine
             // Although each stage defines uniform buffers individually, they are shared
             // across all stages, due to indexing them with set and binding.
             std::vector<SUniformBuffer> uniformBuffers;
+            std::vector<SUniformBuffer> storageBuffers;
             std::vector<SSampledImage>  sampledImages;
             // Fragment shader only
             std::vector<SSubpassInput>  subpassInputs;

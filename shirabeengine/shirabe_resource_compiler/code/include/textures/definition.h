@@ -12,7 +12,7 @@
 
 namespace texture
 {
-    SHIRABE_DECLARE_LOG_TAG(TextureProcessor);
+    SHIRABE_DECLARE_LOG_TAG(TextureProcessor)
 
 }
 

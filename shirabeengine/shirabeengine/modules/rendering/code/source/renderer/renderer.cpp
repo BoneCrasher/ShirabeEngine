@@ -1,4 +1,4 @@
-﻿#include <renderer/rendergraph/rendergraphdata.h>
+﻿#include "renderer/rendergraph/rendergraphdata.h"
 #include "renderer/rendergraph/graphbuilder.h"
 #include "renderer/rendergraph/passbuilder.h"
 #include "renderer/rendergraph/modules/gbuffergeneration.h"
@@ -54,7 +54,8 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::createDeferredPipeline(framegraph::SRenderGraphResourceContext &aResourceContext)
+        EEngineStatus CRenderer::createDeferredPipeline(resources::CResourceManager const         &aResourceManager
+                                                        , framegraph::SRenderGraphResourceContext &aResourceContext)
         {
             using namespace engine;
             using namespace engine::framegraph;
@@ -65,7 +66,7 @@ namespace engine
                     width  = displayDesc.bounds.size.x(),
                     height = displayDesc.bounds.size.y();
 
-            CGraphBuilder graphBuilder{ };
+            CGraphBuilder graphBuilder(aResourceManager);
             graphBuilder.setGraphMode(CGraph::EGraphMode::Graphics);
             graphBuilder.setRenderToBackBuffer(true);
 

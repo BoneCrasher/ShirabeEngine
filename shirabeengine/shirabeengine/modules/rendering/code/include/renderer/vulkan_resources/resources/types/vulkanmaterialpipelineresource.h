@@ -11,12 +11,12 @@
 #include "renderer/resource_management/resourcetypes.h"
 #include "renderer/resource_management/extensibility.h"
 #include "renderer/vulkan_resources/resources/ivkglobalcontext.h"
+#include "renderer/vulkan_core/vulkandevicecapabilities.h"
+
 #include "renderer/vulkan_resources/resources/types/vulkantextureviewresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanbufferresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanrenderpassresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanshadermoduleresource.h"
-#include "renderer/vulkan_core/vulkandevicecapabilities.h"
-#include "vulkanmaterialresource.h"
 
 namespace engine
 {
