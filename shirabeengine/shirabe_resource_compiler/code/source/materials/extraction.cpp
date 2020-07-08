@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include <spirv_cross/spirv_cross.hpp>
+#include <source/spirv_reflect.h>
 #include <core/helpers.h>
 #include <asset/material/asset.h>
 
@@ -170,8 +171,7 @@ namespace materials
         }
 
         return {};
-    }
-    //<-----------------------------------------------------------------------------
+    }//<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //<
@@ -443,13 +443,29 @@ namespace materials
                         // spirv_cross::SPIRType const  &memberBaseType = memberType.basetype;
                         // Shared<SMaterialType  const>  localTypeExtracted = reflectType(compiler, type);
 
+                        uint64_t arrayLayers = 1;
+                        uint64_t arrayStride = 1;
+                        if(not memberType.array.empty())
+                        {
+                            if(memberType.array_size_literal[0])
+                            {
+                                arrayLayers = memberType.array[0];
+                            }
+                            else
+                            {
+                                spirv_cross::SPIRConstant const &constant = compiler.get_constant(memberType.array[0]);
+                                arrayLayers = constant.scalar_u64();
+                            }
+                        }
+                        arrayStride = (size / arrayLayers);
+
                         Shared<SBufferMember> bufferMemberExtracted = makeShared<SBufferMember>();
                         bufferMemberExtracted->name             = name;
                         bufferMemberExtracted->location.offset  = offset;
                         bufferMemberExtracted->location.length  = size;
                         bufferMemberExtracted->location.padding = 0;
-                        bufferMemberExtracted->array.layers     = memberType.array.empty() ? 1 : memberType.array[0];
-                        bufferMemberExtracted->array.stride     = size / bufferMemberExtracted->array.layers;
+                        bufferMemberExtracted->array.layers     = arrayLayers;
+                        bufferMemberExtracted->array.stride     = arrayStride;
 
                         if(not memberType.member_types.empty())
                         {

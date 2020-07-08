@@ -23,6 +23,7 @@ REPOSITORIES[spirv_tools_headers]="git@github.com:KhronosGroup/SPIRV-Headers.git
 REPOSITORIES[spirv_tools_effcee]="git@github.com:google/effcee.git"
 REPOSITORIES[spirv_tools_re2]="git@github.com:google/re2.git"
 REPOSITORIES[spirv_tools_gtest]="git@github.com:google/googletest.git"
+REPOSITORIES[spirv_reflect]="git@github.com:chaoticbob/SPIRV-Reflect.git"
 REPOSITORIES[cryptopp]="git@github.com:weidai11/cryptopp.git"
 REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
 REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
@@ -47,6 +48,7 @@ TARGET_DIRECTORIES[spirv_tools_headers]="${SOURCES_DIR}/spirv_tools/external/spi
 TARGET_DIRECTORIES[spirv_tools_effcee]="${SOURCES_DIR}/spirv_tools/external/effcee"
 TARGET_DIRECTORIES[spirv_tools_re2]="${SOURCES_DIR}/spirv_tools/external/re2"
 TARGET_DIRECTORIES[spirv_tools_gtest]="${SOURCES_DIR}/spirv_tools/external/googletest"
+TARGET_DIRECTORIES[spirv_reflect]="${SOURCES_DIR}/spirv_reflect"
 TARGET_DIRECTORIES[cryptopp]="${SOURCES_DIR}/cryptopp"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
 TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
@@ -142,6 +144,11 @@ function setup_spirv_cross
     setup_one spirv_cross
 }
 
+function setup_spirv_reflect
+{
+    setup_one spirv_reflect
+}
+
 function setup_glslang
 {
     setup_one glslang
@@ -212,6 +219,7 @@ clean_env
 setup_base
 setup_spirv_tools
 setup_spirv_cross
+setup_spirv_reflect
 setup_glslang
 setup_tools
 setup_vulkan

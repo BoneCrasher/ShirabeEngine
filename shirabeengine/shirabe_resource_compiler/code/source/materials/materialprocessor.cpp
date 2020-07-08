@@ -1,3 +1,5 @@
+#include <source/spirv_reflect.h>
+
 #include "materials/materialprocessor.h"
 #include "materials/definition.h"
 #include "materials/extraction.h"
@@ -268,6 +270,43 @@ namespace materials
     }
 
     /**
+     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
+     *
+     * @param aInputFilenames Source data information for the glslangValidator command.
+     * @return                EResult::Success      if successful.
+     * @return                EResult::InputInvalid on error.
+     */
+    static CResult<EResult> runSpirVDisassembler(SShaderCompilationUnit &aUnit)
+    {
+        std::string const application = CString::format("{}/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path().string());
+        std::string const options     = "";
+
+        std::underlying_type_t<EResult> result = 0;
+
+        auto const disassemble = [&] (std::filesystem::path const &aFilename) -> void
+            {
+                std::filesystem::path const inputFile  = aFilename;
+                std::filesystem::path const outputFile = fmt::format("{}{}", inputFile.string(), ".dis");
+
+                std::string                const command       = CString::format("{} {} -o {} {}", application, options, outputFile.string(), inputFile.string());
+                CEngineResult<std::string> const commandResult = executeCmd(command);
+                if(not commandResult.successful())
+                {
+                    CLog::Error(logTag(), commandResult.data());
+                    result |= EnumValueOf(EResult::InputInvalid);
+                }
+                else
+                {
+                    CLog::Debug(logTag(), commandResult.data());
+                    result |= EnumValueOf(EResult::Success);
+                }
+            };
+        std::for_each(aUnit.outputFiles.begin(), aUnit.outputFiles.end(), disassemble);
+
+        return static_cast<EResult>(result);
+    }
+
+    /**
      * Format a valid glslangValidator command line and invoke the command to create a .spv module reading its stdout/stderr output.
      *
      * @param aUnit Source data information for the glslangValidator command.
@@ -277,7 +316,7 @@ namespace materials
     static CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("{}/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
-        std::string       options     = "-v -d -g -Od -V -H --target-env vulkan1.1";
+        std::string       options     = "-v -d -g -Od -H --target-env vulkan1.1";
 
         auto const appendIncludes = [&options] (std::string const &aInclude) -> void
         {
@@ -339,42 +378,6 @@ namespace materials
         return static_cast<EResult>(result);
     }
 
-    /**
-     * Format a valid spirv-dis command line and invoke the command to create a disassembled spirv module reading its stdout/stderr output.
-     *
-     * @param aInputFilenames Source data information for the glslangValidator command.
-     * @return                EResult::Success      if successful.
-     * @return                EResult::InputInvalid on error.
-     */
-    static CResult<EResult> runSpirVDisassembler(std::vector<std::string> const &aInputFilenames)
-    {
-        std::string const application = CString::format("{}/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path().string());
-        std::string const options     = "";
-
-        std::underlying_type_t<EResult> result = 0;
-
-        auto const disassemble = [&] (std::string const &aFilename) -> void
-        {
-            std::string const inputFile  = aFilename;
-            std::string const outputFile = aFilename + ".dis";
-
-            std::string                const command       = CString::format("{} {} -o {} {}", application, options, outputFile, inputFile);
-            CEngineResult<std::string> const commandResult = executeCmd(command);
-            if(not commandResult.successful())
-            {
-                CLog::Error(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::InputInvalid);
-            }
-            else
-            {
-                CLog::Debug(logTag(), commandResult.data());
-                result |= EnumValueOf(EResult::Success);
-            }
-        };
-        std::for_each(aInputFilenames.begin(), aInputFilenames.end(), disassemble);
-
-        return static_cast<EResult>(result);
-    }
 
     /**
      * Accept a SMaterial instance and serialize it to a JSON string.
@@ -522,6 +525,8 @@ namespace materials
             CLog::Error(logTag(), "Failed to run glslang.");
             return glslangResult;
         }
+
+        runSpirVDisassembler(unit);
 
         CResult<bool> const extractionResult = spirvCrossExtract(unit, assetData);
         if(not extractionResult.successful())

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
-include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
+include(project_default_template)
 
 set(SHIRABE_EXCLUDED_SOURCES 
         serialization/jsonobjectserializer.cpp

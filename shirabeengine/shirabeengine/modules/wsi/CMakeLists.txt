@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
-include(project_default_template)
 
 set(SHIRABE_TEMPLATE "StaticLib")
+include(project_default_template)
 
 if(MSVC)
 elseif(UNIX AND NOT APPLE)

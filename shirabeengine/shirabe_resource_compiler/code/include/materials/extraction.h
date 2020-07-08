@@ -32,6 +32,11 @@ namespace materials
      * @return
      */
     CResult<bool> spirvCrossExtract(SShaderCompilationUnit const &aUnit, SMaterialAsset &aInOutAsset);
+
+    /**
+     *
+     */
+    CResult<bool> spirvReflectExtract(materials::SShaderCompilationUnit const &aUnit, SMaterialAsset &aInOutAsset);
 }
 
 #endif // _SHIRABE_SHADERPRECOMP_EXTRACTION_H_

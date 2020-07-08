@@ -17,9 +17,9 @@ add_subdirectory(modules/asset)
 add_subdirectory(modules/rendering)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
-include(project_default_template)
 
 set(SHIRABE_TEMPLATE "SharedLib")
+include(project_default_template)
 
 set(
 	SHIRABE_EXCLUDED_SOURCES 

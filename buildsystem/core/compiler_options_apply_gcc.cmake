@@ -98,7 +98,7 @@ endif()
 # Convert SHIRABE_CC__TREAT_WARNINGS_AS_ERRORS
 #
 if(SHIRABE_CC__TREAT_WARNINGS_AS_ERRORS)
-    append(SHIRABE_GCC_CL_COMMON_FLAGS "-Werror")
+    # append(SHIRABE_GCC_CL_COMMON_FLAGS "-Werror")
 endif()
 	
 #

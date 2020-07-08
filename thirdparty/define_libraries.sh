@@ -18,6 +18,7 @@ LIBRARIES=(                             \
            spirv_tools_effcee           \
            spirv_tools_re2              \
            spirv_tools_gtest            \
+           spirv_reflect                \
            cryptopp                     \
            vulkan_headers               \
            vulkan_sdk                   \
