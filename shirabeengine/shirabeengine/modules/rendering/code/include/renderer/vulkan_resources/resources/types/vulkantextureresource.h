@@ -88,7 +88,8 @@ namespace engine
                                           , VkImageLayout                     const &aSourceLayout
                                           , VkImageLayout                     const &aTargetLayout) -> EEngineStatus;
 
-        //<-----------------------------------------------------------------------------
+        //<--------
+        // ---------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
         using TextureResourceState_t  = SResourceState<STexture>;

@@ -7,6 +7,7 @@
 
 #include <math/matrix.h>
 #include <math/vector.h>
+#include <core/enginetypehelper.h>
 #include <core/memory/memorymanager.h>
 #include <core/enginestatus.h>
 #include <asset/assettypes.h>

@@ -6,10 +6,11 @@
 #define __SHIRABEDEVELOPMENT_MATERIAL_ADAPTER_H__
 
 #include <asset/assetstorage.h>
-#include <materialsystem/declaration.h>
 #include <asset/material/serialization.h>
-#include "renderer/resource_management/cresourcemanager.h"
-#include "renderer/resource_management/resourcedescriptions.h"
+
+#include <renderer/resource_management/cresourcemanager.h>
+#include <renderer/resource_management/resourcedescriptions.h>
+#include "materialsystem/declaration.h"
 
 namespace engine
 {

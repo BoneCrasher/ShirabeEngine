@@ -28,6 +28,18 @@ namespace engine
         //<-----------------------------------------------------------------------------
         struct
             [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SMemory
+            : public CResourceObject<SMemoryDescription>
+        {
+            using CResourceObject<SMemoryDescription>::CResourceObject;
+        };
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        struct
+            [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBuffer
             : public CResourceObject<SBufferDescription>
         {

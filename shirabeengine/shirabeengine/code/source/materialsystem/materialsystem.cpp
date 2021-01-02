@@ -78,7 +78,6 @@ namespace engine
         //--------------------------------------------------------------------------------------------------------------------
         // Fetch sharedMaterial data
         //--------------------------------------------------------------------------------------------------------------------
-
         Shared<CSharedMaterial> sharedMaterial = nullptr;
 
         if(mSharedMaterials.end() != mSharedMaterials.find(aMaterialInstanceAssetId))

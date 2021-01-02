@@ -8,14 +8,13 @@ namespace engine::vulkan
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<SVulkanBufferCreationResult> __createVkBuffer(  VkPhysicalDevice      const &aPhysicalDevice
-                                                                , VkDevice              const &aLogicalDevice
-                                                                , VkDeviceSize          const &aBufferSize
-                                                                , VkBufferUsageFlags    const &aBufferUsage
-                                                                , VkMemoryPropertyFlags const &aBufferMemoryProperties)
+    CEngineResult<std::tuple<VkBuffer, VkMemoryRequirements>>
+        __createVkBuffer(  VkPhysicalDevice   const &aPhysicalDevice
+                         , VkDevice           const &aLogicalDevice
+                         , VkDeviceSize       const &aBufferSize
+                         , VkBufferUsageFlags const &aBufferUsage)
     {
-        VkBuffer       vkBuffer       = VK_NULL_HANDLE;
-        VkDeviceMemory vkBufferMemory = VK_NULL_HANDLE;
+        VkBuffer vkBuffer = VK_NULL_HANDLE;
 
         VkBufferCreateInfo vkBufferCreateInfo = {};
         vkBufferCreateInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -33,21 +32,7 @@ namespace engine::vulkan
         VkMemoryRequirements vkBufferMemoryRequirements {};
         vkGetBufferMemoryRequirements(aLogicalDevice, vkBuffer, &vkBufferMemoryRequirements);
 
-        VkMemoryAllocateInfo vkMemoryAllocationInfo = {};
-        vkMemoryAllocationInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        vkMemoryAllocationInfo.pNext           = nullptr;
-        vkMemoryAllocationInfo.allocationSize  = vkBufferMemoryRequirements.size;
-        vkMemoryAllocationInfo.memoryTypeIndex = CVulkanDeviceCapsHelper::determineMemoryType(aPhysicalDevice, vkBufferMemoryRequirements.memoryTypeBits, aBufferMemoryProperties).data();
-
-        result = vkAllocateMemory(aLogicalDevice, &vkMemoryAllocationInfo, nullptr, &vkBufferMemory);
-        if(VkResult::VK_SUCCESS != result)
-        {
-            vkDestroyBuffer(aLogicalDevice, vkBuffer, nullptr);
-            return EEngineStatus::Error;
-        }
-
-        vkBindBufferMemory(aLogicalDevice, vkBuffer, vkBufferMemory, 0);
-        return { EEngineStatus::Ok, SVulkanBufferCreationResult {vkBuffer, vkBufferMemory}};
+        return { EEngineStatus::Ok, {vkBuffer, vkBufferMemoryRequirements}};
     }
     //<-----------------------------------------------------------------------------
 }

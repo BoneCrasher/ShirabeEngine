@@ -313,7 +313,10 @@ namespace materials
      * @return      EResult::Success           if successful.
      * @return      EResult::CompilationFailed on error.
      */
-    static CResult<EResult> runGlslang(SConfiguration const &aConfiguration, SShaderCompilationUnit &aUnit, bool const aCompileStagesIndividually = false)
+    static CResult<EResult> runGlslang(SConfiguration const   &aConfiguration
+                                     , SShaderCompilationUnit &aUnit
+                                     , std::string const      &aAdditionalIncludePath
+                                     , bool const              aCompileStagesIndividually = false)
     {
         std::string const application = CString::format("{}/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
         std::string       options     = "-v -d -g -Od -H --target-env vulkan1.1";
@@ -328,7 +331,7 @@ namespace materials
 
         auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
         {
-            std::string                const command       = CString::format("{} {} -o {} {}", application, options, aOutputFilename, aInputFilenames);
+            std::string                const command       = CString::format("{} {} {} -o {} {}", application, options, aAdditionalIncludePath, aOutputFilename, aInputFilenames);
             CEngineResult<std::string> const commandResult = executeCmd(command);
 
             bool const compilationError = (std::string::npos != commandResult.data().find("compilation error")
@@ -519,7 +522,9 @@ namespace materials
             return EResult::InputInvalid;
         }
 
-        CResult<EResult> const glslangResult = runGlslang(aConfig, unit, true);
+        std::string const additionalIncludePath = aMaterialFile.parent_path().string();
+
+        CResult<EResult> const glslangResult = runGlslang(aConfig, unit, additionalIncludePath, true);
         if(not glslangResult.successful())
         {
             CLog::Error(logTag(), "Failed to run glslang.");

@@ -205,88 +205,27 @@ namespace engine
                 aSerializer.endArray(); // subpassInputs
 
                 //
-                // Serialize uniform buffers
+                // Serialize buffers
                 //
-                aSerializer.beginArray("uniformBuffers");
-                auto const iterateUniformBuffers = [&] (SUniformBuffer const &aBuffer) -> void
-                {
-                    aSerializer.beginObject(aBuffer.name);
-                    {
-                        aSerializer.writeValue("name",        aBuffer.name);
-                        aSerializer.writeValue("offset",      aBuffer.location.offset);
-                        aSerializer.writeValue("size",        aBuffer.location.length);
-                        aSerializer.writeValue("padding",     aBuffer.location.padding);
-                        aSerializer.writeValue("set",         aBuffer.set);
-                        aSerializer.writeValue("binding",     aBuffer.binding);
-
-                        aSerializer.beginObject("array");
-                        aSerializer.writeValue("layers", aBuffer.array.layers);
-                        aSerializer.writeValue("stride", aBuffer.array.stride);
-                        aSerializer.endObject();
-
-                        std::function<void(BufferMemberMap_t const &)> iterateUniformBufferMembers = nullptr;
-                        iterateUniformBufferMembers = [&] (BufferMemberMap_t const &aMembers) -> void
-                        {
-                            aSerializer.beginArray("members");
-                            auto const iterate = [&] (BufferMemberMap_t::value_type const &aMember)
-                            {
-                                std::string                 const  aKey   = aMember.first;
-                                Shared<SBufferMember const> const &aValue = aMember.second;
-
-                                aSerializer.beginObject(aKey);
-                                aSerializer.writeValue("name",    aKey);
-                                aSerializer.writeValue("offset",  aValue->location.offset);
-                                aSerializer.writeValue("size",    aValue->location.length);
-                                aSerializer.writeValue("padding", aValue->location.padding);
-
-                                aSerializer.beginObject("array");
-                                aSerializer.writeValue("layers", aValue->array.layers);
-                                aSerializer.writeValue("stride", aValue->array.stride);
-                                aSerializer.endObject();
-
-                                if(not aValue->members.empty())
-                                {
-                                    iterateUniformBufferMembers(aValue->members);
-                                }
-
-                                aSerializer.endObject(); // aKey
-                            };
-                            std::for_each(aMembers.begin(), aMembers.end(), iterate);
-                            aSerializer.endArray(); // members
-                        };
-
-                        //if(not aBuffer.members.empty())
-                        //{
-                        iterateUniformBufferMembers(aBuffer.members);
-                        //}
-                    }
-                    aSerializer.endObject(); // aBuffer.Name
-                };
-                std::for_each(this->uniformBuffers.begin(), this->uniformBuffers.end(), iterateUniformBuffers);
-                aSerializer.endArray(); // uniformBuffers
-
-                //
-                // Serialize storage buffers
-                //
-                aSerializer.beginArray("storageBuffers");
-                auto const iterateStorageBuffers = [&] (SUniformBuffer const &aBuffer) -> void
+                auto const iterateBuffers = [&](SUniformBuffer const &aBuffer) -> void
                     {
                         aSerializer.beginObject(aBuffer.name);
                         {
-                            aSerializer.writeValue("name",        aBuffer.name);
-                            aSerializer.writeValue("offset",      aBuffer.location.offset);
-                            aSerializer.writeValue("size",        aBuffer.location.length);
-                            aSerializer.writeValue("padding",     aBuffer.location.padding);
-                            aSerializer.writeValue("set",         aBuffer.set);
-                            aSerializer.writeValue("binding",     aBuffer.binding);
+                            aSerializer.writeValue("name",         aBuffer.name);
+                            aSerializer.writeValue("offset",       aBuffer.location.offset);
+                            aSerializer.writeValue("size",         aBuffer.location.length);
+                            aSerializer.writeValue("padding",      aBuffer.location.padding);
+                            aSerializer.writeValue("set",          aBuffer.set);
+                            aSerializer.writeValue("binding",      aBuffer.binding);
+                            aSerializer.writeValue("sharing_mode", sharingModeToString(aBuffer.sharingMode));
 
                             aSerializer.beginObject("array");
                             aSerializer.writeValue("layers", aBuffer.array.layers);
                             aSerializer.writeValue("stride", aBuffer.array.stride);
                             aSerializer.endObject();
 
-                            std::function<void(BufferMemberMap_t const &)> iterateStorageBufferMembers = nullptr;
-                            iterateStorageBufferMembers = [&] (BufferMemberMap_t const &aMembers) -> void
+                            std::function<void(BufferMemberMap_t const &)> iterateBufferMembers = nullptr;
+                            iterateBufferMembers = [&](BufferMemberMap_t const &aMembers) -> void
                                 {
                                     aSerializer.beginArray("members");
                                     auto const iterate = [&] (BufferMemberMap_t::value_type const &aMember)
@@ -307,7 +246,7 @@ namespace engine
 
                                             if(not aValue->members.empty())
                                             {
-                                                iterateStorageBufferMembers(aValue->members);
+                                                iterateBufferMembers(aValue->members);
                                             }
 
                                             aSerializer.endObject(); // aKey
@@ -318,13 +257,32 @@ namespace engine
 
                             //if(not aBuffer.members.empty())
                             //{
-                            iterateStorageBufferMembers(aBuffer.members);
+                            iterateBufferMembers(aBuffer.members);
                             //}
                         }
                         aSerializer.endObject(); // aBuffer.Name
                     };
-                std::for_each(this->storageBuffers.begin(), this->storageBuffers.end(), iterateStorageBuffers);
+
+                //
+                // Serialize uniform buffers
+                //
+                aSerializer.beginArray("uniformBuffers");
+                std::for_each(this->uniformBuffers.begin(), this->uniformBuffers.end(), iterateBuffers);
+                aSerializer.endArray(); // uniformBuffers
+
+                //
+                // Serialize storage buffers
+                //
+                aSerializer.beginArray("storageBuffers");
+                std::for_each(this->storageBuffers.begin(), this->storageBuffers.end(), iterateBuffers);
                 aSerializer.endArray(); // storageBuffers
+
+                //
+                // Serialize storage buffers
+                //
+                aSerializer.beginArray("pushConstantRanges");
+                std::for_each(this->pushConstantRanges.begin(), this->pushConstantRanges.end(), iterateBuffers);
+                aSerializer.endArray(); // pushConstantRanges
 
                 //
                 // Serialize sampled images
@@ -480,7 +438,7 @@ namespace engine
             aDeserializer.endObject();
 
             //
-            // Serialize subpass input
+            // Deserialize subpass input
             //
             uint32_t subpassInputCount = 0;
             aDeserializer.beginArray("subpassInputs", subpassInputCount);
@@ -505,14 +463,9 @@ namespace engine
             aDeserializer.endArray();
 
             //
-            // Serialize uniform buffers
+            // Buffer deserialization
             //
-            uint32_t uniformBufferCount = 0;
-            aDeserializer.beginArray("uniformBuffers", uniformBufferCount);
-            {
-                uniformBuffers.resize(uniformBufferCount);
-
-                auto const iterateUniformBuffers = [&] (SUniformBuffer &aBuffer, uint32_t const &aIndex) -> void
+            auto const iterateBuffers = [&](SUniformBuffer &aBuffer, uint32_t const &aIndex) -> void
                 {
                     aDeserializer.beginObject(aIndex);
                     {
@@ -523,6 +476,12 @@ namespace engine
                         aDeserializer.readValue("set",         aBuffer.set);
                         aDeserializer.readValue("binding",     aBuffer.binding);
 
+                        std::string sharingMode;
+                        aDeserializer.readValue("sharing_mode", sharingMode);
+                        {
+                            aBuffer.sharingMode = sharingModeFromString(sharingMode);
+                        }
+
                         aDeserializer.beginObject("array");
                         aDeserializer.readValue("layers", aBuffer.array.layers);
                         aDeserializer.readValue("stride", aBuffer.array.stride);
@@ -530,42 +489,42 @@ namespace engine
 
                         std::function<void(MutableBufferMemberMap_t &)> readMembers = nullptr;
                         readMembers = [&] (MutableBufferMemberMap_t &aOutMembers) -> void
-                        {
-                            std::function<void(Shared<SBufferMember> const &, uint32_t const &)> iterate = nullptr;
-                            iterate = [&](Shared<SBufferMember> const &aMember,
-                                          uint32_t              const &aIndex) -> void
                             {
-                                aDeserializer.beginObject(aIndex);
-                                aDeserializer.readValue("name",        aMember->name);
-                                aDeserializer.readValue("offset",      aMember->location.offset);
-                                aDeserializer.readValue("size",        aMember->location.length);
-                                aDeserializer.readValue("padding",     aMember->location.padding);
+                                std::function<void(Shared<SBufferMember> const &, uint32_t const &)> iterate = nullptr;
+                                iterate = [&](Shared<SBufferMember> const &aMember,
+                                    uint32_t              const &aIndex) -> void
+                                    {
+                                        aDeserializer.beginObject(aIndex);
+                                        aDeserializer.readValue("name",        aMember->name);
+                                        aDeserializer.readValue("offset",      aMember->location.offset);
+                                        aDeserializer.readValue("size",        aMember->location.length);
+                                        aDeserializer.readValue("padding",     aMember->location.padding);
 
-                                aDeserializer.beginObject("array");
-                                aDeserializer.readValue("layers", aMember->array.layers);
-                                aDeserializer.readValue("stride", aMember->array.stride);
-                                aDeserializer.endObject();
+                                        aDeserializer.beginObject("array");
+                                        aDeserializer.readValue("layers", aMember->array.layers);
+                                        aDeserializer.readValue("stride", aMember->array.stride);
+                                        aDeserializer.endObject();
 
-                                MutableBufferMemberMap_t mutableMembers {};
-                                readMembers(mutableMembers);
-                                aMember->members = mutableMembers;
+                                        MutableBufferMemberMap_t mutableMembers {};
+                                        readMembers(mutableMembers);
+                                        aMember->members = mutableMembers;
 
-                                aDeserializer.endObject();
+                                        aDeserializer.endObject();
+                                    };
+
+                                MutableBufferMemberMap_t resultMap {};
+
+                                uint32_t size = 0;
+                                aDeserializer.beginArray("members", size);
+                                for (uint32_t k = 0; k < size; ++k) {
+                                    Shared<SBufferMember> member = makeShared<SBufferMember>();
+                                    iterate(member, k);
+                                    resultMap.insert({ member->name, std::move(member) });
+                                }
+                                aDeserializer.endArray();
+
+                                aOutMembers = resultMap;
                             };
-
-                            MutableBufferMemberMap_t resultMap {};
-
-                            uint32_t size = 0;
-                            aDeserializer.beginArray("members", size);
-                            for (uint32_t k = 0; k < size; ++k) {
-                                Shared<SBufferMember> member = makeShared<SBufferMember>();
-                                iterate(member, k);
-                                resultMap.insert({ member->name, std::move(member) });
-                            }
-                            aDeserializer.endArray();
-
-                            aOutMembers = resultMap;
-                        };
 
                         MutableBufferMemberMap_t mutableMembers {};
                         readMembers(mutableMembers);
@@ -577,9 +536,44 @@ namespace engine
                     aDeserializer.endObject();
                 };
 
+            //
+            // Deserialize uniform buffers
+            //
+            uint32_t uniformBufferCount = 0;
+            aDeserializer.beginArray("uniformBuffers", uniformBufferCount);
+            {
+                uniformBuffers.resize(uniformBufferCount);
                 for(uint32_t k=0; k<uniformBufferCount; ++k)
                 {
-                    iterateUniformBuffers(*(uniformBuffers.data() + k), k);
+                    iterateBuffers(*(uniformBuffers.data() + k), k);
+                }
+            }
+            aDeserializer.endArray();
+
+            //
+            // Deserialize storage buffers
+            //
+            uint32_t storageBufferCount = 0;
+            aDeserializer.beginArray("storageBuffers", storageBufferCount);
+            {
+                storageBuffers.resize(storageBufferCount);
+                for(uint32_t k=0; k<storageBufferCount; ++k)
+                {
+                    iterateBuffers(*(storageBuffers.data() + k), k);
+                }
+            }
+            aDeserializer.endArray();
+
+            //
+            // Deserialize push constant ranges
+            //
+            uint32_t pushConstantRangeCount = 0;
+            aDeserializer.beginArray("pushConstantRanges", pushConstantRangeCount);
+            {
+                pushConstantRanges.resize(pushConstantRangeCount);
+                for(uint32_t k=0; k<pushConstantRangeCount; ++k)
+                {
+                    iterateBuffers(*(pushConstantRanges.data() + k), k);
                 }
             }
             aDeserializer.endArray();

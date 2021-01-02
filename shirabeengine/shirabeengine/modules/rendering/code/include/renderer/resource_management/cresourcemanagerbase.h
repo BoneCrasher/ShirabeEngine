@@ -186,14 +186,13 @@ namespace engine::resources
                 , typename TResource::Descriptor_t const &aDescriptor
                 , bool                                    aInitializeImmediately )
     {
-        CEngineResult<OptionalRef_t<TResource>> result = {EEngineStatus::Error, {} };
-
-        auto const alreadyFoundIt = mResourceObjects.find(aResourceId);
-        if(mResourceObjects.end() != mResourceObjects.find(aResourceId))
+        //
+        // If the resource already exists, return instead.
+        //
+        auto const &resourceOpt = getResourceObject<TResource>(aResourceId);
+        if(resourceOpt.has_value())
         {
-            ResourceVariants_t &variant = alreadyFoundIt->second;
-            TResource          &value   = std::get<TResource>(variant);
-            return { EEngineStatus::Ok, OptionalRef_t<TResource>(value) };
+            return { EEngineStatus::Ok, resourceOpt };
         }
 
         //
@@ -205,6 +204,11 @@ namespace engine::resources
         resource.loadState     = EGpuApiResourceState::Unloaded;
 
         storeResourceObject<TResource>(aResourceId, resource);
+
+        if(aInitializeImmediately)
+        {
+            initializeResource<TResource>(aResourceId);
+        }
 
         return { EEngineStatus::Ok, resource };
     }
@@ -223,7 +227,9 @@ namespace engine::resources
     {
         OptionalRef_t<TResource> resource = getResourceObject<TResource>(aId);
         if(false == resource.has_value())
-            return { EEngineStatus::ResourceError_NotFound };
+        {
+            return {EEngineStatus::ResourceError_NotFound};
+        }
 
         return { EEngineStatus::Ok, resource };
     }

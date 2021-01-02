@@ -116,9 +116,9 @@ namespace engine
                                    baseFlags.mipSliceRange   = CRange(0, 1);
 
                                    SRenderGraphWriteTextureFlags write0 = baseFlags,
-                                                                write1 = baseFlags,
-                                                                write2 = baseFlags,
-                                                                write3 = baseFlags;
+                                                                 write1 = baseFlags,
+                                                                 write2 = baseFlags,
+                                                                 write3 = baseFlags;
 
                                    write0.arraySliceRange.offset = 0;
                                    write0.requiredFormat         = gbuffer0Desc.format;
@@ -192,7 +192,7 @@ namespace engine
                 {
                     SRenderGraphMesh const &mesh = renderObject.mesh;
 
-                    aRenderContext.useMesh(aRenderContextState, mesh);
+                    EEngineStatus const bSuccessful = aRenderContext.useMesh(aRenderContextState, mesh);
 
                     for(uint32_t k=0; k<renderObject.materials.size(); ++k)
                     {

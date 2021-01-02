@@ -51,35 +51,38 @@ namespace engine
             CSharedMaterial(asset::AssetId_t   const &aAssetUID,
                             std::string        const &aName,
                             SMaterialAsset          &&aSignature)
-                : mName          (aName)
-                , mLayoutInfo    ({})
-                , mStages        ({})
-                , mUniformBuffers({})
-                , mStorageBuffers({})
-                , mSampledImages ({})
-                , mSubpassInputs ({})
+                : mName              (aName)
+                , mLayoutInfo        ({})
+                , mStages            ({})
+                , mUniformBuffers    ({})
+                , mStorageBuffers    ({})
+                , mPushConstantRanges({})
+                , mSampledImages     ({})
+                , mSubpassInputs     ({})
             {}
 
             SHIRABE_INLINE
             CSharedMaterial(CSharedMaterial const &aOther)
-                : mName           (aOther.mName)
-                , mLayoutInfo     (aOther.mLayoutInfo)
-                , mStages         (aOther.mStages)
-                , mUniformBuffers (aOther.mUniformBuffers)
-                , mStorageBuffers (aOther.mStorageBuffers)
-                , mSampledImages  (aOther.mSampledImages)
-                , mSubpassInputs  (aOther.mSubpassInputs)
+                : mName              (aOther.mName)
+                , mLayoutInfo        (aOther.mLayoutInfo)
+                , mStages            (aOther.mStages)
+                , mUniformBuffers    (aOther.mUniformBuffers)
+                , mStorageBuffers    (aOther.mStorageBuffers)
+                , mPushConstantRanges(aOther.mPushConstantRanges)
+                , mSampledImages     (aOther.mSampledImages)
+                , mSubpassInputs     (aOther.mSubpassInputs)
             {}
 
             SHIRABE_INLINE
             CSharedMaterial(CSharedMaterial &&aOther)
-                : mName         (std::move(aOther.mName))
-                , mLayoutInfo    (aOther.mLayoutInfo)
-                , mStages        (std::move(aOther.mStages))
-                , mUniformBuffers(aOther.mUniformBuffers)
-                , mStorageBuffers(aOther.mStorageBuffers)
-                , mSampledImages (aOther.mSampledImages)
-                , mSubpassInputs (aOther.mSubpassInputs)
+                : mName              (std::move(aOther.mName))
+                , mLayoutInfo        (aOther.mLayoutInfo)
+                , mStages            (std::move(aOther.mStages))
+                , mUniformBuffers    (aOther.mUniformBuffers)
+                , mStorageBuffers    (aOther.mStorageBuffers)
+                , mPushConstantRanges(aOther.mPushConstantRanges)
+                , mSampledImages     (aOther.mSampledImages)
+                , mSubpassInputs     (aOther.mSubpassInputs)
             {}
 
         public_destructors:
@@ -89,13 +92,14 @@ namespace engine
             SHIRABE_INLINE
             CSharedMaterial &operator=(CSharedMaterial const &aOther)
             {
-                mName           = aOther.mName;
-                mLayoutInfo     = aOther.mLayoutInfo;
-                mStages         = aOther.mStages;
-                mUniformBuffers = aOther.mUniformBuffers;
-                mStorageBuffers = aOther.mStorageBuffers;
-                mSampledImages  = aOther.mSampledImages;
-                mSubpassInputs  = aOther.mSubpassInputs;
+                mName               = aOther.mName;
+                mLayoutInfo         = aOther.mLayoutInfo;
+                mStages             = aOther.mStages;
+                mUniformBuffers     = aOther.mUniformBuffers;
+                mStorageBuffers     = aOther.mStorageBuffers;
+                mPushConstantRanges = aOther.mPushConstantRanges;
+                mSampledImages      = aOther.mSampledImages;
+                mSubpassInputs      = aOther.mSubpassInputs;
 
                 return (*this);
             }
@@ -103,13 +107,14 @@ namespace engine
             SHIRABE_INLINE
             CSharedMaterial &operator=(CSharedMaterial &&aOther) noexcept
             {
-                mName           = std::move(aOther.mName);
-                mLayoutInfo     = aOther.mLayoutInfo;
-                mStages         = std::move(aOther.mStages);
-                mUniformBuffers = aOther.mUniformBuffers;
-                mStorageBuffers = aOther.mStorageBuffers;
-                mSampledImages  = aOther.mSampledImages;
-                mSubpassInputs  = aOther.mSubpassInputs;
+                mName               = std::move(aOther.mName);
+                mLayoutInfo         = aOther.mLayoutInfo;
+                mStages             = std::move(aOther.mStages);
+                mUniformBuffers     = std::move(aOther.mUniformBuffers);
+                mStorageBuffers     = std::move(aOther.mStorageBuffers);
+                mPushConstantRanges = std::move(aOther.mPushConstantRanges);
+                mSampledImages      = std::move(aOther.mSampledImages);
+                mSubpassInputs      = std::move(aOther.mSubpassInputs);
 
                 return (*this);
             }
@@ -117,13 +122,14 @@ namespace engine
         public_methods:
             EEngineStatus initializeMemory(Shared<memory::allocators::CAllocator> aAllocator);
 
-            SHIRABE_INLINE std::string                 const &name()           const { return mName; }
-            SHIRABE_INLINE SMaterialLayoutInfo         const &layoutInfo()     const { return mLayoutInfo; }
-            SHIRABE_INLINE StageMap_t                  const &stages()         const { return mStages; }
-            SHIRABE_INLINE std::vector<SUniformBuffer> const &uniformBuffers() const { return mUniformBuffers; }
-            SHIRABE_INLINE std::vector<SUniformBuffer> const &storageBuffers() const { return mStorageBuffers; }
-            SHIRABE_INLINE std::vector<SSampledImage>  const &sampledImages()  const { return mSampledImages; }
-            SHIRABE_INLINE std::vector<SSubpassInput>  const &subpassInputs()  const { return mSubpassInputs; }
+            SHIRABE_INLINE std::string                 const &name()               const { return mName; }
+            SHIRABE_INLINE SMaterialLayoutInfo         const &layoutInfo()         const { return mLayoutInfo; }
+            SHIRABE_INLINE StageMap_t                  const &stages()             const { return mStages; }
+            SHIRABE_INLINE std::vector<SUniformBuffer> const &uniformBuffers()     const { return mUniformBuffers; }
+            SHIRABE_INLINE std::vector<SUniformBuffer> const &storageBuffers()     const { return mStorageBuffers; }
+            SHIRABE_INLINE std::vector<SUniformBuffer> const &pushConstantRanges() const { return mPushConstantRanges; }
+            SHIRABE_INLINE std::vector<SSampledImage>  const &sampledImages()      const { return mSampledImages; }
+            SHIRABE_INLINE std::vector<SSubpassInput>  const &subpassInputs()      const { return mSubpassInputs; }
 
         private_methods:
             friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
@@ -137,24 +143,26 @@ namespace engine
             // across all stages, due to indexing them with set and binding.
             std::vector<SUniformBuffer> mUniformBuffers;
             std::vector<SUniformBuffer> mStorageBuffers;
+            std::vector<SUniformBuffer> mPushConstantRanges;
             std::vector<SSampledImage>  mSampledImages;
             // Fragment shader only
             std::vector<SSubpassInput>  mSubpassInputs;
 
-            Shared<memory::allocators::CPoolAllocator> mConfigPoolAllocator;
+            Map<std::string, Shared<memory::allocators::CAllocator>> mInstanceDataAllocators;
         };
 
         Shared<CSharedMaterial> CSharedMaterial::fromAsset(SMaterialAsset const &aAsset)
         {
             Shared<CSharedMaterial> instance = makeShared<CSharedMaterial>();
 
-            instance->mName           = aAsset.name;
-            instance->mLayoutInfo     = aAsset.layoutInfo;
-            instance->mStages         = aAsset.stages;
-            instance->mUniformBuffers = aAsset.uniformBuffers;
-            instance->mStorageBuffers = aAsset.storageBuffers;
-            instance->mSampledImages  = aAsset.sampledImages;
-            instance->mSubpassInputs  = aAsset.subpassInputs;
+            instance->mName               = aAsset.name;
+            instance->mLayoutInfo         = aAsset.layoutInfo;
+            instance->mStages             = aAsset.stages;
+            instance->mUniformBuffers     = aAsset.uniformBuffers;
+            instance->mStorageBuffers     = aAsset.storageBuffers;
+            instance->mPushConstantRanges = aAsset.pushConstantRanges;
+            instance->mSampledImages      = aAsset.sampledImages;
+            instance->mSubpassInputs      = aAsset.subpassInputs;
 
             return instance;
         }

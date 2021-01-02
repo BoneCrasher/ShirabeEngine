@@ -11,7 +11,7 @@
 #include "renderer/vulkan_resources/resources/types/vulkantextureviewresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanmeshresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanmaterialpipelineresource.h"
-#include "renderer/vulkan_resources/resources/types/vulkanmaterialresource.h"
+#include "renderer/vulkan_resources/resources/types/vulkandescriptorresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanshadermoduleresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanrenderpassresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanframebufferresource.h"

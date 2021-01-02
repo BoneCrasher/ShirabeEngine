@@ -16,10 +16,42 @@ namespace engine::material
             return EEngineStatus::Error;
         }
 
-        // Read size requirements
+        //
+        // Allocation design
+        //
+        // Originally, each shared material should acquire one huge block of memory, which will be suballocated
+        // by designated allocators depending on the buffer to be served.
+        //
+        // As memory should be bindable from the outside however, the design was adjusted.
+        // For each buffer of whichever kind, a suballocation will take place from the global
+        // material data memory.
+        // This way individual allocations may be freed, if overwritten manually w/ another buffer.
+        // This is also, why allocators are to be shared pointers.
+        //
 
+        for(auto const &uniformBuffer : mUniformBuffers)
+        {
+            std::string const &bufferName = uniformBuffer.name;
+            std::size_t const &byteSize   = (uniformBuffer.location.length + uniformBuffer.location.padding);
+            std::size_t const &alignment  = 256;
 
-        // Allocate data
+            void *data = aAllocator->allocate(byteSize, alignment);
+            Shared<memory::allocators::CAllocator> allocator = makeShared<memory::allocators::CBlockAllocator>(aAllocator.get(), byteSize, data);
+
+            mInstanceDataAllocators.insert({bufferName, allocator});
+        }
+
+        for(auto const &storageBuffer : mStorageBuffers)
+        {
+            std::string const &bufferName = storageBuffer.name;
+            std::size_t const &byteSize   = (storageBuffer.location.length + storageBuffer.location.padding);
+            std::size_t const &alignment  = 256;
+
+            void *data = aAllocator->allocate(byteSize, alignment);
+            Shared<memory::allocators::CAllocator> allocator = makeShared<memory::allocators::CBlockAllocator>(aAllocator.get(), byteSize, data);
+
+            mInstanceDataAllocators.insert({bufferName, allocator});
+        }
 
         return EEngineStatus::Ok;
     }
@@ -36,7 +68,6 @@ namespace engine::material
         }
 
         Shared<CSharedMaterial> m = sharedMaterial();
-        m->
 
         CMaterialConfig config = CMaterialConfig::fromMaterialDesc(aMaterial, aIncludeSystemBuffers);
 

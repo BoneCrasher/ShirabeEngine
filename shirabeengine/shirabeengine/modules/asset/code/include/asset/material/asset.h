@@ -160,6 +160,31 @@ namespace engine
             BufferMemberMap_t members;
         };
 
+        enum EBufferSharingMode
+        {
+            Global,
+            Shared,
+            Instance
+        };
+
+        static auto sharingModeFromString(std::string const &aMode) -> EBufferSharingMode
+        {
+            if("global" == aMode)   return EBufferSharingMode::Global;
+            if("shared" == aMode)   return EBufferSharingMode::Shared;
+            /* Default: if("instance" == aMode) */
+            return EBufferSharingMode::Instance;
+        };
+
+        static auto sharingModeToString(EBufferSharingMode const &aMode) -> std::string
+        {
+            switch(aMode)
+            {
+                case EBufferSharingMode::Global: return "global";
+                case EBufferSharingMode::Shared: return "shared";
+                default:                         return "instance";
+            }
+        };
+
         struct SMaterialBuffer
                 : public SBoundResource
         {
@@ -170,27 +195,31 @@ namespace engine
             // SMaterialType     type;
             BufferMemberMap_t members;
 
+            EBufferSharingMode sharingMode;
+
         public_constructors:
             SMaterialBuffer() = default;
 
             SHIRABE_INLINE
             SMaterialBuffer(SMaterialBuffer const &aOther)
                     : SBoundResource(aOther)
-                      , location(aOther.location)
-                      , members (aOther.members )
-                      , array   (aOther.array   )
+                      , location   (aOther.location)
+                      , members    (aOther.members )
+                      , array      (aOther.array   )
+                      , sharingMode(aOther.sharingMode)
             {}
 
         public_operators:
             SHIRABE_INLINE
             SMaterialBuffer &operator=(SMaterialBuffer const &aOther)
             {
-                name     = aOther.name;
-                location = aOther.location;
-                set      = aOther.set;
-                binding  = aOther.binding;
-                members  = aOther.members;
-                array    = aOther.array;
+                name        = aOther.name;
+                location    = aOther.location;
+                set         = aOther.set;
+                binding     = aOther.binding;
+                members     = aOther.members;
+                array       = aOther.array;
+                sharingMode = aOther.sharingMode;
 
                 return (*this);
             }
@@ -317,6 +346,7 @@ namespace engine
                     , stages               (sEmptyMetaMap)
                     , uniformBuffers       ({})
                     , storageBuffers       ({})
+                    , pushConstantRanges   ({})
                     , sampledImages        ({})
                     , subpassInputs        ({})
             {}
@@ -333,6 +363,7 @@ namespace engine
                     , stages               (aOther.stages               )
                     , uniformBuffers       (aOther.uniformBuffers)
                     , storageBuffers       (aOther.storageBuffers)
+                    , pushConstantRanges   (aOther.pushConstantRanges)
                     , sampledImages        (aOther.sampledImages)
                     , subpassInputs        (aOther.subpassInputs)
             {}
@@ -349,6 +380,7 @@ namespace engine
                     , stages               (std::move(aOther.stages    ))
                     , uniformBuffers       (aOther.uniformBuffers)
                     , storageBuffers       (aOther.storageBuffers)
+                    , pushConstantRanges   (aOther.pushConstantRanges)
                     , sampledImages        (aOther.sampledImages)
                     , subpassInputs        (aOther.subpassInputs)
             {}
@@ -365,6 +397,7 @@ namespace engine
                 stages                = aOther.stages;
                 uniformBuffers        = aOther.uniformBuffers;
                 storageBuffers        = aOther.storageBuffers;
+                pushConstantRanges    = aOther.pushConstantRanges;
                 sampledImages         = aOther.sampledImages;
                 subpassInputs         = aOther.subpassInputs;
 
@@ -382,6 +415,7 @@ namespace engine
                 stages                = std::move(aOther.stages);
                 uniformBuffers        = aOther.uniformBuffers;
                 storageBuffers        = aOther.storageBuffers;
+                pushConstantRanges    = aOther.pushConstantRanges;
                 sampledImages         = aOther.sampledImages;
                 subpassInputs         = aOther.subpassInputs;
 
@@ -400,6 +434,7 @@ namespace engine
             // across all stages, due to indexing them with set and binding.
             std::vector<SUniformBuffer> uniformBuffers;
             std::vector<SUniformBuffer> storageBuffers;
+            std::vector<SUniformBuffer> pushConstantRanges;
             std::vector<SSampledImage>  sampledImages;
             // Fragment shader only
             std::vector<SSubpassInput>  subpassInputs;

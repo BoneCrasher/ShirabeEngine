@@ -1,16 +1,7 @@
 #version 450 core
 #extension GL_GOOGLE_include_directive : require
 #include "base.glsl"
-
-//
-// Model specific matrices.
-//
-layout (std140, set = 2, binding = 0)
-uniform struct_modelMatrices
-{
-    mat4  world;
-    mat4  inverseTransposeWorld;
-} modelMatrices;
+#include "standard.shared.glsl"
 
 //
 // Input description
@@ -28,9 +19,12 @@ out struct_vertexData_full shader_output;
 
 void main()
 {
+    struct_cameraMatrices lCamera       = sceneData.cameras[globalData.cameraIndex];
+    struct_instanceData   lInstanceData = instanceData.data[instanceIndex];
+
     vec4 position = vec4(vertex_position.xyz, 1.0);
 
-    mat4 view_transform     = (graphicsData.cameras[0].view * modelMatrices.world);
+    mat4 view_transform     = (lCamera.view * transforms.storage[lInstanceData.transforms.world]);
     mat3 view_transform_3x3 = mat3(view_transform);
 
     vec4 position_viewspace  = (view_transform * position);
@@ -38,7 +32,7 @@ void main()
     vec3 tangent_viewspace   = normalize(view_transform_3x3 * vertex_tangent.xyz);
     vec3 bitangent_viewspace = normalize(cross(normal_viewspace, tangent_viewspace) * vertex_tangent.w);
 
-    gl_Position   = (graphicsData.cameras[0].projection * position_viewspace);
+    gl_Position   = (lCamera.projection * position_viewspace);
     // gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     shader_output.vertex_position  = position_viewspace.xyz;

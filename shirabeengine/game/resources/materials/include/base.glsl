@@ -23,9 +23,10 @@ struct struct_vertexData_full
     vec2 vertex_texcoord;
 };
 
-struct struct_globalData
+struct struct_timingData
 {
-    float time;
+    float timeElapsedTotalSeconds;
+    float timeElapsedSinceLastFrameSeconds;
 };
 
 struct struct_cameraMatrices
@@ -51,29 +52,27 @@ struct struct_modelMatrices_animation
     mat4 animationState[SHIRABE_MAXNUM_SKIN_MATRICES];
 };
 
-//
-// Set 0: Global Application defined data
-//
+// @nnotation:SHIRABE_SHARING_MODE(buffer_id="globalData", mode="global")
 layout (std140, set = 0, binding = 0)
-uniform struct_systemData
+uniform GlobalDataBuffer
 {
-    struct_globalData global;
-} systemData;
+    struct_timingData data;
 
-//
-// Uniform Buffer to hold the camera matrices
-//
-layout (constant_id = 1) const int  SHIRABE_MAXNUM_CAMERAS = 64;
+    int cameraIndex;
+}
+globalData;
+
+// @nnotation:SHIRABE_SHARING_MODE(buffer_id="graphicsData", mode="global")
+layout (constant_id = 1) const int SHIRABE_MAXNUM_CAMERAS = 64;
 layout (std140, set = 0, binding = 1)
-readonly buffer struct_graphicsData
+readonly buffer SceneDataStorage
 {
     struct_cameraMatrices cameras[SHIRABE_MAXNUM_CAMERAS];
-} graphicsData;
+} 
+sceneData;
 
-//
-// Set 1: Reserved for future use
-//
-layout (constant_id = 2) const int  SHIRABE_MAXNUM_OBJECT_TRANSFORMS = 2048;
+// @nnotation:SHIRABE_SHARING_MODE(buffer_id="transforms", mode="global")
+layout (constant_id = 2) const int SHIRABE_MAXNUM_OBJECT_TRANSFORMS = 2048;
 layout (std140, set = 0, binding = 2)
 readonly buffer ObjectTransformStorage
 {
@@ -81,7 +80,8 @@ readonly buffer ObjectTransformStorage
 }
 transforms;
 
-layout (constant_id = 3) const int  SHIRABE_MAXNUM_BINDPOSE_TRANSFORMS = 2048;
+// @nnotation:SHIRABE_SHARING_MODE(buffer_id="bindposes", mode="global")
+layout (constant_id = 3) const int SHIRABE_MAXNUM_BINDPOSE_TRANSFORMS = 2048;
 layout (std140, set = 0, binding = 3)
 readonly buffer BindPoseTransformStorage
 {
@@ -89,7 +89,8 @@ readonly buffer BindPoseTransformStorage
 }
 bindposes;
 
-layout (constant_id = 4) const int  SHIRABE_MAXNUM_ANIMATION_TRANSFORMS = 2048;
+// @nnotation:SHIRABE_SHARING_MODE(buffer_id="animations", mode="global")
+layout (constant_id = 4) const int SHIRABE_MAXNUM_ANIMATION_TRANSFORMS = 2048;
 layout (std140, set = 0, binding = 4)
 readonly buffer AnimationTransformStorage
 {
@@ -97,7 +98,7 @@ readonly buffer AnimationTransformStorage
 }
 animations;
 
-layout (constant_id = 5) const int  SHIRABE_MAXNUM_TEXTURES = 256;
+layout (constant_id = 5) const int SHIRABE_MAXNUM_TEXTURES = 256;
 layout (set = 0, binding = 5)
 uniform sampler2D textures[SHIRABE_MAXNUM_TEXTURES];
 

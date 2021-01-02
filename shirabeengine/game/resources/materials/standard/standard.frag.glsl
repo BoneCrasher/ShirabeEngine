@@ -1,10 +1,7 @@
 #version 450 core
 #extension GL_GOOGLE_include_directive : require
 #include "base.glsl"
-
-layout(set = 3, binding = 0) uniform sampler2D diffuseTexture;
-layout(set = 3, binding = 1) uniform sampler2D normalTexture;
-layout(set = 3, binding = 2) uniform sampler2D specularReflectanceGlossTexture;
+#include "standard.shared.glsl"
 
 // Input
 layout (location = 0)
@@ -18,14 +15,20 @@ layout (location = 3) out vec4 fragment_color_3;
 
 void main()
 {
+    struct_instanceData lInstanceData = instanceData.data[instanceIndex];
+
+    sampler2D diffuseTexture     = textures[lInstanceData.textures.diffuse];
+    sampler2D specularTexture    = textures[lInstanceData.textures.specular];
+    sampler2D normalTextureIndex = textures[lInstanceData.textures.normal];
+
     vec3 normal_viewspace    = normalize(shader_input.vertex_normal);
     vec3 tangent_viewspace   = normalize(shader_input.vertex_tangent);
     vec3 bitangent_viewspace = normalize(shader_input.vertex_bitangent);
 
     mat3 tnb = mat3(tangent_viewspace, bitangent_viewspace, normal_viewspace);
 
-    vec4 diffuse = texture(diffuseTexture, shader_input.vertex_texcoord.xy);
-    vec4 normal  = texture(normalTexture,  shader_input.vertex_texcoord.xy);
+    vec4 diffuse = texture(diffuseTexture,     shader_input.vertex_texcoord.xy);
+    vec4 normal  = texture(normalTextureIndex, shader_input.vertex_texcoord.xy);
 
     vec3 normal_unpacked_tangent_space = unpack_normal(normal.xyz);
     vec3 normal_unpacked_viewspace     = tnb * normal_unpacked_tangent_space;

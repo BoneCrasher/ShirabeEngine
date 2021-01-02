@@ -34,14 +34,6 @@ namespace engine
             SHIRABE_DECLARE_LOG_TAG(SVulkanBufferResource)
         }
 
-        struct
-             [[nodiscard]]
-             SHIRABE_TEST_EXPORT SVulkanBufferCreationResult
-        {
-            VkBuffer       buffer;
-            VkDeviceMemory attachedMemory;
-        };
-
         /**
          *
          * @param aPhysicalDevice
@@ -51,11 +43,11 @@ namespace engine
          * @param aBufferMemoryProperties
          * @return
          */
-        CEngineResult<SVulkanBufferCreationResult> __createVkBuffer(  VkPhysicalDevice      const &aPhysicalDevice
-                                                                    , VkDevice              const &aLogicalDevice
-                                                                    , VkDeviceSize          const &aBufferSize
-                                                                    , VkBufferUsageFlags    const &aBufferUsage
-                                                                    , VkMemoryPropertyFlags const &aBufferMemoryProperties);
+        CEngineResult<std::tuple<VkBuffer, VkMemoryRequirements>>
+            __createVkBuffer(  VkPhysicalDevice   const &aPhysicalDevice
+                             , VkDevice           const &aLogicalDevice
+                             , VkDeviceSize       const &aBufferSize
+                             , VkBufferUsageFlags const &aBufferUsage);
 
         /**
          * The SVulkanTextureResource struct describes the relevant data to deal
@@ -63,13 +55,13 @@ namespace engine
          */
         struct SVulkanBufferResource
         {
-            static constexpr bool is_loadable      = true;
-            static constexpr bool is_unloadable    = true;
+            static constexpr bool is_loadable      = false;
+            static constexpr bool is_unloadable    = false;
             static constexpr bool is_transferrable = false;
 
             struct Handles_t {
-                VkBuffer       handle;
-                VkDeviceMemory attachedMemory;
+                VkBuffer             handle;
+                VkMemoryRequirements memoryRequirements;
             };
 
             template <typename TResourceManager>
@@ -79,22 +71,16 @@ namespace engine
                                           , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
-            static EEngineStatus load(SBufferDescription  const &aDescription
-                                    , Handles_t                 &aGpuApiHandles
-                                    , TResourceManager          *aResourceManager
-                                    , IVkGlobalContext          *aVulkanEnvironment);
-
-            template <typename TResourceManager>
-            static EEngineStatus unload(SBufferDescription  const &aDescription
-                                      , Handles_t                 &aGpuApiHandles
-                                      , TResourceManager          *aResourceManager
-                                      , IVkGlobalContext          *aVulkanEnvironment);
-
-            template <typename TResourceManager>
             static EEngineStatus deinitialize(SBufferDescription  const &aDescription
                                             , Handles_t                 &aGpuApiHandles
                                             , TResourceManager          *aResourceManager
                                             , IVkGlobalContext          *aVulkanEnvironment);
+
+            template <typename TResourceManager>
+            static EEngineStatus bindBufferAndMemory(TResourceManager   *aResourceManager
+                                                     , IVkGlobalContext *aVulkanEnvironment
+                                                     , VkBuffer          aVkBuffer
+                                                     , VkDeviceMemory    aVkMemory);
         };
 
         //<-----------------------------------------------------------------------------
@@ -113,66 +99,27 @@ namespace engine
                                                       , TResourceManager          *aResourceManager
                                                       , IVkGlobalContext          *aVulkanEnvironment)
         {
+            SHIRABE_UNUSED(aResourceManager);
+
             IVkGlobalContext *vkContext = aVulkanEnvironment;
 
             VkDevice         const &vkLogicalDevice  = vkContext->getLogicalDevice();
             VkPhysicalDevice const &vkPhysicalDevice = vkContext->getPhysicalDevice();
 
-            VkBufferCreateInfo createInfo = aDescription.createInfo;
-            createInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            // createInfo.queueFamilyIndexCount = ...;
-            // createInfo.pQueueFamilyIndices   = ...;
+            auto const [result, data] = __createVkBuffer(vkPhysicalDevice, vkLogicalDevice, aDescription.createInfo.size, aDescription.createInfo.usage);
 
-            VkBuffer buffer = VK_NULL_HANDLE;
-
-            VkResult result = vkCreateBuffer(vkLogicalDevice, &createInfo, nullptr, &buffer);
-            if(VkResult::VK_SUCCESS != result)
+            if(CheckEngineError(result))
             {
-                CLog::Error(buffer_log::logTag(), CString::format("Failed to create buffer. Vulkan result: {}", result));
-                return { EEngineStatus::Error };
+                CLog::Error(buffer_log::logTag(), CString::format("Failed to create buffer."));
+                return EEngineStatus::Error;
             }
 
-            VkMemoryRequirements vkMemoryRequirements ={ };
-            vkGetBufferMemoryRequirements(vkLogicalDevice, buffer, &vkMemoryRequirements);
+            auto const [buffer, requirements] = data;
 
-            VkMemoryAllocateInfo vkMemoryAllocateInfo ={ };
-            vkMemoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-            vkMemoryAllocateInfo.allocationSize  = vkMemoryRequirements.size;
+            aGpuApiHandles.handle             = buffer;
+            aGpuApiHandles.memoryRequirements = requirements;
 
-            CEngineResult<uint32_t> memoryTypeFetch =
-                                            CVulkanDeviceCapsHelper::determineMemoryType(
-                                                    vkPhysicalDevice,
-                                                    vkMemoryRequirements.memoryTypeBits,
-                                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-            if(not memoryTypeFetch.successful())
-            {
-                CLog::Error(buffer_log::logTag(), "Could not determine memory type index.");
-                return { EEngineStatus::Error };
-            }
-
-            vkMemoryAllocateInfo.memoryTypeIndex = memoryTypeFetch.data();
-
-            VkDeviceMemory memory = VK_NULL_HANDLE;
-
-            result = vkAllocateMemory(vkLogicalDevice, &vkMemoryAllocateInfo, nullptr, &memory);
-            if(VkResult::VK_SUCCESS != result)
-            {
-                CLog::Error(buffer_log::logTag(), CString::format("Failed to allocate buffer memory on GPU. Vulkan error: {}", result));
-                return { EEngineStatus::Error };
-            }
-
-            result = vkBindBufferMemory(vkLogicalDevice, buffer, memory, 0);
-            if(VkResult::VK_SUCCESS != result)
-            {
-                CLog::Error(buffer_log::logTag(), CString::format("Failed to bind buffer memory on GPU. Vulkan error: {}", result));
-                return { EEngineStatus::Error };
-            }
-
-            aGpuApiHandles.handle         = buffer;
-            aGpuApiHandles.attachedMemory = memory;
-
-            return { EEngineStatus::Ok };
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -185,6 +132,8 @@ namespace engine
                                                 , TResourceManager          *aResourceManager
                                                 , IVkGlobalContext          *aVulkanEnvironment)
         {
+            SHIRABE_UNUSED(aResourceManager);
+
             if(nullptr != aDescription.dataSource)
             {
                 VkDevice device = aVulkanEnvironment->getLogicalDevice();
@@ -197,7 +146,7 @@ namespace engine
                 vkUnmapMemory(device, aGpuApiHandles.attachedMemory);
             }
 
-            return { EEngineStatus::Ok };
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
 
@@ -227,17 +176,31 @@ namespace engine
                                                         , TResourceManager          *aResourceManager
                                                         , IVkGlobalContext          *aVulkanEnvironment)
         {
-            VkBuffer       vkBuffer        = aGpuApiHandles.handle;
-            VkDeviceMemory vkDeviceMemory  = aGpuApiHandles.attachedMemory;
-            VkDevice       vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
+            SHIRABE_UNUSED(aDescription);
+            SHIRABE_UNUSED(aResourceManager);
 
-            vkFreeMemory   (vkLogicalDevice, vkDeviceMemory, nullptr);
+            VkBuffer vkBuffer        = aGpuApiHandles.handle;
+            VkDevice vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
             vkDestroyBuffer(vkLogicalDevice, vkBuffer, nullptr);
 
-            aGpuApiHandles.attachedMemory = VK_NULL_HANDLE;
-            aGpuApiHandles.handle         = VK_NULL_HANDLE;
+            aGpuApiHandles.handle = VK_NULL_HANDLE;
+            return EEngineStatus::Ok;
+        }
+        //<-----------------------------------------------------------------------------
 
-            return { EEngineStatus::Ok };
+        //<-----------------------------------------------------------------------------
+        //
+        //<-----------------------------------------------------------------------------
+        template <typename TResourceManager>
+        EEngineStatus SVulkanBufferResource::bindBufferAndMemory(TResourceManager   *aResourceManager
+                                                                 , IVkGlobalContext *aVulkanEnvironment
+                                                                 , VkBuffer          aVkBuffer
+                                                                 , VkDeviceMemory    aVkMemory)
+        {
+            VkDevice vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
+            vkBindBufferMemory(vkLogicalDevice, aVkBuffer, aVkMemory, 0);
+
+            return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
     }

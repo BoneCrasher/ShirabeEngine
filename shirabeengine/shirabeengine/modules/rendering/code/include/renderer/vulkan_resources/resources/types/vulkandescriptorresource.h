@@ -16,12 +16,12 @@ namespace engine
 {
     namespace vulkan
     {
-        struct SVulkanMaterialResource;
+        struct SVulkanDescriptorResource;
     }
 
     namespace resources
     {
-        template <> struct SLogicalToGpuApiResourceTypeMap<SMaterial> { using TGpuApiResource = vulkan::SVulkanMaterialResource;  };
+        template <> struct SLogicalToGpuApiResourceTypeMap<SMaterial> { using TGpuApiResource = vulkan::SVulkanDescriptorResource;  };
     }
 
     namespace material_log
@@ -35,7 +35,7 @@ namespace engine
          * The SVulkanTextureResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanMaterialResource
+        struct SVulkanDescriptorResource
         {
             static constexpr bool is_loadable      = true;
             static constexpr bool is_unloadable    = true;
@@ -53,23 +53,23 @@ namespace engine
                                             , TResourceManager          *aResourceManager
                                             , IVkGlobalContext          *aVulkanEnvironment);
 
-            template <typename TResourceManager>
-            static EEngineStatus load(SMaterialDescription  const &aDescription
-                                      , Handles_t                 &aGpuApiHandles
-                                      , TResourceManager          *aResourceManager
-                                      , IVkGlobalContext          *aVulkanEnvironment);
+            // template <typename TResourceManager>
+            // static EEngineStatus load(SMaterialDescription  const &aDescription
+            //                           , Handles_t                 &aGpuApiHandles
+            //                           , TResourceManager          *aResourceManager
+            //                           , IVkGlobalContext          *aVulkanEnvironment);
 
-            template <typename TResourceManager>
-            static EEngineStatus transfer(SMaterialDescription  const &aDescription
-                                          , Handles_t                 &aGpuApiHandles
-                                          , TResourceManager          *aResourceManager
-                                          , IVkGlobalContext          *aVulkanEnvironment);
+            // template <typename TResourceManager>
+            // static EEngineStatus transfer(SMaterialDescription  const &aDescription
+            //                               , Handles_t                 &aGpuApiHandles
+            //                               , TResourceManager          *aResourceManager
+            //                               , IVkGlobalContext          *aVulkanEnvironment);
 
-            template <typename TResourceManager>
-            static EEngineStatus unload(SMaterialDescription  const &aDescription
-                                        , Handles_t                 &aGpuApiHandles
-                                        , TResourceManager          *aResourceManager
-                                        , IVkGlobalContext          *aVulkanEnvironment);
+            // template <typename TResourceManager>
+            // static EEngineStatus unload(SMaterialDescription  const &aDescription
+            //                             , Handles_t                 &aGpuApiHandles
+            //                             , TResourceManager          *aResourceManager
+            //                             , IVkGlobalContext          *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus deinitialize(SMaterialDescription  const &aDescription
@@ -245,10 +245,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanMaterialResource::initialize(SMaterialDescription  const &aDescription
-                                                          , Handles_t                 &aGpuApiHandles
-                                                          , TResourceManager          *aResourceManager
-                                                          , IVkGlobalContext          *aVulkanEnvironment)
+        EEngineStatus SVulkanDescriptorResource::initialize(SMaterialDescription  const &aDescription
+                                                          , Handles_t                   &aGpuApiHandles
+                                                          , TResourceManager            *aResourceManager
+                                                          , IVkGlobalContext            *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -338,10 +338,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanMaterialResource::deinitialize(SMaterialDescription const &aDescription
-                                                           , Handles_t                 &aGpuApiHandles
-                                                           , TResourceManager          *aResourceManager
-                                                           , IVkGlobalContext          *aVulkanEnvironment)
+        EEngineStatus SVulkanDescriptorResource::deinitialize(SMaterialDescription const &aDescription
+                                                            , Handles_t                  &aGpuApiHandles
+                                                            , TResourceManager           *aResourceManager
+                                                            , IVkGlobalContext           *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 

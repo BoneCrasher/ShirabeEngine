@@ -19,7 +19,7 @@
 #include "renderer/vulkan_resources/resources/types/vulkanmaterialpipelineresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanshadermoduleresource.h"
 #include "renderer/vulkan_resources/resources/types/vulkanmeshresource.h"
-#include "renderer/vulkan_resources/resources/types/vulkanmaterialresource.h"
+#include "renderer/vulkan_resources/resources/types/vulkandescriptorresource.h"
 
 #include "renderer/resource_management/cresourcemanager.h"
 

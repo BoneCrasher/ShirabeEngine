@@ -30,6 +30,15 @@ namespace engine
 
         struct
             [[nodiscard]]
+            SHIRABE_LIBRARY_EXPORT SMemoryDescription
+        {
+            std::string           name;
+            VkMemoryRequirements  memoryRequirements;
+            VkMemoryPropertyFlags memoryProperties;
+        };
+
+        struct
+            [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SBufferDescription
         {
             std::string          name;
@@ -191,8 +200,8 @@ namespace engine
         };
 
         struct
-                [[nodiscard]]
-                SHIRABE_TEST_EXPORT SShaderModuleDescriptor
+            [[nodiscard]]
+            SHIRABE_TEST_EXPORT SShaderModuleDescriptor
         {
             std::string                                                  name;
             std::unordered_map<VkShaderStageFlags, DataSourceAccessor_t> shaderStages;

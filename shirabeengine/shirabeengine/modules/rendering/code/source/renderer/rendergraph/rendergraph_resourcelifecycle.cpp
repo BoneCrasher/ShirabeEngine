@@ -26,7 +26,8 @@ namespace engine
                     continue;
                 }
 
-                if(false == resourcePtr->description.isDynamicImage)
+                bool const bIsDynamicImage = resourcePtr->description.isDynamicImage;
+                if(false == bIsDynamicImage)
                 {
                     EEngineStatus const initState = aResourceContext.initializePersistentImage(*resourcePtr);
                     if(EEngineStatus::Ok != initState)
