@@ -38,7 +38,7 @@ namespace engine
      *
      */
     template <typename T>
-    using CStdWeakPtr_t = std::weak_ptr<T>;
+    using Weak = std::weak_ptr<T>;
 
     /**
      * @brief makeShared
@@ -87,7 +87,7 @@ namespace engine
      * @param instance
      * @return
      */
-    template <typename T, typename TPtr = CStdWeakPtr_t<T>>
+    template <typename T, typename TPtr = Weak<T>>
     static inline TPtr makeCStdWeakFromThis(T* instance)
     {
         return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
@@ -201,7 +201,7 @@ namespace engine
               typename    TFnReturn, // Member function return-type
               typename... TFnParams> // Member function parameters
     static std::function<TFnReturn(TFnParams...)> bindMethod(
-        T            &instance,
+        T &instance,
         TFnReturn(T::*fn)(TFnParams...))
     {
         auto const function = [&instance, fn](TFnParams... args) mutable -> TFnReturn

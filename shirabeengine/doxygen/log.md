@@ -1270,8 +1270,8 @@ Possible candidates:
   SHIRABE_INLINE shader_precompiler::SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit const &aOther)
   SHIRABE_INLINE shader_precompiler::SShaderCompilationUnit::SShaderCompilationUnit(SShaderCompilationUnit &&aOther)
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:64: warning: documented symbol `private_methods engine::CResourceManagerBase::std::placeholders::_1' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:65: warning: documented symbol `private_methods engine::CResourceManagerBase::std::placeholders::_2' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:64: warning: documented symbol `private_methods engine::CRHIResourceManagerBase::std::placeholders::_1' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/include/resource_management/resourcemanager.h:65: warning: documented symbol `private_methods engine::CRHIResourceManagerBase::std::placeholders::_2' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/buildingblocks/camera.cpp:13: warning: no matching class member found for 
   engine::CCamera::CCamera()
 Possible candidates:
@@ -1298,10 +1298,10 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/core/engine.cpp:147: warning: no uniquely matching class member found for 
   CEngineResult engine::CEngineInstance::initialize()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:15: warning: documented symbol `engine::CResourceManagerBase::CResourceManagerBase' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:23: warning: documented symbol `engine::CResourceManagerBase::~CResourceManagerBase' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:15: warning: documented symbol `engine::CRHIResourceManagerBase::CRHIResourceManagerBase' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:23: warning: documented symbol `engine::CRHIResourceManagerBase::CRHIResourceManagerBasease' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/code/source/resource_management/resourcemanager.cpp:30: warning: no uniquely matching class member found for 
-  CEngineResult engine::CResourceManagerBase::initialize()
+  CEngineResult engine::CRHIResourceManagerBase::initialize()
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/asset/code/include/asset/assetregistry.h:77: warning: documented symbol `EAssetErrorCode engine::asset::CAssetRegistry< T >::addAsset' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/asset/code/source/assetstorage.cpp:20: warning: documented symbol `engine::asset::CAssetStorage::CAssetStorage' was not declared or defined.
@@ -1797,7 +1797,7 @@ Possible candidates:
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:707: warning: no matching class member found for 
   template < TResource >
-  CEngineResult engine::resources::CResourceManagerBase::addCreator(CreatorFn_t< TResource > const &aFunction)
+  CEngineResult engine::resources::CRHIResourceManagerBase::addCreator(CreatorFn_t< TResource > const &aFunction)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcepool.h:112: warning: documented symbol `CEngineResult engine::resources::IndexedResourcePool< TIndex, TValue >::addResource' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourceproxyfactory.h:66: warning: no matching class member found for 
@@ -1805,12 +1805,12 @@ Possible candidates:
   Shared< IResourceProxy< TResource > > engine::resources::CResourceProxyFactory::create(EProxyType const &aProxyType, typename TResource::CCreationRequest const &aCreationRequest)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcedatasource.cpp:26: warning: documented symbol `ByteBuffer engine::resources::CResourceDataSource::getData' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:10: warning: documented symbol `engine::resources::CResourceManagerBase::CResourceManagerBase' was not declared or defined.
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:18: warning: documented symbol `engine::resources::CResourceManagerBase::~CResourceManagerBase' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:10: warning: documented symbol `engine::resources::CRHIResourceManagerBase::CRHIResourceManagerBase' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:18: warning: documented symbol `engine::resources::CRHIResourceManagerBase::CRHIResourceManagerBasease' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:28: warning: no uniquely matching class member found for 
-  CEngineResult engine::resources::CResourceManagerBase::initialize()
+  CEngineResult engine::resources::CRHIResourceManagerBase::initialize()
 
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:61: warning: documented symbol `CEngineResult engine::resources::CResourceManagerBase::proxyLoad' was not declared or defined.
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/source/core/resourcemanagerbase.cpp:61: warning: documented symbol `CEngineResult engine::resources::CRHIResourceManagerBase::proxyLoad' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/utility/code/source/documents/xml.cpp:54: warning: documented symbol `engine::documents::CXMLDocumentSelectError::CXMLDocumentSelectError' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/utility/code/source/documents/xml.cpp:62: warning: documented symbol `engine::documents::CXMLDocument::~CXMLDocument' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/utility/code/source/documents/xml.cpp:100: warning: no matching class member found for 
@@ -2811,7 +2811,7 @@ Generating docs for compound engine::CObserver...
 Generating docs for compound engine::CPassKey...
 Generating docs for compound engine::CPlatformTime...
 Generating docs for compound engine::CRange...
-Generating docs for compound engine::CResourceManagerBase...
+Generating docs for compound engine::CRHIResourceManagerBase...
 Generating docs for compound engine::CResult...
 Generating docs for compound engine::CReverseIterationAdapter...
 Generating docs for compound engine::CScene...
@@ -2975,8 +2975,8 @@ Generating docs for nested compound engine::gfxapi::CTextureViewDeclaration::CCr
 Generating docs for compound engine::gfxapi::IAsyncLoadCallback...
 Generating docs for compound engine::gfxapi::IGFXAPIResourceTaskBackendModule...
 Generating docs for compound engine::gfxapi::SAPIAdapterDescription...
-Generating docs for compound engine::gfxapi::SAttachmentDescription...
-Generating docs for compound engine::gfxapi::SAttachmentReference...
+Generating docs for compound engine::gfxapi::SRHIAttachmentDescription...
+Generating docs for compound engine::gfxapi::SRHIAttachmentReference...
 Generating docs for compound engine::gfxapi::SDeferredResourceOperationHandle...
 Generating docs for compound engine::gfxapi::SGAPIAdapter...
 Generating docs for compound engine::gfxapi::SGAPIAdapterOutputConfig...
@@ -2999,7 +2999,7 @@ Generating docs for compound engine::gfxapi::SMaterialVertexInputBinding...
 Generating docs for compound engine::gfxapi::SMaterialVertexInputState...
 Generating docs for compound engine::gfxapi::SMaterialViewPortState...
 Generating docs for compound engine::gfxapi::SMultisampling...
-Generating docs for compound engine::gfxapi::SSubpassDescription...
+Generating docs for compound engine::gfxapi::SRHISubpassDescription...
 Generating docs for compound engine::gfxapi::STextureInfo...
 Generating docs for compound engine::gfxapi::SViewPort...
 Generating docs for namespace engine::Helper
@@ -3056,9 +3056,9 @@ Generating docs for compound engine::rendering::IRenderContext...
 Generating docs for compound engine::rendering::IRenderer...
 Generating docs for compound engine::rendering::SRenderable...
 Generating docs for compound engine::rendering::SRendererConfiguration...
-Generating docs for namespace Engine::Resources
+Generating docs for namespace engine::rhi
 Generating docs for compound Engine::Resources::Device...
-Generating docs for namespace engine::resources
+Generating docs for namespace engine::rhi
 Generating docs for compound engine::resources::CBaseDeclaration...
 Generating docs for nested compound engine::resources::CBaseDeclaration::CCreationRequestBase...
 Generating docs for nested compound engine::resources::CBaseDeclaration::CDestructionRequestBase...
@@ -3073,7 +3073,7 @@ Generating docs for compound engine::resources::CResourceCreationRequestAdapter.
 Generating docs for compound engine::resources::CResourceDataSource...
 Generating docs for compound engine::resources::CResourceDescriptorAdapter...
 Generating docs for compound engine::resources::CResourceDestructionRequestAdapter...
-Generating docs for compound engine::resources::CResourceManagerBase...
+Generating docs for compound engine::resources::CRHIResourceManagerBase...
 Generating docs for compound engine::resources::CResourceProxyFactory...
 Generating docs for compound engine::resources::CResourcePublicTraits...
 Generating docs for compound engine::resources::CResourceQueryRequestAdapter...
@@ -3112,11 +3112,11 @@ Generating docs for compound engine::vulkan::CVulkanError...
 Generating docs for compound engine::vulkan::CVulkanRenderContext...
 Generating docs for compound engine::vulkan::CVulkanResourceTaskBackend...
 Generating docs for compound engine::vulkan::CX11VulkanSurface...
-Generating docs for compound engine::vulkan::SVulkanFrameBufferResource...
+Generating docs for compound engine::vulkan::SVulkanRHIFrameBufferResource...
 Generating docs for compound engine::vulkan::SVulkanPipelineResource...
-Generating docs for compound engine::vulkan::SVulkanRenderPassResource...
-Generating docs for compound engine::vulkan::SVulkanTextureResource...
-Generating docs for compound engine::vulkan::SVulkanTextureViewResource...
+Generating docs for compound engine::vulkan::SVulkanRHIRenderPassResource...
+Generating docs for compound engine::vulkan::SVulkanRHIImageResource...
+Generating docs for compound engine::vulkan::SVulkanRHIImageViewResource...
 Generating docs for namespace engine::vulkan::Debug
 Generating docs for namespace engine::wsi
 Generating docs for compound engine::wsi::CWindowEventCallbackAdapter...
@@ -3547,7 +3547,7 @@ Generating XML output for class engine:/home/dotti/workspaces/shirabeengine/shir
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:129: warning: argument 'aOther' of command @param is not found in the argument list of engine::math::CField< T, TByteSize, TN, TStride >::operator-=(ClassType_t const &aRight)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/math/code/include/math/field.h:133: warning: The following parameters of engine::math::CField::operator-=(ClassType_t const &aRight) are not documented:
   parameter 'aRight'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/rendergraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::create(Shared< IAssetStorage > aAssetStorage, Shared< CMaterialLoader > aMaterialLoader, Shared< CResourceManagerBase > aResourceManager, Shared< IRenderContext > aRenderer) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/rendergraph/framegraphrendercontext.h:51: warning: The following parameters of engine::framegraph::CRenderGraphRenderContext::create(Shared< IAssetStorage > aAssetStorage, Shared< CMaterialLoader > aMaterialLoader, Shared< CRHIResourceManagerBase > aResourceManager, Shared< IRenderContext > aRenderer) are not documented:
   parameter 'aMaterialLoader'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/rendergraph/framegraphrendercontext.h:76: warning: argument 'aSourceImage' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::copyImage(SRenderGraphImage const &aSourceTexture, SRenderGraphImage const &aTargetTexture)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/rendering/code/include/renderer/rendergraph/framegraphrendercontext.h:76: warning: argument 'aTargetImage' of command @param is not found in the argument list of engine::framegraph::CRenderGraphRenderContext::copyImage(SRenderGraphImage const &aSourceTexture, SRenderGraphImage const &aTargetTexture)
@@ -3801,11 +3801,11 @@ Generating XML output for class test::test_blog::Collap/home/dotti/workspaces/sh
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/requestdefaultimplementation.h:151: warning: argument 'inPublicResourceId' of command @param is not found in the argument list of engine::resources::CBaseDeclaration::CQueryBase::CQueryBase(PublicResourceId_t const &aPublicResourceId)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/requestdefaultimplementation.h:154: warning: The following parameters of engine::resources::CBaseDeclaration::CQueryBase::CQueryBase(PublicResourceId_t const &aPublicResourceId) are not documented:
   parameter 'aPublicResourceId'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:100: warning: argument 'creationDeferred' of command @param is not found in the argument list of engine::resources::CResourceManagerBase::createResource(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:111: warning: The following parameters of engine::resources::CResourceManagerBase::createResource(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:100: warning: argument 'creationDeferred' of command @param is not found in the argument list of engine::resources::CRHIResourceManagerBase::createResource(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:111: warning: The following parameters of engine::resources::CRHIResourceManagerBase::createResource(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false) are not documented:
   parameter 'aCreationDeferred'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:256: warning: argument 'creationDeferred' of command @param is not found in the argument list of engine::resources::CResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:267: warning: The following parameters of engine::resources::CResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:256: warning: argument 'creationDeferred' of command @param is not found in the argument list of engine::resources::CRHIResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:267: warning: The following parameters of engine::resources::CRHIResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false) are not documented:
   parameter 'aCreationDeferred'
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'outFormatted' of command @param is not found in the argument list of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'inArg' of command @param is not found in the argument list of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
@@ -3859,8 +3859,8 @@ Generating XML output for class engine::resources::CResourceCreationRequestAdapt
 Generating XML output for class engine::resources::CResourceDataSource
 Generating XML output for class engine::resources::CResourceDescriptorAdapter
 Generating XML output for class engine::resources::CResourceDestructionRequestAdapter
-Generating XML output for class engine::CResourceManagerBase
-Generating XML output for class engine::resources::CResourceManagerBase
+Generating XML output for class engine::CRHIResourceManagerBase
+Generating XML output for class engine::resources::CRHIResourceManagerBase
 Generating XML output for class engine::resources::CResourceProxyFactory
 Generating XML output for class engine::resources::CResourcePublicTraits
 Generating XML output for class engine::resources::CResourceQueryRequestAdapter
@@ -4251,8 +4251,8 @@ Generating XML output for class m::htmlsanity::SaneHtmlWriter
 Generating XML output for class engine::gfxapi::SAPIAdapterDescription
 Generating XML output for class engine::os::SApplicationEnvironment
 Generating XML output for class engine::asset::SAsset
-Generating XML output for class engine::gfxapi::SAttachmentDescription
-Generating XML output for class engine::gfxapi::SAttachmentReference
+Generating XML output for class engine::gfxapi::SRHIAttachmentDescription
+Generating XML output for class engine::gfxapi::SRHIAttachmentReference
 Generating XML output for class engine::material::SBoundResource
 Generating XML output for class engine::asset::SBufferAsset
 Generating XML output for class engine::material::SBufferData
@@ -4350,7 +4350,7 @@ Generating XML output for class Test::RenderGraph::SSpawnProxy
 Generating XML output for class engine::SSpawnProxy
 Generating XML output for class engine::material::SStageInput
 Generating XML output for class engine::material::SStageOutput
-Generating XML output for class engine::gfxapi::SSubpassDescription
+Generating XML output for class engine::gfxapi::SRHISubpassDescription
 Generating XML output for class engine::material::SSubpassInput
 Generating XML output for class documentation::doxygen::State
 Generating XML output for class documentation::python::State
@@ -4375,15 +4375,15 @@ Generating XML output for class m::components::SuccessText
 Generating XML output for class engine::material::SUniformBuffer
 Generating XML output for class engine::material::SBufferMember
 Generating XML output for class engine::gfxapi::SViewPort
-Generating XML output for class engine::vulkan::SVulkanFrameBufferResource
+Generating XML output for class engine::vulkan::SVulkanRHIFrameBufferResource
 Generating XML output for class engine::vulkan::CVulkanEnvironment::SVulkanPhysicalDevice
 Generating XML output for class engine::vulkan::SVulkanPipelineResource
-Generating XML output for class engine::vulkan::SVulkanRenderPassResource
+Generating XML output for class engine::vulkan::SVulkanRHIRenderPassResource
 Generating XML output for class engine::vulkan::CVulkanEnvironment::SVulkanState
 Generating XML output for class engine::vulkan::CVulkanEnvironment::SVulkanSwapChain
-Generating XML output for class engine::vulkan::SVulkanTextureResource
+Generating XML output for class engine::vulkan::SVulkanRHIImageResource
 Generating XML outpu/home/dotti/workspaces/shirabeengine/shirabeengine/doxygen/m.css/documentation/test_doxygen/search/Dir/File.h:85: warning: Found unknown command `\m_keywords'
-t for class engine::vulkan::SVulkanTextureViewResource
+t for class engine::vulkan::SVulkanRHIImageViewResource
 Generating XML output for class engine::documents::xpath::SXPath
 Generating XML output for class documentation::test_doxygen::test_contents::Tagfile
 Generating XML output for class Task
@@ -4536,8 +4536,8 @@ Generating XML output for namespace engine::os
 Generating XML output for namespace engine::random
 Generating XML output for namespace Engine::Rendering
 Generating XML output for namespace engine::rendering
-Generating XML output for namespace Engine::Resources
-Generating XML output for namespace engine::resources
+Generating XML output for namespace engine::rhi
+Generating XML output for namespace engine::rhi
 Generating XML output for namespace engine::serialization
 Generating XML output for namespace engine::threading
 Generating XML output for namespace Engine::Threading

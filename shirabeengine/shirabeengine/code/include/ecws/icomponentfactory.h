@@ -2,11 +2,17 @@
 #define __SHIRABE_ICOMPONENTFACTORY_H__
 
 #include <core/enginetypehelper.h>
-#include "ecws/icomponent.h"
 #include "ecws/ecomponenttype.h"
 
 namespace engine::ecws
 {
+    class IComponent
+    {
+        SHIRABE_DECLARE_INTERFACE(IComponent);
+
+    public_api:
+    };
+
     /**
      * The IComponentFactory interface describes valid factory signatures of a
      * component factory to create specific components.

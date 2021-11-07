@@ -14,7 +14,7 @@ add_subdirectory(modules/utility)
 add_subdirectory(modules/wsi)
 add_subdirectory(modules/graphicsapi)
 add_subdirectory(modules/asset)
-add_subdirectory(modules/rendering)
+add_subdirectory(modules/rhi)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
 
@@ -37,19 +37,20 @@ set(
         utility
         wsi
         resources
-        rendering
         graphicsapi
         asset)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-        SHIRABEMODULERENDERING)
+		SHIRABEMODULERHI
+		SHIRABEMODULEASSET
+		SHIRABEMODULEGRAPHICSAPI
+		SHIRABEMODULEWSI)
 
 include(project_setup)
 
 add_dependencies(shirabeengine INSTALL_wsi)
 add_dependencies(shirabeengine INSTALL_graphicsapi)
-add_dependencies(shirabeengine INSTALL_rendering)
 add_dependencies(shirabeengine INSTALL_asset)
 add_dependencies(shirabeengine INSTALL_utility)
 add_dependencies(shirabeengine INSTALL_core)

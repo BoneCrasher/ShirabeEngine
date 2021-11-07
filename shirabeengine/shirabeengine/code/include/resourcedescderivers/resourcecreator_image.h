@@ -12,7 +12,7 @@
 #include "textures/declaration.h"
 #include "textures/loader.h"
 
-namespace engine::resources
+namespace engine::rhi
 {
     using namespace asset;
     using namespace textures;
@@ -41,7 +41,7 @@ namespace engine::resources
 
             STextureDescription textureDescription {};
             textureDescription.name        = aTextureInstance->name();
-            textureDescription.textureInfo = aTextureInstance->textureInfo();
+            textureDescription.imageInfo   = aTextureInstance->imageInfo();
             textureDescription.cpuGpuUsage = EResourceUsage::CPU_InitConst_GPU_Read;
             textureDescription.gpuBinding  = EBufferBinding::TextureInput | EBufferBinding::CopyTarget;
             textureDescription.gpuBinding.set(EBufferBinding::CopyTarget);

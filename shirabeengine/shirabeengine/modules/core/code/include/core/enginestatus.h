@@ -105,6 +105,8 @@ namespace engine
         Timer_PlatformTimestampFetchFailed                              = -300053,
         Time_Win32__QueryPerformanceFrequencyFailed                     = -300101,
         Time_Win32__QueryPerformanceCounterFailed                       = -300102,
+        ECWS_Generic                                                     = -301000,
+        ECWS_ChildComponentInitError                                     = -301005,
         RenderGraph_Generic                                              = -500001,
         RenderGraph_PassBuilder_TextureIsBeingRead                       = -500101,
         RenderGraph_PassBuilder_TextureIsBeingWritten                    = -500102,

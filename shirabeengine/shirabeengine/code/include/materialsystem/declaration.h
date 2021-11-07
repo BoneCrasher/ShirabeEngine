@@ -16,11 +16,12 @@
 #include <base/declaration.h>
 #include <base/stl_container_helpers.h>
 #include <core/enginestatus.h>
+#include <core/enginetypehelper.h>
 #include <core/bitfield.h>
 #include <core/memory/allocators/allocators.h>
 #include <core/serialization/serialization.h>
-#include <asset/assettypes.h>
-#include <asset/material/asset.h>
+#include "asset/assettypes.h"
+#include "asset/material/asset.h"
 
 namespace engine
 {
@@ -35,6 +36,10 @@ namespace engine
 
     namespace material
     {
+        static uint32_t const DEFAULT_BUFFER_ALIGMENT            = 256;
+        static uint32_t const DEFAULT_TRANSFORM_BUFFER_ALIGNMENT = 16;
+        static uint32_t const DEFAULT_DATA_BUFFER_ALIGNMENT      = DEFAULT_BUFFER_ALIGMENT;
+
         /**
          * A material sharedMaterial is composed by a signature and base configuration.
          * It will be used to create instances from this material.
@@ -258,7 +263,7 @@ namespace engine
              * Create a material config, optionally from another.
              */
             SHIRABE_INLINE
-            CMaterialConfig(asset::AssetId_t const &aAssetUID = 0)
+            explicit CMaterialConfig(asset::AssetId_t const &aAssetUID = 0)
                 : asset::CAssetReference(aAssetUID)
                   , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
                   , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
@@ -276,7 +281,7 @@ namespace engine
             { }
 
             SHIRABE_INLINE
-            CMaterialConfig(CMaterialConfig  &&aOther)
+            CMaterialConfig(CMaterialConfig  &&aOther) noexcept
                 : asset::CAssetReference(aOther.getAssetId())
                   , serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>()
                   , serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>()
@@ -285,14 +290,14 @@ namespace engine
             { }
 
         public_destructors:
-            ~CMaterialConfig() = default;
+            ~CMaterialConfig() override = default;
 
         public_operators:
             /**
              * Assign another material config.
              */
             SHIRABE_INLINE
-            CMaterialConfig &operator=(CMaterialConfig const &aOther)
+            CMaterialConfig &operator=(CMaterialConfig const &aOther) noexcept
             {
                 mBufferIndex = aOther.mBufferIndex;
                 mData        = aOther.mData;
@@ -301,7 +306,7 @@ namespace engine
             }
 
             SHIRABE_INLINE
-            CMaterialConfig &operator=(CMaterialConfig &&aOther)
+            CMaterialConfig &operator=(CMaterialConfig &&aOther) noexcept
             {
                 mBufferIndex = std::move(aOther.mBufferIndex);
                 mData        = std::move(aOther.mData);
@@ -391,14 +396,14 @@ namespace engine
              * @param aSerializer
              * @return
              */
-            bool acceptSerializer(documents::IJSONSerializer<CMaterialConfig> &aSerializer) const;
+            bool acceptSerializer(documents::IJSONSerializer<CMaterialConfig> &aSerializer) const override;
 
             /**
              * @brief acceptDeserializer
              * @param aSerializer
              * @return
              */
-            bool acceptDeserializer(documents::IJSONDeserializer<CMaterialConfig> &aDeserializer);
+            bool acceptDeserializer(documents::IJSONDeserializer<CMaterialConfig> &aDeserializer) override;
 
         private_methods:
             /**
@@ -563,17 +568,17 @@ namespace engine
         {
             public_constructors:
                 SHIRABE_INLINE
-                explicit CMaterialInstance(std::string             const &aName,
-                                           Shared<CSharedMaterial>        aSharedMaterial)
-                    : mName           ( aName            )
-                    , mConfiguration  (                  )
+                explicit CMaterialInstance(std::string             aName,
+                                           Shared<CSharedMaterial> aSharedMaterial)
+                    : mName          (std::move( aName))
+                    , mConfiguration ()
                     , mSharedMaterial(std::move(aSharedMaterial))
                 {}
 
                 SHIRABE_INLINE
-                explicit CMaterialInstance(CMaterialInstance &&aOther)
-                    : mName         (std::move(aOther.mName           ))
-                    , mConfiguration(std::move(aOther.mConfiguration  ))
+                CMaterialInstance(CMaterialInstance &&aOther) noexcept
+                    : mName          (std::move(aOther.mName          ))
+                    , mConfiguration (std::move(aOther.mConfiguration ))
                     , mSharedMaterial(std::move(aOther.mSharedMaterial))
                 {}
 
@@ -582,7 +587,7 @@ namespace engine
 
             public_operators:
                 SHIRABE_INLINE
-                CMaterialInstance &operator=(CMaterialInstance &&aOther)
+                CMaterialInstance &operator=(CMaterialInstance &&aOther) noexcept
                 {
                     mName           = std::move(aOther.mName           );
                     mSharedMaterial = std::move(aOther.mSharedMaterial);

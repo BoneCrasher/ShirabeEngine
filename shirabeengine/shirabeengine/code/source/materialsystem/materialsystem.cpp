@@ -17,9 +17,9 @@ namespace engine
     EEngineStatus CMaterialSystem::initialize(Unique<memory::CMemoryManager> &aMemoryManager)
     {
         static constexpr std::size_t const sTransformBufferSize      = (4096 * sizeof(math::CVector4D<float>));
-        static constexpr std::size_t const sTransformBufferAlignment = 16;
+        static constexpr std::size_t const sTransformBufferAlignment = DEFAULT_TRANSFORM_BUFFER_ALIGNMENT;
         static constexpr std::size_t const sDataBufferSize           = (64 * 1024 * 1024);
-        static constexpr std::size_t const sDataBufferAlignment      = 16;
+        static constexpr std::size_t const sDataBufferAlignment      = DEFAULT_DATA_BUFFER_ALIGNMENT;
 
         mTransformAllocator
             = aMemoryManager->getAllocator<memory::allocators::CPoolAllocator>(sTransformBufferSize

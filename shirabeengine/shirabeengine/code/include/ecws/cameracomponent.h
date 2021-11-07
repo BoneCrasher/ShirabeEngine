@@ -10,7 +10,7 @@ namespace engine::ecws
 		: public CComponentBase
 	{
 	public_constructors:
-            CCameraComponent(std::string const &aName);
+        explicit CCameraComponent(std::string const &aName);
 
     public_destructors:
 		~CCameraComponent() override;

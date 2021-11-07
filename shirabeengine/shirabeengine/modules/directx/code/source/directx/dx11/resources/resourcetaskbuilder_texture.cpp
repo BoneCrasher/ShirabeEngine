@@ -3,7 +3,7 @@
 namespace Engine {
   namespace DX {
     namespace _11 {
-      using namespace Engine::Resources;
+      using namespace engine::rhi;
       using namespace Engine::DX::_11;
 
       //EEngineStatus

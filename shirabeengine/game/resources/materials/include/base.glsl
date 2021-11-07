@@ -98,7 +98,7 @@ readonly buffer AnimationTransformStorage
 }
 animations;
 
-layout (constant_id = 5) const int SHIRABE_MAXNUM_TEXTURES = 256;
+layout (constant_id = 5) const int SHIRABE_MAXNUM_TEXTURES = 4096; // 256
 layout (set = 0, binding = 5)
 uniform sampler2D textures[SHIRABE_MAXNUM_TEXTURES];
 

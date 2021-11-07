@@ -2,13 +2,13 @@
 #define __SHIRABE_COMPONENT_BASE_H__
 
 #include <string>
+#include <typeindex>
 #include <base/declaration.h>
+#include <core/enginestatus.h>
 #include <core/enginetypehelper.h>
 
 namespace engine::ecws
 {
-    class CEntity;
-
     template <typename TElement>
     class CBoundedCollection
     {
@@ -17,24 +17,24 @@ namespace engine::ecws
 
     public_constructors:
         SHIRABE_INLINE
-        CBoundedCollection()
+        explicit CBoundedCollection()
             : CBoundedCollection(0)
         {}
 
         SHIRABE_INLINE
         explicit CBoundedCollection(std::size_t const &aMaxElements)
             : mMaxElements(aMaxElements)
-              , mElements()
+            , mElements()
         {}
 
         SHIRABE_INLINE CBoundedCollection(CBoundedCollection<TElement> const &aOther)
             : mMaxElements(aOther.mMaxElements)
-              , mElements   (aOther.mElements)
+            , mElements   (aOther.mElements)
         {}
 
         SHIRABE_INLINE CBoundedCollection(CBoundedCollection<TElement> &&aOther) noexcept
             : mMaxElements(aOther.mMaxElements)
-              , mElements   (std::move(aOther.mElements))
+            , mElements   (std::move(aOther.mElements))
         {}
 
         SHIRABE_INLINE
@@ -133,31 +133,31 @@ namespace engine::ecws
         Vector<TElement>  mElements;
     };
 
+    struct SComponentEntry
+    {
+        std::type_index              typeIndex;
+        Shared<class CComponentBase> component;
 
-    SHIRABE_DECLARE_LIST_OF_TYPE(Shared<class CComponentBase>, Component);
-    SHIRABE_DECLARE_MAP_OF_TYPES(std::type_index, CBoundedCollection<Shared<class CComponentBase>>, Component);
+        template <typename TComponent>
+        explicit SComponentEntry(Shared<TComponent> aComponent)
+            : typeIndex(typeid(TComponent))
+            , component(std::move(aComponent))
+        { }
+    };
+
+    SHIRABE_DECLARE_LIST_OF_TYPE(SComponentEntry, Component);
 
 	class CComponentBase
 	{
-	    friend class CEntity;
-
 	public_constructors:
-	    SHIRABE_INLINE
-	    CComponentBase(std::string const &aName)
-	        : mName(aName)
-        {}
+	    explicit CComponentBase(std::string aName);
 
     public_destructors:
-		SHIRABE_INLINE
-	    ~CComponentBase()
-        {
-	        mParentEntity = nullptr;
-        };
+	    virtual ~CComponentBase() = default;
 
 	public_methods:
 	    [[nodiscard]]
-	    SHIRABE_INLINE
-	    std::string const &name() const { return mName; }
+	    SHIRABE_INLINE std::string const &name() const { return mName; }
 
         /**
          * Set the component name.
@@ -167,12 +167,27 @@ namespace engine::ecws
         SHIRABE_INLINE void setName(std::string const& aName) { mName = aName; }
 
         /**
+         * Initialize this component and make it ready for use.
+         *
+         * @return EEngineStatus::Ok, if successful, an error code otherwise.
+         */
+        virtual EEngineStatus initialize();
+
+        /**
+         * Cleanup and deinitialize this components.
+         * Will deinitialize and detach all child components!
+         *
+         * @return EEngineStatus::Ok, if successful, an error code otherwise.
+         */
+        virtual EEngineStatus deinitialize();
+
+        /**
          * Update the component with an optionally usable timer component.
          *
          * @param aTimer A timer providing the currently elapsed time.
          * @return       Return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        EEngineStatus update(CTimer const &aTimer);
+        virtual EEngineStatus update(class CTimer const &aTimer);
 
         /**
          * Add a component to the internal component collection.
@@ -181,7 +196,12 @@ namespace engine::ecws
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
         template <typename TComponent>
-        EEngineStatus addComponent(Shared<TComponent> const &aComponent);
+        SHIRABE_INLINE EEngineStatus addComponent(Shared<TComponent> aComponent)
+        {
+            SComponentEntry entry(aComponent);
+            mChildren.push_back(entry);
+            return EEngineStatus::Ok;
+        }
 
         /**
          * Check, wether a specific component type is available in the internal component collection.
@@ -189,8 +209,18 @@ namespace engine::ecws
          * @tparam TComponent The type of component to check for.
          */
         template<typename TComponent>
-        [[nodiscard]]
-        bool hasComponentOfType() const;
+        [[nodiscard]] SHIRABE_INLINE
+        bool hasComponentOfType() const
+        {
+            std::type_index const typeIndex = typeid(TComponent);
+
+            auto const pred = [&] (SComponentEntry const &r) -> bool
+            {
+                return r.typeIndex == typeIndex;
+            };
+
+            return std::any_of(mChildren.begin(), mChildren.end(), pred);
+        }
 
         /**
          * Fetch a list of components of specific type TComponent, if any.
@@ -198,7 +228,12 @@ namespace engine::ecws
          * @tparam TComponent The type of component to enumerate.
          */
         template <typename TComponent>
-        CBoundedCollection<Shared<TComponent>> const getTypedComponentsOfType() const;
+        CBoundedCollection<Weak<TComponent>> getTypedComponentsOfType(bool const aRecurse = true) const
+        {
+            CBoundedCollection<Weak<TComponent>> matches;
+            getTypedComponentsOfTypeImpl<TComponent>(matches, aRecurse);
+            return matches;
+        }
 
         /**
          * Remove a component from the internal component collection.
@@ -207,24 +242,51 @@ namespace engine::ecws
          * @return           EEngineStatus::Ok, if successful. An error code otherwise.
          */
         template <typename TComponent>
-        EEngineStatus removeComponent(Shared<TComponent> const &aComponent);
+        EEngineStatus removeComponent(Weak<TComponent> const &aComponent)
+        {
+            auto const pred = [&] (SComponentEntry const &r) -> bool
+            {
+                return r.component == aComponent;
+            };
+
+            return std::remove_if(mChildren.begin(), mChildren.end(), pred);
+        }
 
     protected_methods:
-	    SHIRABE_INLINE
-        void setParentEntity(class CEntity const *const aEntity)
-        {
-	        mParentEntity = aEntity;
-        }
+	    void setParent(Weak<CComponentBase> aEntity);
 
 	    [[nodiscard]]
 	    SHIRABE_INLINE
-	    CEntity const *const getParentEntity() const
+	    Weak<CComponentBase> parentComponent() const { return mParent; }
+
+
+        /**
+         * Fetch a list of components of specific type TComponent, if any.
+         *
+         * @tparam TComponent The type of component to enumerate.
+         */
+        template <typename TComponent>
+        void getTypedComponentsOfTypeImpl(CBoundedCollection<Weak<TComponent>> &aOutComponents, bool const aRecurse) const
         {
-	        return mParentEntity;
+            std::type_index const typeIndex = typeid(TComponent);
+            for(auto const &child : mChildren)
+            {
+                if(child.typeIndex == typeIndex)
+                {
+                    aOutComponents.push_back(std::static_pointer_cast<TComponent>(child.component));
+                }
+
+                if(aRecurse)
+                {
+                    child.component->template getTypedComponentsOfTypeImpl<TComponent>(aOutComponents, aRecurse);
+                }
+            }
         }
 
 	private_members:
-	    std::string mName;
+	    std::string          mName;
+	    Weak<CComponentBase> mParent;
+	    ComponentList        mChildren;
 	};
 }
 #endif

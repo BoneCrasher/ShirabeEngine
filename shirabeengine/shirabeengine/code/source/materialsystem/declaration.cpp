@@ -2,7 +2,6 @@
 
 #include <util/documents/json.h>
 
-
 namespace engine::material
 {
 
@@ -33,7 +32,7 @@ namespace engine::material
         {
             std::string const &bufferName = uniformBuffer.name;
             std::size_t const &byteSize   = (uniformBuffer.location.length + uniformBuffer.location.padding);
-            std::size_t const &alignment  = 256;
+            std::size_t const &alignment  = DEFAULT_DATA_BUFFER_ALIGNMENT;
 
             void *data = aAllocator->allocate(byteSize, alignment);
             Shared<memory::allocators::CAllocator> allocator = makeShared<memory::allocators::CBlockAllocator>(aAllocator.get(), byteSize, data);
@@ -45,7 +44,7 @@ namespace engine::material
         {
             std::string const &bufferName = storageBuffer.name;
             std::size_t const &byteSize   = (storageBuffer.location.length + storageBuffer.location.padding);
-            std::size_t const &alignment  = 256;
+            std::size_t const &alignment  = DEFAULT_DATA_BUFFER_ALIGNMENT;
 
             void *data = aAllocator->allocate(byteSize, alignment);
             Shared<memory::allocators::CAllocator> allocator = makeShared<memory::allocators::CBlockAllocator>(aAllocator.get(), byteSize, data);
@@ -83,7 +82,7 @@ namespace engine::material
     CMaterialConfig CMaterialConfig::fromMaterialDesc(CSharedMaterial const &aMaterial, bool aIncludeSystemBuffers)
     {
         // uint32_t const minUBOOffsetAlignment = 0x100; // Hardcoded for the platform SCHLACHTSCHIFF ... make accessible in any other way...
-        uint32_t const minUBOOffsetAlignment = 256; // 0x20;  // Hardcoded for the platform LENOVO ... make accessible in any other way...
+        uint32_t const minUBOOffsetAlignment = DEFAULT_DATA_BUFFER_ALIGNMENT; // 0x20;  // Hardcoded for the platform LENOVO ... make accessible in any other way...
         std::size_t alignment = minUBOOffsetAlignment; // 16 * sizeof(float);
         // if (0 < minUBOOffsetAlignment) {
         //     alignment = (alignment + minUBOOffsetAlignment - 1) & ~(minUBOOffsetAlignment - 1);
@@ -115,8 +114,8 @@ namespace engine::material
             {
                 Shared<SBufferMember> member = makeShared<SBufferMember>(*aMember);
 
-                member->location.offset  = (aCurrentBaseOffset + member->location.offset + (k * member->array.stride));
-                member->location.length  = member->location.length; // nextMultiple(aMember->location.length, alignment);
+                member->location.offset = (aCurrentBaseOffset + member->location.offset + (k * member->array.stride));
+                member->location.length = member->location.length; // nextMultiple(aMember->location.length, alignment);
 
                 std::string prefixPath = path;
                 if(1 < arrayLayers)
@@ -144,8 +143,7 @@ namespace engine::material
         //
         // Filter out all non-user-set indexed buffers, so that they won't have any influence on the buffer size calculation.
         //
-        bool const processSystemUBOs = aIncludeSystemBuffers;
-        if(not processSystemUBOs)
+        if(not aIncludeSystemBuffers)
         {
             static constexpr uint8_t sFirstPermittedUserSetIndex = 2;
 
@@ -217,7 +215,8 @@ namespace engine::material
 
             config.mBufferIndex.insert({ buffer.name, bufferValueIndex });
 
-            int8_t *alignedData = (int8_t *)aligned_alloc(alignment, member->location.length);
+            // TODO: Make sure that the allocation is performed from the allocators.
+            auto *alignedData = (int8_t *)aligned_alloc(alignment, member->location.length);
             memset(alignedData, 0, member->location.length);
             config.mData.insert({ buffer.name, Shared<void>(alignedData) });
         }

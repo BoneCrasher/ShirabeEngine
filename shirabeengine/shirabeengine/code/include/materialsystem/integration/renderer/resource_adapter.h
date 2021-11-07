@@ -8,8 +8,8 @@
 #include <asset/assetstorage.h>
 #include <asset/material/serialization.h>
 
-#include <renderer/resource_management/cresourcemanager.h>
-#include <renderer/resource_management/resourcedescriptions.h>
+#include <rhi/resource_management/cresourcemanager.h>
+#include <rhi/resource_management/resourcedescriptions.h>
 #include "materialsystem/declaration.h"
 
 namespace engine
@@ -19,16 +19,103 @@ namespace engine
         using namespace asset;
         using namespace material;
 
+        struct SHIRABE_TEST_EXPORT SMaterialInstanceRHIResourceCollection
+        {
+            ResourceId_t shaderModuleResourceId;
+            ResourceId_t pipelineLayoutResourceId;
+            ResourceId_t pipelineDescriptorResourceId;
+            ResourceId_t pipelineTemplateResourceId;
+            std::vector<ResourceId_t> imageResourceIds;
+        };
+
         template<>
-        class CResourceCreator<CMaterialInstance, SMaterialDescription>
+        class CResourceCreator<CMaterialInstance, SRHIDescriptorDescription>
         {
         public:
-            static OptionalRef_t<vulkan::MaterialResourceState_t>
+            static OptionalRef_t<SMaterialInstanceRHIResourceCollection>
                     create(Shared<CAssetStorage>       aAssetStorage
-                           , Shared<CResourceManager>  aResourceManager
+                           , Shared<CRHIResourceManager>  aResourceManager
                            , Shared<CMaterialInstance> aInstance)
             {
                 using namespace vulkan;
+
+                auto const configureInputAssembly =
+                   [](SRHIPipelineDescriptor &aPipelineDescriptor) -> void
+                       {
+                           aPipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+                           aPipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
+                           aPipelineDescriptor.inputAssemblyState.flags                  = 0;
+                           aPipelineDescriptor.inputAssemblyState.topology               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+                           aPipelineDescriptor.inputAssemblyState.primitiveRestartEnable = false;
+                       };
+
+                auto const configureRasterizer =
+                   [](SRHIPipelineDescriptor &aPipelineDescriptor) -> void
+                       {
+                           aPipelineDescriptor.rasterizerState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+                           aPipelineDescriptor.rasterizerState.pNext                   = nullptr;
+                           aPipelineDescriptor.rasterizerState.flags                   = 0;
+                           aPipelineDescriptor.rasterizerState.cullMode                = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+                           aPipelineDescriptor.rasterizerState.frontFace               = VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
+                           aPipelineDescriptor.rasterizerState.polygonMode             = VkPolygonMode::VK_POLYGON_MODE_FILL;
+                           aPipelineDescriptor.rasterizerState.lineWidth               = 1.0f;
+                           aPipelineDescriptor.rasterizerState.rasterizerDiscardEnable = VK_FALSE; // isCoreMaterial ? VK_TRUE : VK_FALSE;
+                           aPipelineDescriptor.rasterizerState.depthClampEnable        = VK_FALSE;
+                           aPipelineDescriptor.rasterizerState.depthBiasEnable         = VK_FALSE;
+                           aPipelineDescriptor.rasterizerState.depthBiasSlopeFactor    = 0.0f;
+                           aPipelineDescriptor.rasterizerState.depthBiasConstantFactor = 0.0f;
+                           aPipelineDescriptor.rasterizerState.depthBiasClamp          = 0.0f;
+                       };
+
+                auto const configureMultisampler =
+                   [](SRHIPipelineDescriptor &aPipelineDescriptor) -> void
+                       {
+                           aPipelineDescriptor.multiSampler.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+                           aPipelineDescriptor.multiSampler.pNext                 = nullptr;
+                           aPipelineDescriptor.multiSampler.flags                 = 0;
+                           aPipelineDescriptor.multiSampler.sampleShadingEnable   = VK_FALSE;
+                           aPipelineDescriptor.multiSampler.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
+                           aPipelineDescriptor.multiSampler.minSampleShading      = 1.0f;
+                           aPipelineDescriptor.multiSampler.pSampleMask           = nullptr;
+                           aPipelineDescriptor.multiSampler.alphaToCoverageEnable = VK_FALSE;
+                           aPipelineDescriptor.multiSampler.alphaToOneEnable      = VK_FALSE;
+                       };
+
+                auto const configureDepthStencil =
+                   [](SRHIPipelineDescriptor &aPipelineDescriptor) -> void
+                       {
+                           aPipelineDescriptor.depthStencilState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+                           aPipelineDescriptor.depthStencilState.pNext                 = nullptr;
+                           aPipelineDescriptor.depthStencilState.flags                 = 0;
+                           aPipelineDescriptor.depthStencilState.depthTestEnable       = VK_TRUE;
+                           aPipelineDescriptor.depthStencilState.depthWriteEnable      = VK_TRUE;
+                           aPipelineDescriptor.depthStencilState.depthCompareOp        = VkCompareOp::VK_COMPARE_OP_LESS;
+                           aPipelineDescriptor.depthStencilState.stencilTestEnable     = VK_FALSE;
+                           aPipelineDescriptor.depthStencilState.front.passOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                           aPipelineDescriptor.depthStencilState.front.failOp          = VkStencilOp::VK_STENCIL_OP_KEEP;
+                           aPipelineDescriptor.depthStencilState.front.depthFailOp     = VkStencilOp::VK_STENCIL_OP_KEEP;
+                           aPipelineDescriptor.depthStencilState.front.compareOp       = VkCompareOp::VK_COMPARE_OP_ALWAYS;
+                           aPipelineDescriptor.depthStencilState.front.compareMask     = 0;
+                           aPipelineDescriptor.depthStencilState.front.writeMask       = 0;
+                           aPipelineDescriptor.depthStencilState.front.reference       = 0;
+                           aPipelineDescriptor.depthStencilState.back                  = aPipelineDescriptor.depthStencilState.front;
+                           aPipelineDescriptor.depthStencilState.depthBoundsTestEnable = VK_FALSE;
+                           aPipelineDescriptor.depthStencilState.minDepthBounds        = 0.0f;
+                           aPipelineDescriptor.depthStencilState.maxDepthBounds        = 1.0f;
+                       };
+
+                auto const configureDefaultViewPort =
+                    [](SRHIPipelineDescriptor &aPipelineDescriptor) -> void
+                        {
+                            VkViewport viewPort = {};
+                            viewPort.x        = 0.0;
+                            viewPort.y        = 0.0;
+                            viewPort.width    = 1920.0;
+                            viewPort.height   = 1080.0;
+                            viewPort.minDepth = 0.0;
+                            viewPort.maxDepth = 1.0;
+                            aPipelineDescriptor.viewPort = viewPort;
+                        };
 
                 static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
 
@@ -36,11 +123,19 @@ namespace engine
 
                 bool const isCoreMaterial = (SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID == sharedMaterial->name());
 
-                SMaterialBasePipelineDescriptor basePipelineDescriptor {};
-                SShaderModuleDescriptor         shaderModuleDescriptor {};
+                SRHIPipelineDescriptor       pipelineDescriptor {};
+                SRHIPipelineLayoutDescriptor pipelineLayoutDescriptor {};
+                SRHIShaderModuleDescriptor   shaderModuleDescriptor {};
 
-                basePipelineDescriptor.name = fmt::format("{}_{}", sharedMaterial->name(), "basepipeline");
-                shaderModuleDescriptor.name = fmt::format("{}_{}", sharedMaterial->name(), "shadermodule");
+                pipelineLayoutDescriptor.name = fmt::format("{}_{}", sharedMaterial->name(), "basepipeline");
+                shaderModuleDescriptor.name   = fmt::format("{}_{}", sharedMaterial->name(), "shadermodule");
+                pipelineDescriptor.name       = fmt::format("{}_{}", sharedMaterial->name(), "pipeline");
+
+                pipelineDescriptor.includesSystemBuffers = true;
+                configureInputAssembly(pipelineDescriptor);
+                configureRasterizer(pipelineDescriptor);
+                configureMultisampler(pipelineDescriptor);
+                configureDepthStencil(pipelineDescriptor);
 
                 for(auto const &[stageKey, stage] : sharedMaterial->stages())
                 {
@@ -67,14 +162,92 @@ namespace engine
 
                         shaderModuleDescriptor.shaderStages[stageKey] = dataAccessor;
                     }
+
+                    //
+                    // Handling of special cases for individual stages.
+                    //
+                    if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_VERTEX_SHADER_BIT == stageKey)
+                    {
+                        std::vector<SStageInput> stageInputs(stage.inputs);
+                        std::sort(stageInputs.begin(), stageInputs.end(), [] (SStageInput const &aLHS, SStageInput const &aRHS) -> bool { return aLHS.location < aRHS.location; });
+
+                        for(std::size_t k=0; k<stage.inputs.size(); ++k)
+                        {
+                            SStageInput const &input = stageInputs.at(k);
+
+                            // This number has to be equal to the VkVertexInputBindingDescription::binding index which data should be taken from!
+                            VkVertexInputBindingDescription binding;
+                            binding.binding   = input.location;
+                            binding.stride    = (input.type->byteSize * input.type->vectorSize);
+                            binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+                            VkVertexInputAttributeDescription attribute;
+                            attribute.binding  = k;
+                            attribute.location = input.location;
+                            attribute.offset   = 0;
+                            attribute.format   = (8 == binding.stride)
+                                                 ? VkFormat::VK_FORMAT_R32G32_SFLOAT
+                                                 : (12 == binding.stride)
+                                                   ? VkFormat::VK_FORMAT_R32G32B32_SFLOAT
+                                                   : (16 == binding.stride)
+                                                     ? VkFormat::VK_FORMAT_R32G32B32A32_SFLOAT
+                                                     : VkFormat::VK_FORMAT_UNDEFINED;
+
+                            pipelineDescriptor.vertexInputBindings  .push_back(binding);
+                            pipelineDescriptor.vertexInputAttributes.push_back(attribute);
+                        }
+                    }
+
+                    if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT == stageKey)
+                    {
+                        std::vector<VkPipelineColorBlendAttachmentState> outputs {};
+                        outputs.resize(stage.outputs.size());
+
+                        for(auto const &output : stage.outputs)
+                        {
+                            VkPipelineColorBlendAttachmentState colorBlendAttachmentState{};
+                            colorBlendAttachmentState.blendEnable         = VK_TRUE;
+                            colorBlendAttachmentState.colorWriteMask      = VkColorComponentFlagBits::VK_COLOR_COMPONENT_R_BIT|
+                                                                            VkColorComponentFlagBits::VK_COLOR_COMPONENT_G_BIT|
+                                                                            VkColorComponentFlagBits::VK_COLOR_COMPONENT_B_BIT|
+                                                                            VkColorComponentFlagBits::VK_COLOR_COMPONENT_A_BIT;
+                            colorBlendAttachmentState.srcColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;  // VkBlendFactor::VK_BLEND_FACTOR_SRC_ALPHA;
+                            colorBlendAttachmentState.dstColorBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO; // VkBlendFactor::VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+                            colorBlendAttachmentState.colorBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+                            colorBlendAttachmentState.srcAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ONE;
+                            colorBlendAttachmentState.dstAlphaBlendFactor = VkBlendFactor::VK_BLEND_FACTOR_ZERO;
+                            colorBlendAttachmentState.alphaBlendOp        = VkBlendOp::VK_BLEND_OP_ADD;
+
+                            outputs[output.location] = colorBlendAttachmentState;
+                        }
+
+                        pipelineDescriptor.colorBlendAttachmentStates = outputs;
+
+                        VkPipelineColorBlendStateCreateInfo colorBlendCreateInfo {};
+                        colorBlendCreateInfo.sType             = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+                        colorBlendCreateInfo.pNext             = nullptr;
+                        colorBlendCreateInfo.flags             = 0;
+                        colorBlendCreateInfo.logicOpEnable     = VK_FALSE;
+                        colorBlendCreateInfo.logicOp           = VK_LOGIC_OP_COPY;
+                        colorBlendCreateInfo.blendConstants[0] = 0.0f;
+                        colorBlendCreateInfo.blendConstants[1] = 1.0f;
+                        colorBlendCreateInfo.blendConstants[2] = 2.0f;
+                        colorBlendCreateInfo.blendConstants[3] = 3.0f;
+
+                        pipelineDescriptor.colorBlendState = colorBlendCreateInfo;
+                    }
                 }
+
+                //
+                // Deriving the pipeline and descriptor set layouts.
+                //
 
                 // uint32_t const setSubtractionValue = includeSystemBuffers ? 0 : 2;
                 uint32_t const setCount = sharedMaterial->layoutInfo().setCount; // - setSubtractionValue;
 
                 std::vector<VkDescriptorSetLayoutCreateInfo> descriptorSets {};
                 descriptorSets.resize(setCount);
-                basePipelineDescriptor.descriptorSetLayoutBindings.resize(setCount);
+                pipelineLayoutDescriptor.descriptorSetLayoutBindings.resize(setCount);
 
                 for(std::size_t k=0; k<descriptorSets.size(); ++k)
                 {
@@ -85,15 +258,17 @@ namespace engine
                     info.flags        = 0;
                     info.bindingCount = sharedMaterial->layoutInfo().setBindingCount[k /* + setSubtractionValue*/];
 
-                    basePipelineDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
+                    pipelineLayoutDescriptor.descriptorSetLayoutBindings[k].resize(info.bindingCount);
                 }
 
-                basePipelineDescriptor.descriptorSetLayoutCreateInfos = descriptorSets;
+                pipelineLayoutDescriptor.descriptorSetLayoutCreateInfos = descriptorSets;
 
                 for(SSubpassInput const &input : sharedMaterial->subpassInputs())
                 {
                     if(not isCoreMaterial && 2 > input.set)
+                    {
                         continue;
+                    }
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = input.binding;
@@ -101,13 +276,15 @@ namespace engine
                     layoutBinding.stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT; // Subpass inputs are only accessibly in fragment shaders.
                     layoutBinding.descriptorCount    = 1;
                     layoutBinding.pImmutableSamplers = nullptr;
-                    basePipelineDescriptor.descriptorSetLayoutBindings[input.set /* - setSubtractionValue */][input.binding] = layoutBinding;
+                    pipelineLayoutDescriptor.descriptorSetLayoutBindings[input.set /* - setSubtractionValue */][input.binding] = layoutBinding;
                 }
 
                 for(SUniformBuffer const &uniformBuffer : sharedMaterial->uniformBuffers())
                 {
                     if(not isCoreMaterial && 2 > uniformBuffer.set)
+                    {
                         continue;
+                    }
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = uniformBuffer.binding;
@@ -115,13 +292,15 @@ namespace engine
                     layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL; // serialization::shaderStageFromPipelineStage(uniformBuffer.stageBinding.value());
                     layoutBinding.descriptorCount    = uniformBuffer.array.layers;
                     layoutBinding.pImmutableSamplers = nullptr;
-                    basePipelineDescriptor.descriptorSetLayoutBindings[uniformBuffer.set /* - setSubtractionValue */][uniformBuffer.binding] = layoutBinding;
+                    pipelineLayoutDescriptor.descriptorSetLayoutBindings[uniformBuffer.set /* - setSubtractionValue */][uniformBuffer.binding] = layoutBinding;
                 }
 
                 for(SUniformBuffer const &storageBuffer : sharedMaterial->storageBuffers())
                 {
                     if(not isCoreMaterial && 2 > storageBuffer.set)
+                    {
                         continue;
+                    }
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = storageBuffer.binding;
@@ -129,21 +308,23 @@ namespace engine
                     layoutBinding.stageFlags         = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
                     layoutBinding.descriptorCount    = storageBuffer.array.layers;
                     layoutBinding.pImmutableSamplers = nullptr;
-                    basePipelineDescriptor.descriptorSetLayoutBindings[storageBuffer.set /* - setSubtractionValue */][storageBuffer.binding] = layoutBinding;
+                    pipelineLayoutDescriptor.descriptorSetLayoutBindings[storageBuffer.set /* - setSubtractionValue */][storageBuffer.binding] = layoutBinding;
                 }
 
                 for(SSampledImage const &sampledImage : sharedMaterial->sampledImages())
                 {
                     if(not isCoreMaterial && 2 > sampledImage.set)
+                    {
                         continue;
+                    }
 
                     VkDescriptorSetLayoutBinding layoutBinding {};
                     layoutBinding.binding            = sampledImage.binding;
                     layoutBinding.descriptorType     = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-                    layoutBinding.stageFlags         = serialization::shaderStageFromPipelineStage(sampledImage.stageBinding.value());
+                    layoutBinding.stageFlags         = vulkan::shaderStageFromPipelineStage(sampledImage.stageBinding.value());
                     layoutBinding.descriptorCount    = 1;
                     layoutBinding.pImmutableSamplers = nullptr;
-                    basePipelineDescriptor.descriptorSetLayoutBindings[sampledImage.set /* - setSubtractionValue */][sampledImage.binding] = layoutBinding;
+                    pipelineLayoutDescriptor.descriptorSetLayoutBindings[sampledImage.set /* - setSubtractionValue */][sampledImage.binding] = layoutBinding;
                 }
 
                 Vector <SSampledImage> sampledImages = sharedMaterial->sampledImages();
@@ -170,35 +351,33 @@ namespace engine
                     sampledImageResources.push_back(assetId);
                 }
 
-                SMaterialDescription materialDescriptor{};
-                materialDescriptor.name = aInstance->name();
                 {
                     auto const &[status, resourceState] =
-                        aResourceManager->useResource<BasePipelineResourceState_t>(basePipelineDescriptor.name, basePipelineDescriptor);
+                        aResourceManager->useResource<RHIPipelineLayoutResourceState_t>(pipelineLayoutDescriptor.name, pipelineLayoutDescriptor);
                     if(CheckEngineError(status))
                     {
                         // TODO: Error log
                         return {};
                     }
 
-                    materialDescriptor.basePipelineId = basePipelineDescriptor.name;
+                    pipelineDescriptor.pipelineLayoutResourceId = pipelineLayoutDescriptor.name;
                 }
 
                 {
                     auto const &[status, resourceState] =
-                        aResourceManager->useResource<ShaderModuleResourceState_t>(shaderModuleDescriptor.name, shaderModuleDescriptor);
+                        aResourceManager->useResource<RHIShaderModuleResourceState_t>(shaderModuleDescriptor.name, shaderModuleDescriptor);
                     if(CheckEngineError(status))
                     {
                         // TODO: Error log
                         return {};
                     }
 
-                    materialDescriptor.shaderModuleId = shaderModuleDescriptor.name;
+                    pipelineDescriptor.shaderModuleResourceId = shaderModuleDescriptor.name;
                 }
 
                 {
                     auto const &[status, resourceState] =
-                        aResourceManager->useResource<MaterialResourceState_t>(materialDescriptor.name, materialDescriptor);
+                        aResourceManager->useResource<SRHIPipelineResourceState_t>(pipelineDescriptor.name, pipelineDescriptor);
                     if(CheckEngineError(status))
                     {
                         // TODO: Error log

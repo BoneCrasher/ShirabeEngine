@@ -119,7 +119,7 @@ namespace Test
         {
             using namespace engine;
             using namespace engine::core;
-            using namespace engine::resources;
+            using namespace engine::rhi;
             using namespace engine::gfxapi;
             using namespace engine::framegraph;
 

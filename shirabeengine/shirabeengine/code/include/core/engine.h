@@ -10,19 +10,13 @@
 #include <asset/assetstorage.h>
 
 #include <renderer/rendergraph/framegraphcontexts.h>
-#include <resources/cresourcemanager.h>
-#include <material/loader.h>
-#include <mesh/loader.h>
-#include <textures/loader.h>
-
-#include <vulkan_integration/vulkanenvironment.h>
+#include <rhi/resource_management/cresourcemanager.h>
+#include <rhi/vulkan_core/vulkanenvironment.h>
 
 #if   defined SHIRABE_PLATFORM_WINDOWS
     #include <wsi/windows/windowserror.h>
 #elif defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11error.h>
-#include <material/loader.h>
-
 #endif
 
 #include "buildingblocks/scene.h"
@@ -95,17 +89,17 @@ namespace engine
         Shared<IWindow>                    mMainWindow;
 
         // Assets & Resources
-        Shared<CAssetStorage>        mAssetStorage;
-        Shared<CResourceManagerBase> mResourceManager;
-        Shared<CMaterialLoader>      mMaterialLoader;
-        Shared<CMeshLoader>                mMeshLoader;
-        Shared<CTextureLoader>             mTextureLoader;
+        Shared<CAssetStorage>               mAssetStorage;
+        Shared<CRHIResourceManager>         mResourceManager{};
+        Shared<CMaterialLoader>             mMaterialLoader;
+        Shared<CMeshLoader>                 mMeshLoader;
+        Shared<CTextureLoader>              mTextureLoader;
 
         // Rendering
-        Shared<CVulkanEnvironment>         mVulkanEnvironment;
+        Shared<CVulkanEnvironment>          mVulkanEnvironment;
         Shared<SRenderGraphRenderContext>   mRenderContext;
         Shared<SRenderGraphResourceContext> mResourceContext;
-        Shared<CRenderer>                  mRenderer;
+        Shared<CRenderer>                   mRenderer;
 
         // Internals
         CScene                             mScene;

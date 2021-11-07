@@ -10,7 +10,7 @@ namespace engine
 {
     namespace gfxapi
     {
-        using namespace engine::resources;
+        using namespace engine::rhi;
 
         struct SGAPIOutputMode
         {

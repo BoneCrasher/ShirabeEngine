@@ -166,12 +166,13 @@ namespace engine
     //<-----------------------------------------------------------------------------
     template <typename... TArgs>
     std::string CString::format(
-            std::string     const &aFormat,
-            TArgs             &&...aArgs)
+            std::string const &aFormat,
+            TArgs         &&...aArgs)
     {
     #define SHIRABE_USE_FMT 1
     #if defined SHIRABE_USE_FMT
-        return fmt::format(aFormat, std::forward<TArgs>(aArgs)...);
+        std::string_view format_view = { aFormat.c_str(), aFormat.size() };
+        return fmt::vformat(format_view, fmt::make_format_args(std::forward<TArgs>(aArgs)...));
     #else
         std::array<std::string, sizeof...(aArgs)> formattedArguments{};
 

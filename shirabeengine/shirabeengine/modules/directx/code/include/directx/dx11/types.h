@@ -11,7 +11,7 @@
 namespace Engine {
 	namespace DX {
 		namespace _11 {
-			using namespace Engine::Resources;
+			using namespace engine::rhi;
 
 			template <EResourceType type, EResourceSubType subtype>
 			struct DetermineDXResourceType {};

@@ -3,37 +3,34 @@
 
 #include <asset/assetindex.h>
 #include <asset/filesystemassetdatasource.h>
+#include <asset/mesh/loader.h>
+#include <asset/textures/loader.h>
 #include <core/enginestatus.h>
-#include <renderer/renderer.h>
 #include <graphicsapi/definitions.h>
-#include <material/loader.h>
-#include <material/assetloader.h>
-#include <mesh/loader.h>
-#include <mesh/assetloader.h>
-#include <textures/loader.h>
-#include <textures/assetloader.h>
 #include <util/crc32.h>
-#include <renderer/rendererconfiguration.h>
-#include <renderer/rendergraph/framegraphcontexts.h>
-#include <vulkan_integration/rendering/vulkanrendercontext.h>
-#include <vulkan_integration/vulkandevicecapabilities.h>
+#include <rhi/resource_management/cresourcemanager.h>
+#include <rhi/vulkan_core/vulkandevicecapabilities.h>
+#include "materialsystem/materialsystem.h"
+#include "renderer/renderer.h"
+#include "renderer/rendererconfiguration.h"
+#include "renderer/rendergraph/framegraphcontexts.h"
+#include "renderer/rhi/vulkanrendercontext.h"
 
 #include <wsi/display.h>
-
 
 #if defined SHIRABE_PLATFORM_LINUX
     #include <wsi/x11/x11display.h>
     #include <wsi/x11/x11windowfactory.h>
-    #include <vulkan_integration/wsi/x11surface.h>
+    #include <rhi/vulkan_wsi/wsi/x11surface.h>
 #elif defined SHIRABE_PLATFORM_WINDOWS
     #include <wsi/windows/windowsdisplay.h>
     #include <wsi/windows/windowswindowfactory.h>
 #endif
 
-#include <material/assetloader.h>
 #include "core/engine.h"
-#include "../../../modules/textures/code/include/textures/loader.h"
-#include "../../../../_deploy/linux64/debug/include/renderer/rendergraph/framegraphrendercontext.h"
+#include <asset/textures/loader.h>
+#include <asset/mesh/loader.h>
+#include <asset/buffers/loader.h>
 
 namespace engine
 {
@@ -203,14 +200,12 @@ namespace engine
         rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
         rendererConfiguration.requestFullscreen       = false;
 
-        Shared<CGpuApiResourceStorage> gpuApiResourceStorage = makeShared<CGpuApiResourceStorage>();
-
-        auto const fnCreateDefaultGFXAPI = [&, gpuApiResourceStorage, this] () -> CEngineResult<>
+        auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
         {
             if(EGFXAPI::Vulkan == gfxApi)
             {
                 mVulkanEnvironment = makeShared<CVulkanEnvironment>();
-                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment, gpuApiResourceStorage);
+                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
 
                 if(CheckEngineError(status))
                 {
@@ -255,9 +250,9 @@ namespace engine
             //
 
             std::filesystem::path const root          = std::filesystem::current_path();
-            std::filesystem::path const resourcesPath = root/ "data/output/resources"_path;
+            std::filesystem::path const resourcesPath = root/ "data/output/resources";
 
-            CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/ "game.assetindex.xml"_path);
+            CAssetStorage::AssetRegistry_t assetIndex = asset::CAssetIndex::loadIndexById(resourcesPath/ "game.assetindex.xml");
 
             Unique<IAssetDataSource> assetDataSource = makeUnique<CFileSystemAssetDataSource>(resourcesPath);
             Shared<CAssetStorage>    assetStorage    = makeShared<CAssetStorage>(std::move(assetDataSource));
@@ -265,7 +260,7 @@ namespace engine
             mAssetStorage = assetStorage;
 
             mMeshLoader     = makeShared<mesh::CMeshLoader>();
-            mMaterialLoader = makeShared<material::CMaterialLoader>();
+
             mTextureLoader  = makeShared<textures::CTextureLoader>();
 
             // The graphics API resource backend is static and does not have to be replaced.
@@ -278,7 +273,7 @@ namespace engine
             {
             }
 
-            Shared<CResourceManagerBase> manager = makeShared<CResourceManagerBase>();
+            Shared<CRHIResourceManager> manager = makeShared<CRHIResourceManager>();
             mResourceManager = manager;
 
             return { EEngineStatus::Ok };
@@ -297,12 +292,12 @@ namespace engine
                 renderGraphResourceContext = vulkan::CreateResourceContextForVulkan(mVulkanEnvironment, mResourceManager, mAssetStorage);
             }
 
-            mRenderContext   = makeShared(SRenderGraphRenderContext(renderGraphRenderContext));
-            mResourceContext = makeShared(SRenderGraphResourceContext(renderGraphResourceContext));
+            mRenderContext   = makeShared<SRenderGraphRenderContext>(renderGraphRenderContext);
+            mResourceContext = makeShared<SRenderGraphResourceContext>(renderGraphResourceContext);
 
             mRenderer = makeShared<CRenderer>();
             status    = mRenderer->initialize(mApplicationEnvironment, display, rendererConfiguration);
-            status    = mRenderer->createDeferredPipeline(renderGraphResourceContext);
+            status    = mRenderer->createDeferredPipeline(*mResourceManager, renderGraphResourceContext);
 
             return { status };
         };
@@ -350,7 +345,7 @@ namespace engine
 
         if(nullptr != mResourceManager)
         {
-            // mResourceManager->reset(); // Will implicitely clear all subsystems!
+            // mRHIResourceManager->reset(); // Will implicitely clear all subsystems!
             mResourceManager = nullptr;
         }
 
@@ -422,7 +417,7 @@ namespace engine
                     }
             }
 
-            mRenderer->renderScene(renderableCollection);
+            mRenderer->renderSceneDeferred(renderableCollection);
         }
 
         return { EEngineStatus::Ok };

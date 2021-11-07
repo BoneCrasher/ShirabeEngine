@@ -5,7 +5,7 @@
             //
             //<-----------------------------------------------------------------------------
             auto const configureInputAssembly =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                           [] (SRHIPipelineDescriptor &aPipelineDescriptor) -> void
                                {
                                    aPipelineDescriptor.inputAssemblyState.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
                                    aPipelineDescriptor.inputAssemblyState.pNext                  = nullptr;
@@ -15,7 +15,7 @@
                                };
 
             auto const configureRasterizer =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                           [] (SRHIPipelineDescriptor &aPipelineDescriptor) -> void
                                {
                                    aPipelineDescriptor.rasterizerState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
                                    aPipelineDescriptor.rasterizerState.pNext                   = nullptr;
@@ -33,7 +33,7 @@
                                };
 
             auto const configureMultisampler =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                           [] (SRHIPipelineDescriptor &aPipelineDescriptor) -> void
                                {
                                    aPipelineDescriptor.multiSampler.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
                                    aPipelineDescriptor.multiSampler.pNext                 = nullptr;
@@ -47,7 +47,7 @@
                                };
 
             auto const configureDepthStencil =
-                           [] (SMaterialPipelineDescriptor &aPipelineDescriptor) -> void
+                           [] (SRHIPipelineDescriptor &aPipelineDescriptor) -> void
                                {
                                    aPipelineDescriptor.depthStencilState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
                                    aPipelineDescriptor.depthStencilState.pNext                 = nullptr;
@@ -75,7 +75,7 @@
             //
             //<-----------------------------------------------------------------------------
             auto initializeMaterial(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                                    , Shared<CResourceManager>     aResourceManager
+                                    , Shared<CRHIResourceManager>     aResourceManager
                                     , Shared<asset::CAssetStorage> aAssetStorage
                                     , SRenderGraphMaterial   const &aMaterial
                                     , ResourceId_t          const &aRenderPassId) -> EEngineStatus
@@ -101,7 +101,7 @@
                 {
                     SNoDependencies dependencies {};
 
-                    CEngineResult<> const bufferInitialization = aResourceManager->initializeResource<BufferResourceState_t>(buffer.name, aVulkanEnvironment);
+                    CEngineResult<> const bufferInitialization = aResourceManager->initializeResource<RHIBufferResourceState_t>(buffer.name, aVulkanEnvironment);
                     EngineStatusPrintOnError(bufferInitialization.result(), logTag(), "Failed to initialize buffer.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(bufferInitialization.result());
                 }
@@ -110,46 +110,46 @@
                 {
                     std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
 
-                    OptRef_t <TextureResourceState_t> sampledImageOpt{};
+                    OptRef_t <RHIResourceState_t> sampledImageOpt{};
                     {
-                        auto[success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
+                        auto[success, resource] = fetchResource<RHIResourceState_t>(aResourceManager, sampledImageResourceId);
                         if( not success )
                         {
                             return EEngineStatus::Ok;
                         }
                         sampledImageOpt = resource;
                     }
-                    TextureResourceState_t &sampledImage = *sampledImageOpt;
+                    RHIResourceState_t &sampledImage = *sampledImageOpt;
 
                     std::string const sampledImageViewResourceId = fmt::format("{}_{}_view", material.description.name, sampledImage.description.name);
-                    OptRef_t<TextureViewResourceState_t> sampledImageViewOpt {};
+                    OptRef_t<RHIImageViewResourceState_t> sampledImageViewOpt {};
                     {
-                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
+                        auto [success, resource] = fetchResource<RHIImageViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
                         if(not success)
                         {
                             return EEngineStatus::Ok;
                         }
                         sampledImageViewOpt = resource;
                     }
-                    TextureViewResourceState_t &sampledImageView = *sampledImageViewOpt;
+                    RHIImageViewResourceState_t &sampledImageView = *sampledImageViewOpt;
 
-                    CEngineResult<> const textureInitialization = aResourceManager->initializeResource<TextureResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
+                    CEngineResult<> const textureInitialization = aResourceManager->initializeResource<RHIResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
                     EngineStatusPrintOnError(textureInitialization.result(), logTag(), "Failed to initialize texture.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(textureInitialization.result());
 
                     STextureViewDependencies textureViewInitDependencies {};
-                    textureViewInitDependencies.subjacentTextureId = sampledImageResourceId;
+                    textureViewInitDependencies.subjacentImageId = sampledImageResourceId;
 
-                    CEngineResult<> const textureViewInitialization = aResourceManager->initializeResource<TextureViewResourceState_t>(sampledImageViewResourceId, aVulkanEnvironment);
+                    CEngineResult<> const textureViewInitialization = aResourceManager->initializeResource<RHIImageViewResourceState_t>(sampledImageViewResourceId, aVulkanEnvironment);
                     EngineStatusPrintOnError(textureViewInitialization.result(), logTag(), "Failed to initialize texture view.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(textureViewInitialization.result());
                 }
 
-                CEngineResult<> const shaderModuleInitialization = aResourceManager->initializeResource<ShaderModuleResourceState_t>(material.description.shaderModuleDescriptor.name, aVulkanEnvironment);
+                CEngineResult<> const shaderModuleInitialization = aResourceManager->initializeResource<RHIShaderModuleResourceState_t>(material.description.shaderModuleDescriptor.name, aVulkanEnvironment);
                 EngineStatusPrintOnError(shaderModuleInitialization.result(), logTag(), "Failed to initialize shader module.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(shaderModuleInitialization.result());
 
-                CEngineResult<> const pipelineInitialization = aResourceManager->initializeResource<PipelineResourceState_t>(material.description.basePipelineDescriptor.name, aVulkanEnvironment);
+                CEngineResult<> const pipelineInitialization = aResourceManager->initializeResource<RHIPipelineResourceState_t>(material.description.basePipelineDescriptor.name, aVulkanEnvironment);
                 EngineStatusPrintOnError(pipelineInitialization.result(), logTag(), "Failed to initialize pipeline.");
                 SHIRABE_RETURN_RESULT_ON_ERROR(pipelineInitialization.result());
             };
@@ -159,7 +159,7 @@
             //
             //<-----------------------------------------------------------------------------
             auto transferMaterial(Shared<CVulkanEnvironment>     aVulkanEnvironment
-                                  , Shared<CResourceManager>     aResourceManager
+                                  , Shared<CRHIResourceManager>     aResourceManager
                                   , Shared<asset::CAssetStorage> aAssetStorage
                                   , SRenderGraphMaterial   const &aMaterial) -> EEngineStatus
             {
@@ -178,34 +178,34 @@
 
                 for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
                 {
-                    OptRef_t<BufferResourceState_t> bufferOpt {};
+                    OptRef_t<RHIBufferResourceState_t> bufferOpt {};
                     {
-                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
+                        auto [success, resource] = fetchResource<RHIBufferResourceState_t>(aResourceManager, bufferDesc.name);
                         if(not success)
                         {
                             return EEngineStatus::Ok;
                         }
                         bufferOpt = resource;
                     }
-                    BufferResourceState_t &buffer = *bufferOpt;
+                    RHIBufferResourceState_t &buffer = *bufferOpt;
 
-                    transferBufferData(device, bufferDesc.dataSource(), buffer.gpuApiHandles.attachedMemory);
+                    transferBufferData(device, bufferDesc.dataSource(), buffer.rhiHandles.attachedMemory);
                 }
 
                 for(auto const &sampledImageAssetId : material.description.sampledImages)
                 {
                     std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
 
-                    OptRef_t <TextureResourceState_t> sampledImageOpt{};
+                    OptRef_t <RHIResourceState_t> sampledImageOpt{};
                     {
-                        auto[success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
+                        auto[success, resource] = fetchResource<RHIResourceState_t>(aResourceManager, sampledImageResourceId);
                         if( not success )
                         {
                             return EEngineStatus::Ok;
                         }
                         sampledImageOpt = resource;
                     }
-                    TextureResourceState_t &sampledImage = *sampledImageOpt;
+                    RHIResourceState_t &sampledImage = *sampledImageOpt;
 
                     // Make sure, that the texture is in the correct pre-transfer layout!
                     if(sampledImage.description.gpuBinding.check(EBufferBinding::TextureInput))
@@ -223,7 +223,7 @@
                         SHIRABE_RETURN_RESULT_ON_ERROR(layoutTransfer);
                     }
 
-                    CEngineResult<> const textureTransfer = aResourceManager->transferResource<TextureResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
+                    CEngineResult<> const textureTransfer = aResourceManager->transferResource<RHIResourceState_t>(sampledImageResourceId, aVulkanEnvironment);
                     EngineStatusPrintOnError(textureTransfer.result(), logTag(), "Failed to transfer texture.");
                     SHIRABE_RETURN_RESULT_ON_ERROR(textureTransfer.result());
 
@@ -251,8 +251,8 @@
             //<-----------------------------------------------------------------------------
             struct SSampledImageBinding
             {
-                OptRef_t<TextureViewResourceState_t> imageView;
-                OptRef_t<TextureResourceState_t>     image;
+                OptRef_t<RHIImageViewResourceState_t> imageView;
+                OptRef_t<RHIResourceState_t>     image;
             };
             //<-----------------------------------------------------------------------------
 
@@ -265,19 +265,19 @@
             //<-----------------------------------------------------------------------------
             //
             //<-----------------------------------------------------------------------------
-            auto const bindPipeline = [=] (PipelineResourceState_t &aPipeline) -> EEngineStatus
+            auto const bindPipeline = [=] (RHIPipelineResourceState_t &aPipeline) -> EEngineStatus
                 {
                 SVulkanState     &vkState        = aVulkanEnvironment->getState();
                 VkCommandBuffer  vkCommandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getGraphicsCommandBuffer(); // The commandbuffers and swapchain count currently match
 
-                vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, aPipeline.gpuApiHandles.pipeline);
+                vkCmdBindPipeline(vkCommandBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, aPipeline.rhiHandles.pipeline);
 
                 vkCmdBindDescriptorSets(vkCommandBuffer
                                         , VK_PIPELINE_BIND_POINT_GRAPHICS
-                                        , aPipeline.gpuApiHandles.pipelineLayout
+                                        , aPipeline.rhiHandles.pipelineLayout
                                         , 0
-                                        , aPipeline.gpuApiHandles.descriptorSets.size()
-                                        , aPipeline.gpuApiHandles.descriptorSets.data()
+                                        , aPipeline.rhiHandles.descriptorSets.size()
+                                        , aPipeline.rhiHandles.descriptorSets.data()
                                         , 0, nullptr);
 
                 return EEngineStatus::Ok;
@@ -302,26 +302,26 @@
                 }
                 MaterialResourceState_t &material = *materialOpt;
 
-                OptRef_t<RenderPassResourceState_t> renderPassOpt {};
+                OptRef_t<RHIRenderPassResourceState_t> renderPassOpt {};
                 {
-                    auto [success, resource] = fetchResource<RenderPassResourceState_t>(aResourceManager, material.dependencies.pipelineDependencies.referenceRenderPassId);
+                    auto [success, resource] = fetchResource<RHIRenderPassResourceState_t>(aResourceManager, material.dependencies.pipelineDependencies.referenceRenderPassId);
                     if(not success)
                     {
                         return EEngineStatus::Ok;
                     }
                     renderPassOpt = resource;
                 }
-                RenderPassResourceState_t &renderPass = *renderPassOpt;
+                RHIRenderPassResourceState_t &renderPass = *renderPassOpt;
 
-                std::vector<OptRef_t<BufferResourceState_t>>      buffers           {};
-                std::vector<OptRef_t<TextureViewResourceState_t>> inputAttachments  {};
+                std::vector<OptRef_t<RHIBufferResourceState_t>>      buffers           {};
+                std::vector<OptRef_t<RHIImageViewResourceState_t>> inputAttachments  {};
                 std::vector<SSampledImageBinding>                 textureViews      {};
 
                 for(auto const &bufferDesc : material.description.uniformBufferDescriptors)
                 {
-                    OptRef_t<BufferResourceState_t> bufferOpt {};
+                    OptRef_t<RHIBufferResourceState_t> bufferOpt {};
                     {
-                        auto [success, resource] = fetchResource<BufferResourceState_t>(aResourceManager, bufferDesc.name);
+                        auto [success, resource] = fetchResource<RHIBufferResourceState_t>(aResourceManager, bufferDesc.name);
                         if(not success)
                         {
                             return EEngineStatus::Ok;
@@ -331,15 +331,15 @@
                     buffers.push_back(bufferOpt);
                 }
 
-                SSubpassDescription const &subPassDesc = renderPass.description.subpassDescriptions.at(aState.currentSubpassIndex);
+                SRHISubpassDescription const &subPassDesc = renderPass.description.subpassDescriptions.at(aState.currentSubpassIndex);
                 for(auto const &inputAttachment : subPassDesc.inputAttachments)
                 {
                     uint32_t     const &attachmentIndex           = inputAttachment.attachment;
                     ResourceId_t const &attachementResourceHandle = renderPass.dependencies.attachmentTextureViews.at(attachmentIndex);
 
-                    OptRef_t<TextureViewResourceState_t> textureViewOpt {};
+                    OptRef_t<RHIImageViewResourceState_t> textureViewOpt {};
                     {
-                        auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, attachementResourceHandle);
+                        auto [success, resource] = fetchResource<RHIImageViewResourceState_t>(aResourceManager, attachementResourceHandle);
                         if(not success)
                         {
                             return EEngineStatus::Ok;
@@ -351,10 +351,10 @@
 
                 for(auto const &sampledImageAssetId : material.description.sampledImages)
                 {
-                    OptRef_t<TextureResourceState_t> sampledImageOpt {};
+                    OptRef_t<RHIResourceState_t> sampledImageOpt {};
                     {
                         std::string const sampledImageResourceId = fmt::format("{}", sampledImageAssetId);
-                        auto [success, resource] = fetchResource<TextureResourceState_t>(aResourceManager, sampledImageResourceId);
+                        auto [success, resource] = fetchResource<RHIResourceState_t>(aResourceManager, sampledImageResourceId);
                         if(not success)
                         {
                             return EEngineStatus::Ok;
@@ -368,13 +368,13 @@
                     }
                     else
                     {
-                        TextureResourceState_t &sampledImage = *sampledImageOpt;
+                        RHIResourceState_t &sampledImage = *sampledImageOpt;
 
                         std::string const sampledImageViewResourceId = fmt::format("{}_{}_view", material.description.name, sampledImage.description.name);
 
-                        OptRef_t<TextureViewResourceState_t> sampledImageViewOpt {};
+                        OptRef_t<RHIImageViewResourceState_t> sampledImageViewOpt {};
                         {
-                            auto [success, resource] = fetchResource<TextureViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
+                            auto [success, resource] = fetchResource<RHIImageViewResourceState_t>(aResourceManager, sampledImageViewResourceId);
                             if(not success)
                             {
                                 return EEngineStatus::Ok;
@@ -396,16 +396,16 @@
                                                                         , inputAttachments
                                                                         , textureViews);
 
-                OptRef_t<PipelineResourceState_t> pipelineResourceOpt {};
+                OptRef_t<RHIPipelineResourceState_t> pipelineResourceOpt {};
                 {
-                    auto [success, resource] = fetchResource<PipelineResourceState_t>(aResourceManager, material.description.basePipelineDescriptor.name);
+                    auto [success, resource] = fetchResource<RHIPipelineResourceState_t>(aResourceManager, material.description.basePipelineDescriptor.name);
                     if(not success)
                     {
                         return EEngineStatus::Ok;
                     }
                     pipelineResourceOpt = resource;
                 }
-                PipelineResourceState_t &pipelineResource = *pipelineResourceOpt;
+                RHIPipelineResourceState_t &pipelineResource = *pipelineResourceOpt;
 
                 auto const result = bindPipeline(aState, pipelineResource);
                 return result;

@@ -6,9 +6,9 @@
 #define __SHIRABEDEVELOPMENT_BUFFERS_ASSETLOADER_H__
 
 #include <asset/assetstorage.h>
-#include <renderer/resource_management/resourcedescriptions.h>
-#include <renderer/resource_management/resourcetypes.h>
-#include <renderer/resource_management/cresourcemanager.h>
+#include <rhi/resource_management/resourcedescriptions.h>
+#include <rhi/resource_management/resourcetypes.h>
+#include <rhi/resource_management/cresourcemanager.h>
 #include <asset/buffers/loader.h>
 #include <asset/buffers/declaration.h>
 
@@ -23,7 +23,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        using ResourceDescriptionDerivationReturn_t = std::tuple<bool, resources::SBufferDescription>;
+        using ResourceDescriptionDerivationReturn_t = std::tuple<bool, resources::SRHIBufferDescription>;
 
         static
         ResourceDescriptionDerivationReturn_t deriveResourceDescriptions(Shared<asset::IAssetStorage> const &aAssetStorage

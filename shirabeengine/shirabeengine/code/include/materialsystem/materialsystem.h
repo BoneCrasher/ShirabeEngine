@@ -12,16 +12,10 @@
 #include <core/enginestatus.h>
 #include <asset/assettypes.h>
 #include <asset/material/asset.h>
-#include "materialsystem/declaration.h"
+#include <materialsystem/declaration.h>
 
 namespace engine
 {
-    namespace asset
-    {
-        using AssetID_t = uint64_t;
-        class IAssetStorage;
-    }
-
     using namespace material;
 
     class CMaterialSystem
@@ -53,8 +47,8 @@ namespace engine
         Shared<memory::allocators::CPoolAllocator>   mTransformAllocator;
         Shared<memory::allocators::CLinearAllocator> mDataAllocator;
 
-        Map <asset::AssetID_t, Shared<CSharedMaterial>> mSharedMaterials;
-        Map <std::string, Shared<CMaterialInstance>>    mMaterialInstances;
+        Map <asset::AssetID_t, Shared<CSharedMaterial>>   mSharedMaterials;
+        Map <std::string,      Shared<CMaterialInstance>> mMaterialInstances;
     };
 }
 

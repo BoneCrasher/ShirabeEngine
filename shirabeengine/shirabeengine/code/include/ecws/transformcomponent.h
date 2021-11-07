@@ -10,7 +10,7 @@ namespace engine::ecws
 		: public CComponentBase
 	{
 	public_constructors:
-            CTransformComponent(std::string const &aName);
+        explicit CTransformComponent(std::string const &aName);
 
     public_destructors:
 		~CTransformComponent() override;

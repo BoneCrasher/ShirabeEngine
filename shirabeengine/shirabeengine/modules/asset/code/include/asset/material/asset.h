@@ -160,7 +160,8 @@ namespace engine
             BufferMemberMap_t members;
         };
 
-        enum EBufferSharingMode
+        enum class EBufferSharingMode
+            : uint8_t
         {
             Global,
             Shared,
@@ -173,7 +174,7 @@ namespace engine
             if("shared" == aMode)   return EBufferSharingMode::Shared;
             /* Default: if("instance" == aMode) */
             return EBufferSharingMode::Instance;
-        };
+        }
 
         static auto sharingModeToString(EBufferSharingMode const &aMode) -> std::string
         {
@@ -183,7 +184,7 @@ namespace engine
                 case EBufferSharingMode::Shared: return "shared";
                 default:                         return "instance";
             }
-        };
+        }
 
         struct SMaterialBuffer
                 : public SBoundResource

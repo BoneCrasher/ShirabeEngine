@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_COMPONENT_MATERIAL_H__
 #define __SHIRABE_COMPONENT_MATERIAL_H__
 
-#include <material/declaration.h>
+#include <materialsystem/declaration.h>
 #include "ecws/componentbase.h"
 
 namespace engine::ecws
@@ -10,7 +10,7 @@ namespace engine::ecws
 		: public CComponentBase
 	{
 	public_constructors:
-        CMaterialComponent(std::string const &aName);
+        explicit CMaterialComponent(std::string const &aName);
 
     public_destructors:
 		~CMaterialComponent() override;
@@ -22,7 +22,7 @@ namespace engine::ecws
 
 		[[nodiscard]]
 		SHIRABE_INLINE
-		Shared<material::CMaterialInstance> const getMaterialInstance() const { return mMaterialInstance; }
+		Weak<material::CMaterialInstance> getMaterialInstance() const { return mMaterialInstance; }
 
 		SHIRABE_INLINE
 		material::CMaterialConfig &getMutableConfiguration()

@@ -4,21 +4,19 @@
 #include <log/log.h>
 
 #include <asset/assetstorage.h>
-#include <resources/cresourcemanager.h>
+#include <rhi/resource_management/cresourcemanager.h>
 
-#include <material/declaration.h>
-#include <material/loader.h>
-#include <mesh/declaration.h>
-#include <mesh/loader.h>
-#include <textures/declaration.h>
-#include <textures/loader.h>
+#include <materialsystem/declaration.h>
+#include <materialsystem/integration/renderer/resource_adapter.h>
+#include <asset/mesh/declaration.h>
+#include <asset/mesh/loader.h>
+#include <asset/textures/declaration.h>
+#include <asset/textures/loader.h>
 
 #include "ecws/meshcomponent.h"
 #include "ecws/materialcomponent.h"
 #include "ecws/transformcomponent.h"
 #include "ecws/cameracomponent.h"
-
-#include
 
 namespace engine
 {
@@ -47,16 +45,17 @@ namespace engine
                                                                   , bool                              aAutoCreatedConfig    = false
                                                                   , bool                              aIncludeSystemBuffers = false)
     {
-        auto fetch = aMaterialLoader->loadMaterialInstance(aAssetStorage
-                                                         , aAssetId
-                                                         , aAutoCreatedConfig
-                                                         , aIncludeSystemBuffers);
-        if(not fetch.successful())
-        {
-            CLog::Error("CScene::loadMaterial", "Could not load material instance w/ ID {}", aAssetId);
-        }
-
-        return fetch;
+        //auto fetch = aMaterialLoader->loadMaterialInstance(aAssetStorage
+        //                                                 , aAssetId
+        //                                                 , aAutoCreatedConfig
+        //                                                 , aIncludeSystemBuffers);
+        //if(not fetch.successful())
+        //{
+        //    CLog::Error("CScene::loadMaterial", "Could not load material instance w/ ID {}", aAssetId);
+        //}
+//
+        //return fetch;
+        return {};
     }
     //<-----------------------------------------------------------------------------
 
@@ -67,14 +66,15 @@ namespace engine
                                                       , Shared<mesh::CMeshLoader>    aMeshLoader
                                                       , asset::AssetId_t             aAssetId)
     {
-        auto fetch = aMeshLoader->loadMeshInstance(aAssetStorage
-                                                 , aAssetId);
-        if(not fetch.successful())
-        {
-            CLog::Error("CScene::loadMesh", "Could not load mesh instance w/ ID {}", aAssetId);
-        }
-
-        return fetch;
+        // auto fetch = aMeshLoader->loadMeshInstance(aAssetStorage
+        //                                          , aAssetId);
+        // if(not fetch.successful())
+        // {
+        //     CLog::Error("CScene::loadMesh", "Could not load mesh instance w/ ID {}", aAssetId);
+        // }
+//
+        // return fetch;
+        return {};
     }
     //<-----------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     CEngineResult<> CScene::initialize(Shared<asset::CAssetStorage>        aAssetStorage
-                                     , Shared<resources::CResourceManagerBase> aResourceManager
+                                     , Shared<resources::CRHIResourceManagerBase> aResourceManager
                                      , Shared<mesh::CMeshLoader>           aMeshLoader
                                      , Shared<material::CMaterialLoader>   aMaterialLoader
                                      , Shared<textures::CTextureLoader>    aTextureLoader)
@@ -108,10 +108,6 @@ namespace engine
         using mesh::CMeshInstance;
         using material::CMaterialInstance;
         using textures::CTextureInstance;
-        using resources::CResourceDescDeriver;
-        using resources::SMeshDescriptor;
-        using resources::SMaterialDescription;
-        using resources::STextureDescription;
 
         //
         // Load assets
@@ -131,12 +127,13 @@ namespace engine
         //
         // Register resources in resource manager
         //
-        aResourceManager->useResource(mat_core->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_core));
-        aResourceManager->useResource(mat_lighting->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_lighting));
+
+        aResourceManager->useResource(mat_core->name(),        CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_core));
+        aResourceManager->useResource(mat_lighting->name(),    CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_lighting));
         aResourceManager->useResource(mat_compositing->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_compositing));
-        aResourceManager->useResource(mat_standard->name(), CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_standard));
-        aResourceManager->useResource(mesh_fish->name(), CResourceDescDeriver<CMeshInstance, SMeshDescriptor>::derive(aAssetStorage, mesh_fish));
-        aResourceManager->useResource(tex_fish_base->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_base));
+        aResourceManager->useResource(mat_standard->name(),    CResourceDescDeriver<CMaterialInstance, SMaterialDescription>::derive(aAssetStorage, mat_standard));
+        aResourceManager->useResource(mesh_fish->name(),       CResourceDescDeriver<CMeshInstance, SMeshDescriptor>::derive(aAssetStorage, mesh_fish));
+        aResourceManager->useResource(tex_fish_base->name(),   CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_base));
         aResourceManager->useResource(tex_fish_normal->name(), CResourceDescDeriver<CTextureInstance, STextureDescription>::derive(aAssetStorage, tex_fish_normal));
 
         //

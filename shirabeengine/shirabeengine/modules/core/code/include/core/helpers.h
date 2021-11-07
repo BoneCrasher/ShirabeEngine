@@ -6,7 +6,6 @@
 #include <memory>
 #include <unordered_map>
 
-#include <core/helpers.h>
 #include <log/log.h>
 #include "result.h"
 #include "enginestatus.h"

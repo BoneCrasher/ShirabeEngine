@@ -190,7 +190,7 @@ namespace engine::textures
 
         std::string formatString = toFormatString(textureInfo.format);
 
-        aSerializer.beginObject("textureInfo");
+        aSerializer.beginObject("imageInfo");
         aSerializer.writeValue("width",                 textureInfo.width);
         aSerializer.writeValue("height",                textureInfo.height);
         aSerializer.writeValue("depth",                 textureInfo.depth);
@@ -221,7 +221,7 @@ namespace engine::textures
 
         std::string formatString = "";
 
-        aDeserializer.beginObject("textureInfo");
+        aDeserializer.beginObject("imageInfo");
         aDeserializer.readValue("width",                 textureInfo.width);
         aDeserializer.readValue("height",                textureInfo.height);
         aDeserializer.readValue("depth",                 textureInfo.depth);

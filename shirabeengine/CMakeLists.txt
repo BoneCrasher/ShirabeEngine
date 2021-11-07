@@ -16,6 +16,6 @@ add_subdirectory(crc32generator)
 add_subdirectory(game)
 
 # add_dependencies(enginetest                 INSTALL_shirabeengine)
-add_dependencies(game                       INSTALL_shirabeengine)
-add_dependencies(game                       INSTALL_shirabe_resource_compiler)
+add_dependencies(game INSTALL_shirabeengine)
+add_dependencies(game INSTALL_shirabe_resource_compiler)
         

@@ -1,7 +1,7 @@
 #ifndef __SHIRABE_COMPONENT_MESH_H__
 #define __SHIRABE_COMPONENT_MESH_H__
 
-#include <mesh/declaration.h>
+#include <asset/mesh/declaration.h>
 
 #include "ecws/componentbase.h"
 
@@ -12,13 +12,12 @@ namespace engine::ecws
 		: public CComponentBase
 	{
 	public_constructors:
-		CMeshComponent(std::string const &aName);
+		explicit CMeshComponent(std::string const &aName);
 
     public_destructors:
 		~CMeshComponent() override;
 
     public_methods:
-
 		EEngineStatus update(CTimer const &aTimer) override;
 
 		SHIRABE_INLINE
@@ -28,7 +27,7 @@ namespace engine::ecws
         }
 
         SHIRABE_INLINE
-        Shared<mesh::CMeshInstance> const getMeshInstance()
+        Weak<mesh::CMeshInstance> getMeshInstance()
         {
 		    return mMeshInstance;
         }
