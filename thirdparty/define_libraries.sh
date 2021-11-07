@@ -23,6 +23,7 @@ LIBRARIES=(                             \
            vulkan_headers               \
            vulkan_sdk                   \
            vulkan_sdk_validation_layers \
+           vulkan_memory_allocator      \
            fmt                          \
           )
 
@@ -31,3 +32,4 @@ DEPENDENCIES_libxml2=( zlib )
 DEPENDENCIES_libxslt=( zlib libxml2 )
 DEPENDENCIES_vulkan_sdk=( googletest vulkan_headers )
 DEPENDENCIES_vulkan_sdk_validation_layers=( googletest glslang spirv_tools vulkan_headers vulkan_sdk )
+DEPENDENCIES_vulkan_memory_allocator=( googletest glslang spirv_tools vulkan_headers vulkan_sdk vulkan_sdk_validation_layers)

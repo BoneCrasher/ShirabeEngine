@@ -28,6 +28,7 @@ REPOSITORIES[cryptopp]="git@github.com:weidai11/cryptopp.git"
 REPOSITORIES[vulkan_headers]="git@github.com:KhronosGroup/Vulkan-Headers.git"
 REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
 REPOSITORIES[vulkan_sdk_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
+REPOSITORIES[vulkan_memory_allocator]="git@github.com:GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git"
 REPOSITORIES[fmt]="git@github.com:fmtlib/fmt.git"
 
 declare -A BRANCHES
@@ -53,6 +54,7 @@ BRANCHES[cryptopp]="master"
 BRANCHES[vulkan_headers]="main"
 BRANCHES[vulkan_sdk]="master"
 BRANCHES[vulkan_sdk_validation_layers]="master"
+BRANCHES[vulkan_memory_allocator]="master"
 BRANCHES[fmt]="master"
 
 
@@ -79,6 +81,7 @@ TARGET_DIRECTORIES[cryptopp]="${SOURCES_DIR}/cryptopp"
 TARGET_DIRECTORIES[vulkan_headers]="${SOURCES_DIR}/vulkan_headers"
 TARGET_DIRECTORIES[vulkan_sdk]="${SOURCES_DIR}/vulkan_sdk"
 TARGET_DIRECTORIES[vulkan_sdk_validation_layers]="${SOURCES_DIR}/vulkan_sdk_validation_layers"
+TARGET_DIRECTORIES[vulkan_memory_allocator]="${SOURCES_DIR}/vulkan_memory_allocator"
 TARGET_DIRECTORIES[fmt]="${SOURCES_DIR}/fmt"
 
 
@@ -215,6 +218,7 @@ function setup_vulkan
     setup_one vulkan_headers
     setup_one vulkan_sdk
     setup_one vulkan_sdk_validation_layers
+    setup_one vulkan_memory_allocator
 }
 
 function setup_vmem
