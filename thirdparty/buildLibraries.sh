@@ -17,6 +17,7 @@ mkdir -p ${DEPLOY_BASE_DIR}
 
 DEBUG=0
 VERBOSE=0
+SANITIZE=0
 LIBRARIES=()
 ADDRESS_MODES=( 32 64 )
 CONFIGURATIONS=( debug release )
@@ -125,6 +126,12 @@ function read_arguments
     # now enjoy the options in order and nicely split until we see --
     while true; do
         case "$1" in
+            -s|--sanitize)
+                printf "Enabling sanitizing mode.\n"
+                SANITIZE=1
+
+                shift
+                ;;
             -d|--debug)
                 printf "Enabling debug mode.\n"
                 DEBUG=1
@@ -253,12 +260,12 @@ function build
                     printf "/*--------------------------------------------------------------------*/\n"
                     printf "                                                                        \n"
 
-                    export CC=gcc-9
-                    export CPP=cpp-9 
-                    export CXX=g++-9
-                    export LD=g++-9
+                    export CC=gcc-10
+                    export CPP=cpp-10 
+                    export CXX=g++-10
+                    export LD=g++-10
                     export CFLAGS="-m${addressmode}"
-                    export CXXFLAGS="-m${addressmode} -std=c++17"
+                    export CXXFLAGS="-m${addressmode} -std=c++20"
                     export LDFLAGS=
                     export ASFLAGS=
                     
@@ -266,11 +273,18 @@ function build
                     local build_directory=${BUILD_BASE_DIR}/${libraryToBuild}
                     local deploy_directory=${DEPLOY_BASE_DIR}/${libraryToBuild}/linux${addressmode}/${configuration}
 
-                    rm -rf ${build_directory}
-                    mkdir -p ${build_directory}
+                    if [ "${SANITIZE}" = "1" ]; then
+                        rm -rf ${build_directory}
+                        rm -rf ${deploy_directory}
+                    fi 
+                    
+                    if [ ! -d ${build_directory} ]; then
+                        mkdir -p ${build_directory}
+                    fi
 
-                    rm -rf ${deploy_directory}
-                    mkdir -p ${deploy_directory}
+                    if [ ! -d ${deploy_directory} ]; then
+                        mkdir -p ${deploy_directory}
+                    fi
 
                     # Will inherit the current enclosing scopes and variables
                     source ${buildscript}

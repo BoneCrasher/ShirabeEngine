@@ -30,6 +30,32 @@ REPOSITORIES[vulkan_sdk]="git@github.com:KhronosGroup/Vulkan-Loader.git"
 REPOSITORIES[vulkan_sdk_validation_layers]="git@github.com:KhronosGroup/Vulkan-ValidationLayers.git"
 REPOSITORIES[fmt]="git@github.com:fmtlib/fmt.git"
 
+declare -A BRANCHES
+BRANCHES[zlib]="master"
+BRANCHES[libxml2]="master"
+BRANCHES[libxslt]="master"
+BRANCHES[nlohmann_json]="master"
+BRANCHES[googletest]="master"
+BRANCHES[asio]="master"
+BRANCHES[stb]="master"
+BRANCHES[assimp]="master"
+BRANCHES[fxgltf]="master"
+BRANCHES[glslang]="master"
+BRANCHES[spirv_headers]="master"
+BRANCHES[spirv_cross]="master"
+BRANCHES[spirv_tools]="master"
+BRANCHES[spirv_tools_headers]="master"
+BRANCHES[spirv_tools_effcee]="master"
+BRANCHES[spirv_tools_re2]="master"
+BRANCHES[spirv_tools_gtest]="master"
+BRANCHES[spirv_reflect]="master"
+BRANCHES[cryptopp]="master"
+BRANCHES[vulkan_headers]="main"
+BRANCHES[vulkan_sdk]="master"
+BRANCHES[vulkan_sdk_validation_layers]="master"
+BRANCHES[fmt]="master"
+
+
 declare -A TARGET_DIRECTORIES
 TARGET_DIRECTORIES[zlib]="${SOURCES_DIR}/zlib"
 TARGET_DIRECTORIES[libxml2]="${SOURCES_DIR}/libxml2"
@@ -111,12 +137,13 @@ function update_one
 
     local key=${1}
     local dir=${TARGET_DIRECTORIES[${key}]}
+    local branch=${BRANCHES[${key}]}
 
     if [ ! -d ${dir} ]; then
         printf "Directory ${key} does not exist.\n"
     else
         cd ${dir}
-        git pull
+        git pull origin ${branch}
         cd ..
     fi
 }

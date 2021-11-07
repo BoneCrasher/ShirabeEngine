@@ -8,8 +8,13 @@ buildOne ()
     
     export PREFIX=${deploy_directory}
     
-    mkdir ${deploy_directory}/include
-    mkdir ${deploy_directory}/lib
+    if [!-d ${deploy_directory}/source]; then
+        mkdir ${deploy_directory}/source
+    fi
+
+    if [!-d ${deploy_directory}/lib]; then
+        mkdir ${deploy_directory}/lib
+    fi
     
     # cd ${build_directory}
     cd ${source_directory}

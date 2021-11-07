@@ -19,7 +19,7 @@ set(SHIRABE_GCC_LD_CXXFLAGS)
 set(
         SHIRABE_GCC_CL_COMMON_FLAGS
             "-v"              # Print to the max
-            "-std=c++17"      # C++17 required
+            "-std=c++20"      # C++17 required
             #"-fconcepts"
             "-fexceptions"    # Enable std exceptions
             "-pthread"        # Enforce to use of pthread, as all ext. libs do

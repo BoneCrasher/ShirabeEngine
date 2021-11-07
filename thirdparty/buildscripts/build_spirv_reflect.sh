@@ -14,7 +14,10 @@ buildOne ()
     # cmake --build . -- -j12
     # cmake --build . --target install
 
-    mkdir ${deploy_directory}/source
+    if [!-d ${deploy_directory}/source]; then
+        mkdir ${deploy_directory}/source
+    fi
+    
     cp ${source_directory}/spirv_reflect.h ${deploy_directory}/source/
     cp ${source_directory}/spirv_reflect.c ${deploy_directory}/source/
     cp -r ${source_directory}/include ${deploy_directory}

@@ -1,10 +1,10 @@
 function(linkLibrary)
 
-    set(TARGET_NAME rendering)
-    set(BINARY_NAME rendering)
+    set(TARGET_NAME rhi)
+    set(BINARY_NAME rhi)
     set(LINK_STATIC OFF)
 
-    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/rendering)
+    set(MODULE_DIR ${SHIRABE_WORKSPACE_ROOT_DIR}/shirabeengine/modules/rhi)
 
     # -I
     append_parentscope(
