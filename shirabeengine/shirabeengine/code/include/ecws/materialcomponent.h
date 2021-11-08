@@ -27,7 +27,7 @@ namespace engine::ecws
 		SHIRABE_INLINE
 		material::CMaterialConfig &getMutableConfiguration()
         {
-		    static material::CMaterialConfig sEmptyConfig = {};
+		    static material::CMaterialConfig sEmptyConfig;
 
 		    if(nullptr == mMaterialInstance)
             {

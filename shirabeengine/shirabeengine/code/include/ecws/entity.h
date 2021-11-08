@@ -3,7 +3,7 @@
 
 #include <core/enginestatus.h>
 #include <core/benchmarking/timer/timer.h>
-#include "ecws/componentbase.h"
+#include "ecws/componentsystem.h"
 
 namespace engine::ecws
 {
@@ -11,7 +11,6 @@ namespace engine::ecws
      * A CEntity instance describes an engine entity, which can be enriched by various
      * types of engine components.
      */
-
     class CEntity
     {
     public_constructors:

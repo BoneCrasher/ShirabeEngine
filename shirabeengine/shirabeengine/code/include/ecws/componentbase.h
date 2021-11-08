@@ -18,7 +18,8 @@ namespace engine::ecws
     public_constructors:
         SHIRABE_INLINE
         explicit CBoundedCollection()
-            : CBoundedCollection(0)
+            : mMaxElements(0)
+            , mElements()
         {}
 
         SHIRABE_INLINE

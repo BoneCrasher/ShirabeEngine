@@ -2,8 +2,8 @@
 // Created by dotti on 23.10.19.
 //
 
-#ifndef __SHIRABEDEVELOPMENT_ADJACENCYTREE_H__
-#define __SHIRABEDEVELOPMENT_ADJACENCYTREE_H__
+#ifndef __SHIRABE_ADJACENCYTREE_H__
+#define __SHIRABE_ADJACENCYTREE_H__
 
 // Example program
 #include <iostream>
