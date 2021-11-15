@@ -14,39 +14,49 @@ namespace engine::ecws
     class CUidIssuer
     {
     public_typedefs:
-        using Uid_t = TUidType;
+        using Uid_t     = TUidType;
+        using Storage_t = Vector<Uid_t>;
 
     private_members:
-        Uid_t         mUid;
-        Vector<Uid_t> mReturnedUids;
+        Storage_t mStorage;
 
     public_constructors:
         CUidIssuer()
-            : mUid(0)
-            , mReturnedUids()
+            : mStorage(0)
         {};
 
     public_destructors:
         ~CUidIssuer()
         {
-            mUid = 0;
-            mReturnedUids.clear();
+            mStorage.clear();
         };
 
     public_methods:
-        Uid_t fetchNextAvailableUid()
+        void initialize(typename Storage_t::size_type aCapacity)
         {
-            if(mReturnedUids.empty())
+            mStorage.resize(aCapacity);
+            for(int k=0; k<aCapacity; ++K)
             {
-                return (++mUid);
+                // Don't assume congruency of index and value after initialization.
+                mStorage[k] = k;
             }
+        };
 
-            return mReturnedUids.front();
+        Uid_t fetchUid()
+        {
+            Uid_t const uid = mStorage.back();
+            mStorage.pop_back();
+            return uid;
         };
 
         void releaseUid(Uid_t aUid)
         {
-            mReturnedUids.push_back(aUid);
+            mStorage.push_back(aUid);
+        }
+
+        typename Storage_t::size_type capacity() const
+        {
+            return mStorage.size();
         }
     };
 
@@ -62,16 +72,13 @@ namespace engine::ecws
                 return (((TComposedUidType) aPrimaryUid << (CHAR_BIT * sizeof(TSecondaryUidType))) | aSecondaryUid);
             }
 
-            static TPrimaryUidType extractPrimary(TComposedUidType aComposedUidType)
+            static std::tuple<TPrimaryUidType, TSecondaryUidType> extract(TComposedUidType aComposedUid)
             {
                 static_assert(sizeof(TComposedUidType) == (sizeof(TPrimaryUidType) + sizeof(TSecondaryUidType)), "Can't combine types.");
-                return (TPrimaryUidType) (aComposedUidType >> (CHAR_BIT * sizeof(TSecondaryUidType)));
-            }
+                auto const primary   = (TPrimaryUidType)   (aComposedUid >> (CHAR_BIT * sizeof(TSecondaryUidType)));
+                auto const secondary = (TSecondaryUidType) (aComposedUid & ((1 << (CHAR_BIT * sizeof(TSecondaryUidType))) - 1));
 
-            static TSecondaryUidType extractSecondary(TComposedUidType aComposedUidType)
-            {
-                static_assert(sizeof(TComposedUidType) == (sizeof(TPrimaryUidType) + sizeof(TSecondaryUidType)), "Can't combine types.");
-                return (TSecondaryUidType) (aComposedUidType & ((1 << (CHAR_BIT * sizeof(TSecondaryUidType))) - 1));
+                return {primary, secondary};
             }
         };
     }

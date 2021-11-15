@@ -53,6 +53,41 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    bool CEntity::addComponent(PublicComponentId_t   aParentComponentId
+                               , Shared<IComponent>  aComponent)
+    {
+        if (   gInvalidComponentId == aParentComponentId
+            || not aComponent
+            || not containsComponent(aComponent->getComponentId()))
+        {
+            return false;
+        }
+
+        PublicComponentId_t const childComponentId = aComponent->getComponentId();
+        mAssignedComponents.insert({childComponentId, aComponent});
+        mComponentHierarchy.add(childComponentId);
+        mComponentHierarchy.connect(aParentComponentId, childComponentId);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    bool CEntity::removeComponent(PublicComponentId_t aComponentId)
+    {
+        if(gInvalidComponentId == aComponentId || not containsComponent(aComponentId))
+        {
+            return false;
+        }
+
+        mComponentHierarchy.remove(aComponentId);
+        mAssignedComponents.erase(aComponentId);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
     EEngineStatus CEntity::update(CTimer const &aTimer)
     {
         if(mRootComponent)

@@ -51,24 +51,73 @@ namespace engine
         return std::make_shared<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
     }
 
+    template<typename T>
+    struct no_delete
+    {
+        constexpr no_delete() noexcept = default;
+
+        template<typename U, typename = std::_Require<std::is_convertible<U*, T*>>>
+        explicit no_delete(no_delete<U> const&) noexcept
+        { }
+
+        void operator()(T* aInstance) const
+        {
+            SHIRABE_UNUSED(aInstance);
+            /* No-op */
+        }
+    };
+
+    template<typename T>
+    struct no_delete<T[]>
+    {
+    public:
+        constexpr no_delete() noexcept = default;
+
+        template<typename U, typename = std::_Require<std::is_convertible<U(*)[], T(*)[]>>>
+        explicit no_delete(no_delete<U[]> const&) noexcept
+        { }
+
+        template<typename U>
+        typename std::enable_if<std::is_convertible<U(*)[], T(*)[]>::value>::type
+        operator()(U* aArray) const
+        {
+            SHIRABE_UNUSED(aArray);
+            /* No-Op */
+        }
+    };
+
+    template <typename T>
+    using DefaultDelete_t = std::default_delete<T>;
+
+    template <typename T>
+    using DefaultDeleteArray_t = std::default_delete<T[]>;
+
+    template <typename T>
+    using NoDelete_t = no_delete<T>;
+
+    template <typename T>
+    using NoDeleteArray_t = no_delete<T[]>;
+
     /**
-     *
+     * @brief makeCStdSharedFromThis
+     * @param instance
+     * @return
+     */
+    template <typename T, typename TDeleter, typename TPtr = Shared<T>>
+    static inline TPtr makeManagingPtrFromInstance(T* aInstance, TDeleter &&aDeleter = DefaultDelete_t<T>())
+    {
+        return TPtr(aInstance, aDeleter);
+    }
+
+    /**
+     * @brief makeCStdSharedFromThis
+     * @param instance
+     * @return
      */
     template <typename T>
-    using CStdSharedPtrDeleterFn_t = std::function<void(T*)>;
-
-    /**
-     * @brief makeSharedCustomDeleter
-     * @param aInstance
-     * @param aDeleter
-     * @return
-     */
-    template <typename T, typename TDeleter>
-    static Shared<T> makeSharedCustomDeleter(
-            T          *aInstance,
-            TDeleter    aDeleter)
+    static inline Shared<T> makeSharedFromInstance(T* aInstance)
     {
-        return Shared<T>(aInstance, aDeleter);
+        return makeManagingPtrFromInstance<T, Shared<T>>(aInstance);
     }
 
     /**
@@ -76,21 +125,10 @@ namespace engine
      * @param instance
      * @return
      */
-    template <typename T, typename TPtr = Shared<T>>
-    static inline TPtr makeSharedFromThis(T* instance)
+    template <typename T>
+    static inline Shared<T> makeNonDeletingSharedFromInstance(T* aInstance)
     {
-        return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
-    }
-
-    /**
-     * @brief makeCStdSharedFromThis
-     * @param instance
-     * @return
-     */
-    template <typename T, typename TPtr = Weak<T>>
-    static inline TPtr makeCStdWeakFromThis(T* instance)
-    {
-        return TPtr(instance, [](T*) -> void {; /* Do not delete */ });
+        return makeManagingPtrFromInstance<T, Shared<T>>(aInstance, NoDelete_t<T>());
     }
 
     /**
@@ -102,6 +140,18 @@ namespace engine
     static Unique<TUnderlyingType> makeUnique(TArgs&&... aArgs)
     {
         return std::make_unique<TUnderlyingType>(std::forward<TArgs>(aArgs)...);
+    }
+
+    template <typename T>
+    static Unique<T> makeUniqueFromInstance(T *aInstance)
+    {
+        return makeManagingPtrFromInstance<T, Unique<T>>(aInstance);
+    }
+
+    template <typename T>
+    static Unique<T> makeNonDeletingUniqueFromInstance(T *aInstance)
+    {
+        return makeManagingPtrFromInstance<T, Unique<T>>(aInstance, NoDelete_t<T>());
     }
 
     /**
