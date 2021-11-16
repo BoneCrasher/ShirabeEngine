@@ -207,7 +207,7 @@ namespace engine::ecws
             }
 
             Variant_t& subsystem = mAttachedSubsystems[ti];
-            return std::get<std::shared_ptr<TSubsystem>>(subsystem);s
+            return std::get<std::shared_ptr<TSubsystem>>(subsystem);
         }
     };
 
