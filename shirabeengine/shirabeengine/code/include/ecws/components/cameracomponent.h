@@ -1,8 +1,8 @@
 #ifndef __SHIRABE_COMPONENT_CAMERA_H__
 #define __SHIRABE_COMPONENT_CAMERA_H__
 
-#include "ecws/componentsystem.h"
-#include "buildingblocks/camera.h"
+#include "../componentsystem.h"
+#include "../../buildingblocks/camera.h"
 
 namespace engine::ecws
 {
@@ -15,7 +15,7 @@ namespace engine::ecws
 		: public AComponentBase<SCameraComponentState>
 	{
 	public_constructors:
-        explicit CCameraComponent(std::string const &aName);
+        explicit CCameraComponent(String aName);
 
     public_destructors:
 		~CCameraComponent() override;

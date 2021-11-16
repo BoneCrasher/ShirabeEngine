@@ -57,7 +57,7 @@ namespace engine
                 Shared<IWindow> const &,
                 CRect                    const &) override
         {
-            //Log::Status(logTag(), String::format("onBoundsChanged: {}/{}/{}/{}", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
+            //Log::Status(logTag(), StaticStringHelpers::format("onBoundsChanged: {}/{}/{}/{}", r.m_position.x(), r.m_position.y(), r.m_size.x(), r.m_size.y()));
         }
 
         void onHide(Shared<IWindow> const &) override

@@ -1,4 +1,5 @@
-#include "ecws/transformcomponent.h"
+#include <ecws/components/transformcomponent.h>
+#include "ecws/components/cameracomponent.h"
 #include "ecws/entity.h"
 
 namespace engine::ecws
@@ -6,9 +7,8 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CTransformComponent::CTransformComponent(std::string const &aName)
-        : CComponentBase(aName)
-        //, mMaterialInstance(nullptr)
+    CCameraComponent::CCameraComponent(String aName)
+        : AComponentBase<SCameraComponentState>(std::move(aName))
     {
     }
     //<-----------------------------------------------------------------------------
@@ -16,18 +16,21 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CTransformComponent::~CTransformComponent()
+    CCameraComponent::~CCameraComponent()
     {
-        //mMaterialInstance = nullptr;
+        getMutableComponentState().camera = nullptr;
     }
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    EEngineStatus CTransformComponent::update(CTimer const &aTimer)
+    EEngineStatus CCameraComponent::update(CTimer const &aTimer)
     {
-        SHIRABE_UNUSED(aTimer);
+        CBoundedCollection<Shared<CTransformComponent>> const  transformComponents = getParentEntity()->getTypedComponentsOfType<ecws::CTransformComponent>();
+        Shared<CTransformComponent>                     const &transformComponent  = *(transformComponents.cbegin());
+
+        mCamera->update(aTimer, transformComponent->getTransform());
 
         return EEngineStatus::Ok;
     }

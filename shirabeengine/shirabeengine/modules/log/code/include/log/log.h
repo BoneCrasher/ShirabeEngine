@@ -230,7 +230,7 @@ namespace engine
 
             #ifdef SHIRABE_PLATFORM_WINDOWS
             #ifdef _UNICODE
-                    std::wstring wmsg = String::toWideString(msg);
+                    std::wstring wmsg = StaticStringHelpers::toWideString(msg);
                     DWORD       written = 0;
                     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), wmsg.c_str(), ((DWORD)msg.size()), &written, nullptr);
             #else

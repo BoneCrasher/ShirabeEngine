@@ -1,16 +1,21 @@
 #ifndef __SHIRABE_COMPONENT_TRANSFORM_H__
 #define __SHIRABE_COMPONENT_TRANSFORM_H__
 
-#include "ecws/componentbase.h"
+#include "ecws/componentsystem.h"
 #include "buildingblocks/transform.h"
 
 namespace engine::ecws
 {
+    struct STransformComponentState
+    {
+        CTransform transform;
+    };
+
 	class CTransformComponent
-		: public CComponentBase
+		: public AComponentBase<STransformComponentState>
 	{
 	public_constructors:
-        explicit CTransformComponent(std::string const &aName);
+        explicit CTransformComponent(String aName);
 
     public_destructors:
 		~CTransformComponent() override;
@@ -20,14 +25,11 @@ namespace engine::ecws
 
 		[[nodiscard]]
 		SHIRABE_INLINE
-		CTransform const &getTransform() const { return mTransform; }
+		CTransform const &getTransform() const { return getComponentState().transform; }
 
         [[nodiscard]]
         SHIRABE_INLINE
-        CTransform &getMutableTransform() { return mTransform; }
-
-	private_members:
-	    CTransform mTransform;
+        CTransform &getMutableTransform() { return getMutableComponentState().transform; }
 	};
 
 }

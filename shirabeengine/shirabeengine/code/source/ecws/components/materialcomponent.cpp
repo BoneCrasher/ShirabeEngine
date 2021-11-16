@@ -1,4 +1,4 @@
-#include "ecws/materialcomponent.h"
+#include "ecws/components/materialcomponent.h"
 #include "ecws/entity.h"
 
 namespace engine::ecws
@@ -6,8 +6,8 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CMaterialComponent::CMaterialComponent(std::string const &aName)
-        : CComponentBase(aName)
+    CMaterialComponent::CMaterialComponent(String aName)
+        : AComponentBase<SMaterialComponentState>(std::move(aName))
         //, mMaterialInstance(nullptr)
     {}
     //<-----------------------------------------------------------------------------
@@ -42,8 +42,24 @@ namespace engine::ecws
             return EEngineStatus::Error;
         }
 
-        mMaterialInstance = std::move(aMaterialInstance);
+        getMutableComponentState().material = std::move(aMaterialInstance);
         return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    material::CMaterialConfig& CMaterialComponent::getMutableConfiguration()
+    {
+        static material::CMaterialConfig sEmptyConfig;
+
+        if(not getMutableComponentState().material)
+        {
+            return sEmptyConfig;
+        }
+
+        return getMutableComponentState().material->getMutableConfiguration();
     }
     //<-----------------------------------------------------------------------------
 }

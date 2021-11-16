@@ -3,16 +3,20 @@
 
 #include <asset/mesh/declaration.h>
 
-#include "ecws/componentbase.h"
+#include "ecws/componentsystem.h"
 
 namespace engine::ecws
 {
+    struct SMeshComponentState
+    {
+        Shared<mesh::CMeshInstance> mesh;
+    };
 
 	class CMeshComponent
-		: public CComponentBase
+		: public AComponentBase<SMeshComponentState>
 	{
 	public_constructors:
-		explicit CMeshComponent(std::string const &aName);
+		explicit CMeshComponent(String aName);
 
     public_destructors:
 		~CMeshComponent() override;
@@ -23,17 +27,14 @@ namespace engine::ecws
 		SHIRABE_INLINE
 		void setMeshInstance(Shared<mesh::CMeshInstance> aInstance)
         {
-		    mMeshInstance = std::move(aInstance);
+            getMutableComponentState().mesh = std::move(aInstance);
         }
 
         SHIRABE_INLINE
         Weak<mesh::CMeshInstance> getMeshInstance()
         {
-		    return mMeshInstance;
+		    return getMutableComponentState().mesh;
         }
-
-	private:
-	    Shared<mesh::CMeshInstance> mMeshInstance;
 	};
 
 }

@@ -13,10 +13,10 @@
 #include <asset/textures/declaration.h>
 #include <asset/textures/loader.h>
 
-#include "ecws/meshcomponent.h"
-#include "ecws/materialcomponent.h"
-#include "ecws/transformcomponent.h"
-#include "ecws/cameracomponent.h"
+#include "ecws/components/meshcomponent.h"
+#include "ecws/components/materialcomponent.h"
+#include "ecws/components/transformcomponent.h"
+#include "ecws/components/cameracomponent.h"
 
 namespace engine
 {

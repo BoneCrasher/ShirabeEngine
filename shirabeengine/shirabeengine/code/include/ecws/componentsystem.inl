@@ -7,8 +7,23 @@
 template <typename TComponentState>
 AComponentBase<TComponentState>::AComponentBase()
     : IComponent()
+      , mPublicComponentId(gInvalidComponentId)
+      , mComponentId(gInvalidComponentId)
+      , mComponentName(u8"Unnamed Component")
+      , mState(nullptr)
+{
+}
+//<-----------------------------------------------------------------------------
+
+//<-----------------------------------------------------------------------------
+//
+//<-----------------------------------------------------------------------------
+template <typename TComponentState>
+AComponentBase<TComponentState>::AComponentBase(String aComponentName)
+    : IComponent()
     , mPublicComponentId(gInvalidComponentId)
     , mComponentId(gInvalidComponentId)
+    , mComponentName(std::move(aComponentName))
     , mState(nullptr)
 {
 }
@@ -30,6 +45,16 @@ template <typename TComponentState>
 PublicComponentId_t AComponentBase<TComponentState>::getComponentId() const
 {
     return mPublicComponentId;
+}
+//<-----------------------------------------------------------------------------
+
+//<-----------------------------------------------------------------------------
+//
+//<-----------------------------------------------------------------------------
+template <typename TComponentState>
+String const& AComponentBase<TComponentState>::getComponentName() const
+{
+    return mComponentName;
 }
 //<-----------------------------------------------------------------------------
 
@@ -133,8 +158,9 @@ TComponentState& AComponentBase<TComponentState>::getMutableComponentState()
 //
 //<-----------------------------------------------------------------------------
 template <typename TSubsystem, typename TComponentState>
-ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>::ASubsystemIntegratedComponentBase(Shared<TSubsystem> aSubsystem)
-    : AComponentBase<TComponentState>()
+ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>
+    ::ASubsystemIntegratedComponentBase(String aComponentName, Shared<TSubsystem> aSubsystem)
+        : AComponentBase<TComponentState>(std::move(aComponentName))
         , mAttachedSubsystem(aSubsystem)
 {
 

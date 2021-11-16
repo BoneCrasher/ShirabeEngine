@@ -40,6 +40,13 @@ namespace engine::ecws
         virtual PublicComponentId_t getComponentId() const = 0;
 
         /**
+         * Retrieve the component's assigned name.
+         * @return
+         */
+        [[nodiscard]]
+        virtual String const& getComponentName() const = 0;
+
+        /**
          * Initialize the component.
          *
          * @return EEngineStatus::Ok, if successful.
@@ -85,12 +92,14 @@ namespace engine::ecws
     {
     private_members:
         PublicComponentId_t     mPublicComponentId        = gInvalidComponentId;
-        ComponentId_t           mComponentId              = gInvalidComponentId;
-        Unique<TComponentState> mState                    = nullptr;
+        ComponentId_t           mComponentId   = gInvalidComponentId;
+        String                  mComponentName = u8"";
+        Unique<TComponentState> mState         = nullptr;
         bool                    mStateIsExternallyManaged = false;
 
     public_constructors:
         AComponentBase();
+        explicit AComponentBase(String aComponentName);
 
     public_destructors:
         ~AComponentBase() override;
@@ -99,8 +108,11 @@ namespace engine::ecws
         /**
          * @copydoc IComponent::getComponentId()
          */
-         [[nodiscard]]
+        [[nodiscard]]
         PublicComponentId_t getComponentId() const final;
+
+        [[nodiscard]]
+        String const& getComponentName() const final;
 
         /**
          * @copydoc IComponent::initialize()
@@ -166,7 +178,7 @@ namespace engine::ecws
         Shared<TSubsystem> mAttachedSubsystem = nullptr;
 
     public_constructors:
-        explicit ASubsystemIntegratedComponentBase(Shared<TSubsystem> aSubsystem);
+        explicit ASubsystemIntegratedComponentBase(String aComponentName, Shared<TSubsystem> aSubsystem);
 
     public_destructors:
         ~ASubsystemIntegratedComponentBase() override;

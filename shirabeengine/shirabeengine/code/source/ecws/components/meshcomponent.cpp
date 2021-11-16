@@ -1,10 +1,10 @@
-#include "ecws/meshcomponent.h"
+#include "ecws/components/meshcomponent.h"
 #include "ecws/entity.h"
 
 namespace engine::ecws
 {
-    CMeshComponent::CMeshComponent(std::string const &aName)
-        : CComponentBase(aName)
+    CMeshComponent::CMeshComponent(String aName)
+        : AComponentBase<SMeshComponentState>(std::move(aName))
     {
 
     }
