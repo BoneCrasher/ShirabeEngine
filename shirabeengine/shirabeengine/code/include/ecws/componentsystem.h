@@ -92,9 +92,9 @@ namespace engine::ecws
     {
     private_members:
         PublicComponentId_t     mPublicComponentId        = gInvalidComponentId;
-        ComponentId_t           mComponentId   = gInvalidComponentId;
-        String                  mComponentName = u8"";
-        Unique<TComponentState> mState         = nullptr;
+        ComponentId_t           mComponentId              = gInvalidComponentId;
+        String                  mComponentName            = u8"Unnamed Component";
+        Unique<TComponentState> mState                    = nullptr;
         bool                    mStateIsExternallyManaged = false;
 
     public_constructors:
@@ -167,18 +167,20 @@ namespace engine::ecws
      * @tparam TSubsystem      The static type of the subsystem the component integrates with.
      * @tparam TComponentState The specific state type in the subsystem the component will be assigned by the subsystem.
      */
-    template <typename TSubsystem, typename TComponentState>
+    template <typename TComponentState, typename... TAttachedSubsystems>
     class ASubsystemIntegratedComponentBase
         : public AComponentBase<TComponentState>
     {
+        using Variant_t = Variant<Shared<TAttachedSubsystems>...>;
+        using Pair_t    = Pair<std::type_index, Variant_t>;
     private_members:
         /**
          * Reference to the subsystem the component integrates with.
          */
-        Shared<TSubsystem> mAttachedSubsystem = nullptr;
+        Map<std::type_index, Variant<Shared<TAttachedSubsystems>...>> mAttachedSubsystems;
 
     public_constructors:
-        explicit ASubsystemIntegratedComponentBase(String aComponentName, Shared<TSubsystem> aSubsystem);
+        explicit ASubsystemIntegratedComponentBase(String aComponentName, Shared<TAttachedSubsystems>... aSubsystems);
 
     public_destructors:
         ~ASubsystemIntegratedComponentBase() override;
@@ -194,6 +196,19 @@ namespace engine::ecws
          */
         EEngineStatus deinitialize() override;
 
+    protected_methods:
+        template <typename TSubsystem>
+        std::shared_ptr<TSubsystem> getSubsystem()
+        {
+            std::type_index const& ti = typeid(TSubsystem);
+            if(mAttachedSubsystems.end() == mAttachedSubsystems.find(ti))
+            {
+                return nullptr;
+            }
+
+            Variant_t& subsystem = mAttachedSubsystems[ti];
+            return std::get<std::shared_ptr<TSubsystem>>(subsystem);s
+        }
     };
 
     /**

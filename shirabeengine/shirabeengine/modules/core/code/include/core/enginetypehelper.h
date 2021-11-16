@@ -14,6 +14,7 @@
 #include <functional>
 #include <vector>
 #include <unordered_map>
+#include <variant>
 
 #include <base/declaration.h>
 
@@ -165,6 +166,12 @@ namespace engine
      */
     template <typename TKey, typename TValue>
     using Map = std::unordered_map<TKey, TValue>;
+
+    template <typename... TTypes>
+    using Variant = std::variant<TTypes...>;
+
+    template <typename TKey, typename TValue>
+    using Pair = std::pair<TKey, TValue>;
 
     #define SHIRABE_DECLARE_LIST_OF_TYPE(type, prefix) \
         using prefix##List = std::vector<type>;

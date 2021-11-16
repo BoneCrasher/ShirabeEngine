@@ -157,31 +157,30 @@ TComponentState& AComponentBase<TComponentState>::getMutableComponentState()
 //<-----------------------------------------------------------------------------
 //
 //<-----------------------------------------------------------------------------
-template <typename TSubsystem, typename TComponentState>
-ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>
-    ::ASubsystemIntegratedComponentBase(String aComponentName, Shared<TSubsystem> aSubsystem)
+template <typename TComponentState, typename... TAttachedSubsystems>
+ASubsystemIntegratedComponentBase<TComponentState, TAttachedSubsystems...>
+    ::ASubsystemIntegratedComponentBase(String aComponentName, Shared<TAttachedSubsystems>... aSubsystems)
         : AComponentBase<TComponentState>(std::move(aComponentName))
-        , mAttachedSubsystem(aSubsystem)
+        , mAttachedSubsystems({ Pair_t(typeid(TAttachedSubsystems), Variant_t(aSubsystems))... })
 {
-
 }
 //<-----------------------------------------------------------------------------
 
 //<-----------------------------------------------------------------------------
 //
 //<-----------------------------------------------------------------------------
-template <typename TSubsystem, typename TComponentState>
-ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>::~ASubsystemIntegratedComponentBase()
+template <typename TComponentState, typename... TAttachedSubsystems>
+ASubsystemIntegratedComponentBase<TComponentState, TAttachedSubsystems...>::~ASubsystemIntegratedComponentBase()
 {
-    mAttachedSubsystem.reset();
+    mAttachedSubsystems.reset();
 }
 //<-----------------------------------------------------------------------------
 
 //<-----------------------------------------------------------------------------
 //
 //<-----------------------------------------------------------------------------
-template <typename TSubsystem, typename TComponentState>
-EEngineStatus ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>::initialize()
+template <typename TComponentState, typename... TAttachedSubsystems>
+EEngineStatus ASubsystemIntegratedComponentBase<TComponentState, TAttachedSubsystems...>::initialize()
 {
     return AComponentSystemBase<TComponentState>::initialize();
 }
@@ -190,8 +189,8 @@ EEngineStatus ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>::in
 //<-----------------------------------------------------------------------------
 //
 //<-----------------------------------------------------------------------------
-template <typename TSubsystem, typename TComponentState>
-EEngineStatus ASubsystemIntegratedComponentBase<TSubsystem, TComponentState>::deinitialize()
+template <typename TComponentState, typename... TAttachedSubsystems>
+EEngineStatus ASubsystemIntegratedComponentBase<TComponentState, TAttachedSubsystems...>::deinitialize()
 {
     return AComponentSystemBase<TComponentState>::deinitialize();
 }
