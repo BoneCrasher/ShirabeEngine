@@ -17,7 +17,7 @@ namespace engine::rhi
     // although currently unnecessary.
     //<-----------------------------------------------------------------------------
     template <typename... TResources>
-    using CRHIResourceManagerRemap = CRHIResourceManagerBase<SRHIResourceState<TResources>...>;
+    using CRHIResourceManagerRemap = CRHIResourceManagerBase<vulkan::IVkGlobalContext, SRHIResourceState<TResources>...>;
 
     using CRHIResourceManager = CRHIResourceManagerRemap<SRHIImage
                                                          , SRHIImageView

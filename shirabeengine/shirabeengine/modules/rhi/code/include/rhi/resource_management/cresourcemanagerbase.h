@@ -21,12 +21,12 @@
 
 namespace engine::rhi
 {
-    using asset::AssetId_t ;
+    using asset::AssetId_t;
 
     /**
      *
      */
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     class
         [[nodiscard]]
         SHIRABE_LIBRARY_EXPORT CRHIResourceManagerBase
@@ -34,8 +34,13 @@ namespace engine::rhi
         SHIRABE_DECLARE_LOG_TAG(CRHIResourceManager);
 
     private_typedefs:
-        using My_t               = CRHIResourceManagerBase<TResources...>;
+        using My_t               = CRHIResourceManagerBase<TRHIEnvironment, TResources...>;
         using ResourceVariants_t = std::variant<TResources...>;
+
+    private_members:
+        engine::threading::CLooper<EEngineStatus>            mResourceThreadLooper;
+        std::unordered_map<ResourceId_t, ResourceVariants_t> mResourceObjects;
+        Shared<TRHIEnvironment>                              mRhiEnvironment;
 
     public_constructors:
         CRHIResourceManagerBase();
@@ -121,19 +126,14 @@ namespace engine::rhi
                 mResourceObjects.erase(aId);
             }
         }
-
-    private_members:
-        engine::threading::CLooper<EEngineStatus> mResourceThreadLooper;
-
-        std::unordered_map<ResourceId_t, ResourceVariants_t> mResourceObjects;
     };
     //<-----------------------------------------------------------------------------
 
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
-    CRHIResourceManagerBase<TResources...>::CRHIResourceManagerBase()
+    template <typename TRHIEnvironment, typename... TResources>
+    CRHIResourceManagerBase<TRHIEnvironment, TResources...>::CRHIResourceManagerBase()
         : mResourceObjects    ()
     {
         mResourceThreadLooper.initialize();
@@ -144,8 +144,8 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
-    CRHIResourceManagerBase<TResources...>::~CRHIResourceManagerBase()
+    template <typename TRHIEnvironment, typename... TResources>
+    CRHIResourceManagerBase<TRHIEnvironment, TResources...>::~CRHIResourceManagerBase()
     {
         mResourceThreadLooper.abortAndJoin();
         mResourceThreadLooper.deinitialize();
@@ -155,10 +155,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TLogicalResource>
     CEngineResult<typename TLogicalResource::RHIResourceDescriptor_t> const
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::getResourceDescription(ResourceId_t const &aResourceId) const
     {
         auto const &[result, resourceOpt] = getResource<SRHIResourceState<TLogicalResource>>(aResourceId);
@@ -177,10 +177,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource>
     CEngineResult<OptionalRef_t<TResource>>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::useResource(
                   ResourceId_t                                const &aResourceId
                 , typename TResource::RHIResourceDescriptor_t const &aDescriptor
@@ -218,10 +218,10 @@ namespace engine::rhi
     //
     //<-----------------------------------------------------------------------------
 
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<OptionalRef_t<TResource>>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::getResource(
                 ResourceId_t const &aId, TArgs &&...aArgs)
     {
@@ -239,10 +239,10 @@ namespace engine::rhi
     //
     //<-----------------------------------------------------------------------------
 
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::initializeResource(
                 ResourceId_t const &aId, TArgs &&...aArgs)
     {
@@ -270,10 +270,10 @@ namespace engine::rhi
     //
     //<-----------------------------------------------------------------------------
 
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::updateResource(
                 ResourceId_t const &aId, TArgs &&...aArgs)
     {
@@ -299,10 +299,10 @@ namespace engine::rhi
     //
     //<-----------------------------------------------------------------------------
 
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::deinitializeResource(
                 ResourceId_t const &aId, TArgs &&...aArgs)
     {
@@ -327,10 +327,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::uploadResource(
                   ResourceId_t const &aId, TArgs &&...aArgs)
     {
@@ -355,10 +355,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     CEngineResult<>
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::discardResource(
                 ResourceId_t const &aResourceId, TArgs &&...aArgs)
     {
@@ -384,10 +384,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     EEngineStatus
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::initializeResourceImpl(
                 TResource &aResource, TArgs &&...aArgs)
     {
@@ -415,7 +415,7 @@ namespace engine::rhi
         {
             aResource.rhiLoadState.set(EGpuApiResourceState::Creating);
 
-            EEngineStatus const initResult = TResource::RHIMappedResource_t::template initialize<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const initResult = TResource::RHIMappedResource_t::template initialize<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(initResult))
             {
                 aResource.rhiLoadState.set(EGpuApiResourceState::Error);
@@ -445,10 +445,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     EEngineStatus
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::updateResourceImpl(
                 TResource &aResource, TArgs &&...aArgs)
     {
@@ -473,7 +473,7 @@ namespace engine::rhi
             {
                 aResource.rhiLoadState.set(EGpuApiResourceState::Loading);
 
-                EEngineStatus const loadResult = TResource::RHIMappedResource_t::template load<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const loadResult = TResource::RHIMappedResource_t::template load<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(loadResult))
                 {
                     aResource.rhiLoadState.set(EGpuApiResourceState::Error);
@@ -504,10 +504,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     EEngineStatus
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::deinitializeResourceImpl(
                     TResource &aResource, TArgs       &&...aArgs)
     {
@@ -539,7 +539,7 @@ namespace engine::rhi
             {
                 aResource.rhiLoadState.set(EGpuApiResourceState::Unloading);
 
-                EEngineStatus const unloadResult = TResource::RHIMappedResource_t::template unload<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const unloadResult = TResource::RHIMappedResource_t::template unload<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(unloadResult))
                 {
                     aResource.rhiLoadState.set(EGpuApiResourceState::Error);
@@ -556,7 +556,7 @@ namespace engine::rhi
         {
             aResource.rhiLoadState.reset(EGpuApiResourceState::Discarding);
 
-            EEngineStatus const deinitResult = TResource::RHIMappedResource_t::template deinitialize<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, std::forward<TArgs>(aArgs)...);
+            EEngineStatus const deinitResult = TResource::RHIMappedResource_t::template deinitialize<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
             if(not CheckEngineError(deinitResult))
             {
                 return deinitResult;
@@ -573,10 +573,10 @@ namespace engine::rhi
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    template <typename... TResources>
+    template <typename TRHIEnvironment, typename... TResources>
     template <typename TResource, typename... TArgs>
     EEngineStatus
-        CRHIResourceManagerBase<TResources...>
+        CRHIResourceManagerBase<TRHIEnvironment, TResources...>
             ::transferResourceImpl(
                 TResource &aResourceId, TArgs &&...aArgs)
     {
@@ -596,7 +596,7 @@ namespace engine::rhi
             {
                 aResourceId.rhiLoadState.set(EGpuApiResourceState::Transferring);
 
-                EEngineStatus const transferResult = TResource::RHIMappedResource_t::template transfer<My_t>(aResourceId.rhiCreateDesc, aResourceId.rhiHandles, this, std::forward<TArgs>(aArgs)...);
+                EEngineStatus const transferResult = TResource::RHIMappedResource_t::template transfer<My_t>(aResourceId.rhiCreateDesc, aResourceId.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
                 if(not CheckEngineError(transferResult))
                 {
                     return transferResult;
