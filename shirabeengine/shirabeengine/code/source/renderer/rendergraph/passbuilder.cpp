@@ -190,7 +190,7 @@ namespace engine
             view.parentResource              = aImage.resourceId;
             view.subjacentResource           = subjacentResourceId;
             view.type                        = ERenderGraphResourceType::ImageView;
-            view.readableName                = CString::format("ImageView ID {} - {} #{}"
+            view.readableName                = StaticStringHelpers::format("ImageView ID {} - {} #{}"
                                                                , view.resourceId
                                                                , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
                                                                , aImage.resourceId);
@@ -330,7 +330,7 @@ namespace engine
                 view.parentResource              = aTextureView.resourceId;
                 view.subjacentResource           = subjacentResourceId;
                 view.type                        = ERenderGraphResourceType::ImageView;
-                view.readableName                = CString::format("ImageView ID {} - {} #{}"
+                view.readableName                = StaticStringHelpers::format("ImageView ID {} - {} #{}"
                                                                    , view.resourceId
                                                                    , ( mode == ERenderGraphViewAccessMode::Write ? "Write" : "Read" )
                                                                    , aTextureView.resourceId);
@@ -600,7 +600,7 @@ namespace engine
         CEngineResult<SRenderGraphBufferView> CPassBuilder::readBuffer(SRenderGraphBuffer &subjacentTargetResource, CRange const &aSubrange)
         {
             SRenderGraphBufferView bufferView = mResourceData.spawnResource<SRenderGraphBufferView>();
-            bufferView.readableName = CString::format("Buffer_%d_View_%d", subjacentTargetResource.resourceId, bufferView.resourceId);
+            bufferView.readableName = StaticStringHelpers::format("Buffer_%d_View_%d", subjacentTargetResource.resourceId, bufferView.resourceId);
             bufferView.description.mode     = ERenderGraphViewAccessMode::Read;
             bufferView.description.subrange = aSubrange;
 
@@ -714,7 +714,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //<
         //<-----------------------------------------------------------------------------
-        CEngineResult<SRenderGraphPipeline> CPassBuilder::usePipeline(resources::ResourceId_t      const &aPipelineResourceId
+        CEngineResult<SRenderGraphPipeline> CPassBuilder::usePipeline(rhi::ResourceId_t      const &aPipelineResourceId
                                                                       , SRenderGraphPipelineConfig const &aPipelineConfig)
         {
             SRenderGraphPipeline &resource = mResourceData.spawnResource<SRenderGraphPipeline>();
@@ -808,7 +808,7 @@ namespace engine
 
             if(arraySliceRangeOutOfBounds or mipSliceRangeOutOfBounds)
             {
-                CLog::Error(logTag(), CString::format("Derived subresource range out of bounds (Array:{}, Mip:{}).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
+                CLog::Error(logTag(), StaticStringHelpers::format("Derived subresource range out of bounds (Array:{}, Mip:{}).", arraySliceRangeOutOfBounds, mipSliceRangeOutOfBounds));
                 return { EEngineStatus::Error };
             }
 
@@ -847,7 +847,7 @@ namespace engine
                 if(isBeingRead)
                 {
                     CLog::Error(logTag(),
-                        CString::format(
+                        StaticStringHelpers::format(
                             "Resource is already being read at the specified ranges (Array: {}[{}]; Mip: {}[{}])",
                             aArraySliceRange.offset,
                             aArraySliceRange.length,
@@ -875,7 +875,7 @@ namespace engine
                 if(isBeingWritten)
                 {
                     CLog::Error(logTag(),
-                        CString::format(
+                        StaticStringHelpers::format(
                             "Resource is already being written at the specified ranges (Array: {}[{}]; Mip: {}[{}])",
                             aArraySliceRange.offset,
                             aArraySliceRange.length,

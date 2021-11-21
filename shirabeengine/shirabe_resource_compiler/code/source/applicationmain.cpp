@@ -406,7 +406,7 @@ public_methods:
         ss << "<Index>\n";
         for(auto const &a : processedAssets)
         {
-            ss << CString::format("<Asset aid=\"{}\" parent_aid=\"0\" type=\"{}\" subtype=\"{}\" uri=\"{}\"></Asset>\n"
+            ss << StaticStringHelpers::format("<Asset aid=\"{}\" parent_aid=\"0\" type=\"{}\" subtype=\"{}\" uri=\"{}\"></Asset>\n"
                                   , a.id
                                   , convert_to_string<asset::EAssetType>(a.type)
                                   , convert_to_string<asset::EAssetSubtype>(a.subtype)
@@ -438,7 +438,7 @@ private_methods:
             return { false };
         }
 
-        std::vector<std::string> paths = CString::split(aPathsString, ',');
+        std::vector<std::string> paths = StaticStringHelpers::split(aPathsString, ',');
         if(paths.empty())
         {
             return { false };

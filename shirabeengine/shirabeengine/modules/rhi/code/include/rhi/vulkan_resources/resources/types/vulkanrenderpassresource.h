@@ -197,7 +197,7 @@ namespace engine
             VkResult result = vkCreateRenderPass(aVulkanEnvironment->getLogicalDevice(), &vkRenderPassCreateInfo, nullptr, &vkRenderPass);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error("CVulkanRenderPassResource::initialize", CString::format("Failed to create render target view. Vulkan error: {}", result));
+                CLog::Error("CVulkanRenderPassResource::initialize", StaticStringHelpers::format("Failed to create render target view. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 

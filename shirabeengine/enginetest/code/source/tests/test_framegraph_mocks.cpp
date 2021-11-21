@@ -9,7 +9,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderContext::bindResource(PublicResourceId_t const &aResourceId)
         {
-            CLog::Verbose(logTag(), CString::format("bindResource(ID: {});", aResourceId));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("bindResource(ID: {});", aResourceId));
 
             return EEngineStatus::Ok;
         }
@@ -20,7 +20,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderContext::unbindResource(PublicResourceId_t const &aResourceId)
         {
-            CLog::Verbose(logTag(), CString::format("unbindResource(ID: {});", aResourceId));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("unbindResource(ID: {});", aResourceId));
 
             return EEngineStatus::Ok;
         }
@@ -32,7 +32,7 @@ namespace Test
         CEngineResult<> MockRenderContext::render(SRenderable const &aRenderable)
         {
             std::string message =
-                    CString::format(
+                    StaticStringHelpers::format(
                         "operation -> render(Renderable const&):\n"
                         "Renderable: {}\n"
                         "  MeshId:     {}\n"
@@ -77,7 +77,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::importTexture(SRenderGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("ImportTexture(...):\n{}", convert_to_string(aTexture)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("ImportTexture(...):\n{}", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -88,7 +88,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::createTexture(SRenderGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("CreateTexture(...):\n{}", convert_to_string(aTexture)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("CreateTexture(...):\n{}", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -101,7 +101,7 @@ namespace Test
                 SRenderGraphTexture      const &aTexture,
                 SRenderGraphTextureView  const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("CreateTextureView(...):\n{}", convert_to_string(aView)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("CreateTextureView(...):\n{}", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -115,7 +115,7 @@ namespace Test
                 SRenderGraphResource    const &aResource,
                 SRenderGraphBuffer      const &aBuffer)
         {
-            CLog::Verbose(logTag(), CString::format("CreateBuffer(...):\n{}", convert_to_string(aBuffer)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("CreateBuffer(...):\n{}", convert_to_string(aBuffer)));
 
             return EEngineStatus::Ok;
         }
@@ -129,7 +129,7 @@ namespace Test
                 SRenderGraphResource    const &aResource,
                 SRenderGraphBufferView  const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("CreateBufferView(...):\n{}", convert_to_string(aView)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("CreateBufferView(...):\n{}", convert_to_string(aView)));
             return EEngineStatus::Ok;
         }
         //<-----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::bindTextureView(SRenderGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("BindTextureView(...):\n{}", convert_to_string(aView)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("BindTextureView(...):\n{}", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -195,7 +195,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::unbindTextureView(SRenderGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("UnbindTextureView(...):\n{}", convert_to_string(aView)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("UnbindTextureView(...):\n{}", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -251,7 +251,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::destroyTexture(SRenderGraphTexture const &aTexture)
         {
-            CLog::Verbose(logTag(), CString::format("DestroyTexture(...):\n{}", convert_to_string(aTexture)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("DestroyTexture(...):\n{}", convert_to_string(aTexture)));
 
             return EEngineStatus::Ok;
         }
@@ -262,7 +262,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::destroyTextureView(SRenderGraphTextureView const &aView)
         {
-            CLog::Verbose(logTag(), CString::format("DestroyTextureView(...):\n{}", convert_to_string(aView)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("DestroyTextureView(...):\n{}", convert_to_string(aView)));
 
             return EEngineStatus::Ok;
         }
@@ -291,7 +291,7 @@ namespace Test
         //<-----------------------------------------------------------------------------
         CEngineResult<> CMockRenderGraphRenderContext::render(SRenderable const &aRenderable)
         {
-            CLog::Verbose(logTag(), CString::format("Render(...):\n", convert_to_string(aRenderable)));
+            CLog::Verbose(logTag(), StaticStringHelpers::format("Render(...):\n", convert_to_string(aRenderable)));
 
             return EEngineStatus::Ok;
         }
@@ -367,7 +367,7 @@ namespace Test
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
                 CTexture::SDescriptor const &descriptor = aRequest.resourceDescriptor();
-                CLog::Debug(logTag(), CString::format("Creating texture:\n{}", descriptor.toString()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Creating texture:\n{}", descriptor.toString()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -392,7 +392,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Updating texture:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Updating texture:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -417,7 +417,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Destroying texture:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Destroying texture:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -441,7 +441,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Querying texture:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Querying texture:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -466,7 +466,7 @@ namespace Test
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
                 CTextureView::SDescriptor const &descriptor = aRequest.resourceDescriptor();
-                CLog::Debug(logTag(), CString::format("Creating textureview:\n{}", descriptor.toString()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Creating textureview:\n{}", descriptor.toString()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -491,7 +491,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Updating textureview:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Updating textureview:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -516,7 +516,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Destroying textureview:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Destroying textureview:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;
@@ -540,7 +540,7 @@ namespace Test
 
             aOutTask = [=] () -> SGFXAPIResourceHandleAssignment
             {
-                CLog::Debug(logTag(), CString::format("Querying textureview:\n{}", aRequest.publicResourceId()));
+                CLog::Debug(logTag(), StaticStringHelpers::format("Querying textureview:\n{}", aRequest.publicResourceId()));
 
                 SGFXAPIResourceHandleAssignment assignment ={ };
                 assignment.publicResourceHandle   = 1;

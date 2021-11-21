@@ -75,7 +75,7 @@ namespace engine
                 xml::CXMLDocument      const &aFile,
                 CAssetRegistry<SAsset>       &aOutRegistry)
         {
-            std::string   const path   = CString::format("/Index/Asset");
+            std::string   const path   = StaticStringHelpers::format("/Index/Asset");
             xmlNodeSetPtr const assets = aFile.xmlSelect(path);
 
             for(uint32_t k=0; k<static_cast<uint32_t>(assets->nodeNr); ++k)
@@ -104,11 +104,11 @@ namespace engine
                 return value;
             };
 
-            std::string const aid     = CString::format("{}", getProp(aAsset, "aid"));
-            std::string const parent  = CString::format("{}", getProp(aAsset, "parent_aid"));
-            std::string const type    = CString::format("{}", getProp(aAsset, "type"));
-            std::string const subtype = CString::format("{}", getProp(aAsset, "subtype"));
-            std::string const uri     = CString::format("{}", getProp(aAsset, "uri"));
+            std::string const aid     = StaticStringHelpers::format("{}", getProp(aAsset, "aid"));
+            std::string const parent  = StaticStringHelpers::format("{}", getProp(aAsset, "parent_aid"));
+            std::string const type    = StaticStringHelpers::format("{}", getProp(aAsset, "type"));
+            std::string const subtype = StaticStringHelpers::format("{}", getProp(aAsset, "subtype"));
+            std::string const uri     = StaticStringHelpers::format("{}", getProp(aAsset, "uri"));
 
             std::filesystem::path uriPath     = std::filesystem::path(uri).lexically_normal();
             std::filesystem::path composedURI = aSourceDir.lexically_normal();

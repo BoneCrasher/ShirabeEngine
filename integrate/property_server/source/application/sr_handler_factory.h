@@ -19,7 +19,7 @@ static std::string toString(TDataType const &aValue)
     }
     else if constexpr (std::is_same_v<TDataType, std::wstring>)
     {
-        std::string const narrowed = CString::narrow(aValue);
+        std::string const narrowed = StaticStringHelpers::narrow(aValue);
         return narrowed;
     }
     else
@@ -64,7 +64,7 @@ public_methods:
                 uint32_t                 const &aValueIndex)
         {
             std::string const valueString   = toString<TDataType>(aValue);
-            std::string const messageString = CString::formatString("writeProperty/%s/%" PRIu32 "/%s", aProperty.getPropertyPath().c_str(), aValueIndex, valueString.c_str());
+            std::string const messageString = StaticStringHelpers::formatString("writeProperty/%s/%" PRIu32 "/%s", aProperty.getPropertyPath().c_str(), aValueIndex, valueString.c_str());
             CTCPMessage const message       = CTCPMessage::create(messageString);
 
             mSession->writeMessage(message);

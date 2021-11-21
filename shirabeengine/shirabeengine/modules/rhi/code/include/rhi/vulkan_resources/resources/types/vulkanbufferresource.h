@@ -107,7 +107,7 @@ namespace engine
 
             if(CheckEngineError(result))
             {
-                CLog::Error(buffer_log::logTag(), CString::format("Failed to create buffer."));
+                CLog::Error(buffer_log::logTag(), StaticStringHelpers::format("Failed to create buffer."));
                 return EEngineStatus::Error;
             }
 
@@ -157,7 +157,7 @@ namespace engine
             VkResult const result = vkBindBufferMemory(vkLogicalDevice, aVkBuffer, aVkMemory, aVkMemoryOffset);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(buffer_log::logTag(), CString::format("Failed to bind buffer memory on GPU. Vulkan error: {}", result));
+                CLog::Error(buffer_log::logTag(), StaticStringHelpers::format("Failed to bind buffer memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
             return EEngineStatus::Ok;

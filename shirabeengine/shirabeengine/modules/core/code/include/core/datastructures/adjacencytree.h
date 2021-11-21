@@ -536,7 +536,7 @@ namespace engine::datastructures
         }
         catch(std::runtime_error const &aRTE)
         {
-            // CLog::Error(logTag(), CString::format("Failed to perform topological sort: {} ", aRTE.what()));
+            // CLog::Error(logTag(), StaticStringHelpers::format("Failed to perform topological sort: {} ", aRTE.what()));
         }
         catch(...)
         {

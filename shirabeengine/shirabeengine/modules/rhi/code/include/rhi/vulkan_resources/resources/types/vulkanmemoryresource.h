@@ -99,7 +99,7 @@ namespace engine
             auto const [result, memory] = __createVkMemory(vkPhysicalDevice, vkLogicalDevice, aDescription.memoryRequirements, aDescription.memoryProperties);
             if(CheckEngineError(result))
             {
-                CLog::Error(memory_log::logTag(), CString::format("Failed to allocate buffer memory on GPU. Vulkan error: {}", result));
+                CLog::Error(memory_log::logTag(), StaticStringHelpers::format("Failed to allocate buffer memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 

@@ -199,9 +199,9 @@ namespace engine::rhi
         // Wrap the gpu api resource operations with dependency resolving operations.
         //
         TResource resource {};
-        resource.descriptor = aDescriptor;
-        resource.rhiHandles   = {};
-        resource.rhiLoadState = EGpuApiResourceState::Unloaded;
+        resource.rhiCreateDesc = aDescriptor;
+        resource.rhiHandles    = {};
+        resource.rhiLoadState  = EGpuApiResourceState::Unloaded;
 
         storeResourceObject<TResource>(aResourceId, resource);
 

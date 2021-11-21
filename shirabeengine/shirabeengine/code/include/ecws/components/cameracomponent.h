@@ -4,6 +4,8 @@
 #include "../componentsystem.h"
 #include "../../buildingblocks/camera.h"
 
+class CCameraSubsystem;
+
 namespace engine::ecws
 {
     struct SCameraComponentState
@@ -11,21 +13,22 @@ namespace engine::ecws
         Shared<CCamera> camera;
     };
 
-	class CCameraComponent
-		: public AComponentBase<SCameraComponentState>
+    template<CompatibleComponentState_c<SCameraComponentState> TForwardedComponentState, typename... TForwardedSubsystems>
+	class CCameraComponentImpl
+		: public ASubsystemIntegratedComponentBase<TForwardedComponentState, CCameraSubsystem, TForwardedSubsystems...>
 	{
 	public_constructors:
-        explicit CCameraComponent(String aName);
+        explicit CCameraComponentImpl(String aName);
 
     public_destructors:
-		~CCameraComponent() override;
+		~CCameraComponentImpl() override;
 
 	public_methods:
 		EEngineStatus update(CTimer const &aTimer) final;
 
 		[[nodiscard]]
 		SHIRABE_INLINE
-        Shared<CCamera> const &getCamera() const { return getComponentState().camera; }
+        Shared<CCamera> const &getCamera() const {  return getComponentState().camera; }
 
         [[nodiscard]]
         SHIRABE_INLINE
@@ -38,5 +41,8 @@ namespace engine::ecws
         }
 	};
 
+    class CCameraComponent final
+        : public CCameraComponentImpl<SCameraComponentState>
+    {};
 }
 #endif

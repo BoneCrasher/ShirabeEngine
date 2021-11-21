@@ -14,7 +14,7 @@
 
 namespace engine
 {
-    namespace resources
+    namespace rhi
     {
         using namespace asset;
         using namespace material;
@@ -33,9 +33,9 @@ namespace engine
         {
         public:
             static OptionalRef_t<SMaterialInstanceRHIResourceCollection>
-                    create(Shared<CAssetStorage>       aAssetStorage
+                    create(Shared<CAssetStorage>          aAssetStorage
                            , Shared<CRHIResourceManager>  aResourceManager
-                           , Shared<CMaterialInstance> aInstance)
+                           , Shared<CMaterialInstance>    aInstance)
             {
                 using namespace vulkan;
 
@@ -377,7 +377,7 @@ namespace engine
 
                 {
                     auto const &[status, resourceState] =
-                        aResourceManager->useResource<SRHIPipelineResourceState_t>(pipelineDescriptor.name, pipelineDescriptor);
+                        aResourceManager->useResource<RHIPipelineResourceState_t>(pipelineDescriptor.name, pipelineDescriptor);
                     if(CheckEngineError(status))
                     {
                         // TODO: Error log

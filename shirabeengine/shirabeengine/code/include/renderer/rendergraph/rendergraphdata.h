@@ -284,7 +284,7 @@ namespace engine
             SRenderGraphPersistentBufferDescription();
 
         public_members:
-            resources::ResourceId_t bufferResourceId;
+            rhi::ResourceId_t bufferResourceId;
         };
 
         struct SHIRABE_TEST_EXPORT SRenderGraphDynamicBufferDescription
@@ -370,7 +370,7 @@ namespace engine
             SRenderGraphPersistentImageDescription();
 
         public_members:
-            resources::ResourceId_t imageId;
+            rhi::ResourceId_t imageId;
         };
 
         struct SHIRABE_TEST_EXPORT SRenderGraphImageDescription
@@ -601,15 +601,15 @@ namespace engine
             : SRenderGraphResource
         {
         public_members:
-            resources::ResourceId_t    pipelineResourceId;
+            rhi::ResourceId_t    pipelineResourceId;
             SRenderGraphPipelineConfig pipelineConfiguration;
         };
 
         struct SRenderGraphMaterialDescription
         {
         public_members:
-            resources::ResourceId_t materialResourceId;
-            resources::ResourceId_t sharedMaterialResourceId;
+            rhi::ResourceId_t materialResourceId;
+            rhi::ResourceId_t sharedMaterialResourceId;
             std::vector<SRenderGraphPersistentBufferDescription> buffers;
             std::vector<SRenderGraphPersistentImageDescription>  images;
         };
@@ -628,7 +628,7 @@ namespace engine
 
         struct SRenderGraphMeshDescription
         {
-            resources::ResourceId_t meshResourceId;
+            rhi::ResourceId_t meshResourceId;
         };
 
         struct SRenderGraphMesh
@@ -769,7 +769,7 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(mResources.size() <= aResourceId)
                 {
-                    CLog::Error(logTag(), CString::format("Resource w/ resource id {} not found."));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Resource w/ resource id {} not found."));
                     return { EEngineStatus::ResourceError_NotFound };
                 }
 #endif
@@ -778,7 +778,7 @@ namespace engine
 #if defined SHIRABE_DEBUG || defined SHIRABE_TEST
                 if(nullptr == resource)
                 {
-                    CLog::Error(logTag(), CString::format("Resource w/ resource id {}: Handle is empty. Invalid resource."));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Resource w/ resource id {}: Handle is empty. Invalid resource."));
                     return { EEngineStatus::ResourceError_ResourceInvalid };
                 }
 #endif

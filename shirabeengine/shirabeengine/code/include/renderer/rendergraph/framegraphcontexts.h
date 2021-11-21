@@ -259,9 +259,10 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             // Pipelines
             //---------------------------------------------------------------------------------------------------------------
-            std::function<EEngineStatus(SRenderGraphPipeline const     &/* aPipeline */
-                                       , resources::ResourceId_t const &/* aRenderPassResourceId */
-                                       , uint32_t const                &/* aSubpassIndex*/)> createPipeline;
+            std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */
+                                       , rhi::ResourceId_t   const &/* aRenderPassResourceId */
+                                       , uint32_t const            &/* aSubpassIndex*/)> createPipeline;
+
             std::function<EEngineStatus(SRenderGraphPipeline const &/* aPipeline */)> destroyPipeline;
         };
 

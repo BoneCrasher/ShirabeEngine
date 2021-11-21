@@ -67,7 +67,7 @@ namespace engine
                                  , Shared<resources::CRHIResourceManagerBase> aResourceManager
                                  , Shared<mesh::CMeshLoader>           aMeshLoader
                                  , Shared<material::CMaterialLoader>   aMaterialLoader
-                                 , Shared<textures::CTextureLoader>    aTextureLoader;
+                                 , Shared<textures::CTextureLoader>    aTextureLoader);
 
         CEngineResult<> initializeResources();
 
@@ -95,7 +95,7 @@ namespace engine
         SHIRABE_INLINE
         Vector<Unique<ecws::CEntity>> const &getEntities() const { return mEntities; }
 
-        Unique<ecws::CEntity> const &findEntity(std::string const &aName)
+        Unique<ecws::CEntity> const &findEntity(String const &aName)
         {
             for(auto const &e : mEntities)
             {

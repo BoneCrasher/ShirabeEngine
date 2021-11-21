@@ -43,7 +43,7 @@ namespace engine::vulkan
             void                      *aUserData)
     {
         std::string const message =
-                CString::format(
+                StaticStringHelpers::format(
                     "[{}][{}({})]@'{}' -> ({}) in layer {}:\n{}",
                     aFlags, aObjType, (void*)aObj, aLocation, aCode, aLayerPrefix, aMsg);
         CLog::Debug(Debug::logTag(), message);
@@ -460,7 +460,7 @@ namespace engine::vulkan
         VkResult result = vkCreateDevice(physicalDevice.handle, &vkDeviceCreateInfo, nullptr, &vkLogicalDevice);
         if(VkResult::VK_SUCCESS != result)
         {
-            throw CVulkanError(CString::format("Failed to create logical device for physical device at index {}.", aIndex), result);
+            throw CVulkanError(StaticStringHelpers::format("Failed to create logical device for physical device at index {}.", aIndex), result);
         }
 
         vkGetPhysicalDeviceProperties(physicalDevice.handle, &(mVkState.properties));
@@ -516,7 +516,7 @@ namespace engine::vulkan
             {
                 CLog::Warning(
                             logTag(),
-                            CString::format(
+                            StaticStringHelpers::format(
                                 "Requested backbuffer extents {} x {} unsupported. Clamping the extents.",
                                 aRequestedBackBufferSize.size.x(),
                                 aRequestedBackBufferSize.size.y()));
@@ -1003,7 +1003,7 @@ namespace engine::vulkan
         }
         catch(CVulkanError const&ve)
         {
-            CLog::Error(logTag(), CString::format("CVulkanError (VkResult: {}):\n{}", ve.vulkanResult(), ve.what()));
+            CLog::Error(logTag(), StaticStringHelpers::format("CVulkanError (VkResult: {}):\n{}", ve.vulkanResult(), ve.what()));
             return EEngineStatus::Error;
         }
         catch(std::exception const &stde)

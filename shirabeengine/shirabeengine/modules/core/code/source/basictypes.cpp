@@ -52,7 +52,7 @@ namespace engine
     template <>
     std::string convert_to_string<CRange>(CRange const& aRange)
     {
-        return CString::format("[off:{},len:{}]", aRange.offset, aRange.length);
+        return StaticStringHelpers::format("[off:{},len:{}]", aRange.offset, aRange.length);
     }
     //<-----------------------------------------------------------------------------
 }

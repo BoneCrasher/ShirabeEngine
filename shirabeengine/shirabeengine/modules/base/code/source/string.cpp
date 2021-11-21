@@ -8,7 +8,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::wstring CString::widen(std::string const &aInput)
+    std::wstring StaticStringHelpers::widen(std::string const &aInput)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
@@ -20,7 +20,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::wstring CString::widen(char *aInput)
+    std::wstring StaticStringHelpers::widen(char *aInput)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
@@ -32,7 +32,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::string CString::narrow(std::wstring const &aInput)
+    std::string StaticStringHelpers::narrow(std::wstring const &aInput)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
@@ -44,7 +44,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::string CString::narrow(wchar_t *aInput)
+    std::string StaticStringHelpers::narrow(wchar_t *aInput)
     {
         std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 
@@ -56,7 +56,7 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    std::vector<std::string> CString::split(std::string const &aInput, char const aDelimiter)
+    std::vector<std::string> StaticStringHelpers::split(std::string const &aInput, char const aDelimiter)
     {
         std::vector<std::string> tokens;
         std::string              token;

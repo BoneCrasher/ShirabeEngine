@@ -92,7 +92,7 @@ int main( int aArgC, char* aArgV[] )
                 std::string value{};
                 (std::cin >> value);
 
-                std::string outputCommand = CString::formatString("writeProperty/%s/%s/%s", path.c_str(), index.c_str(), value.c_str());
+                std::string outputCommand = StaticStringHelpers::formatString("writeProperty/%s/%s/%s", path.c_str(), index.c_str(), value.c_str());
                 CTCPMessage outputMessage = CTCPMessage::create(outputCommand);
 
                 tcpServer->getSession()->writeMessage(outputMessage);

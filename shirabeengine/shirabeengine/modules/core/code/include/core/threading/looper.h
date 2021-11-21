@@ -482,7 +482,7 @@ namespace engine
                 TaskType      &&aRunnable,
                 uint64_t const &aTimeoutMilliseconds)
         {
-            std::function<bool()> fn = [=] () -> bool
+            std::function<bool()> fn = [=, this] () -> bool
             {
                 std::this_thread::sleep_for(std::chrono::milliseconds(aTimeoutMilliseconds));
                 return mAssignedLooper.post(std::move(aRunnable));

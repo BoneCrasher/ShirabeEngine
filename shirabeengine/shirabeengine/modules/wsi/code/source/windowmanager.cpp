@@ -38,7 +38,7 @@ namespace engine
             {
                 for(Shared<IWindow> const &window : mWindows)
                 {
-                    CLog::Warning(logTag(), CString::format("Pending, non-finalized window instance found with name '{}'", window->name()));
+                    CLog::Warning(logTag(), StaticStringHelpers::format("Pending, non-finalized window instance found with name '{}'", window->name()));
                 }
 
                 mWindows.clear();
@@ -85,7 +85,7 @@ namespace engine
             {
                 if(CheckEngineError(window->update()))
                 {
-                    CLog::Warning(logTag(), CString::format("Window '{}' failed to update.", window->name()));
+                    CLog::Warning(logTag(), StaticStringHelpers::format("Window '{}' failed to update.", window->name()));
 
                     error = EWindowManagerError::UpdateFailed;
                     continue;
@@ -106,7 +106,7 @@ namespace engine
             Shared<IWindow> window = mWindowFactory->createWindow(aName, aInitialBounds);
             if(!window)
             {
-                CLog::Warning(logTag(), CString::format("Failed to create window '{}' with bounds x/y/w/h --> {}/{}/{}/{}",
+                CLog::Warning(logTag(), StaticStringHelpers::format("Failed to create window '{}' with bounds x/y/w/h --> {}/{}/{}/{}",
                                                       aName.c_str(),
                                                       aInitialBounds.position.x(), aInitialBounds.position.y(),
                                                       aInitialBounds.size.x(),     aInitialBounds.size.y()));

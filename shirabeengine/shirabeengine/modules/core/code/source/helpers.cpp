@@ -17,7 +17,7 @@ namespace engine
         std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
         if (nullptr == pipe)
         {
-            CLog::Error(helpers::logTag(), CString::format("Failed to open command pipe for command '{}'", cmd));
+            CLog::Error(helpers::logTag(), StaticStringHelpers::format("Failed to open command pipe for command '{}'", cmd));
             return { EEngineStatus::Error };
         }
 

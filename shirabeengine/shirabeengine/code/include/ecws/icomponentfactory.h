@@ -3,15 +3,10 @@
 
 #include <core/enginetypehelper.h>
 #include "ecws/ecomponenttype.h"
+#include "ecws/componentsystem.h"
 
 namespace engine::ecws
 {
-    class IComponent
-    {
-        SHIRABE_DECLARE_INTERFACE(IComponent);
-
-    public_api:
-    };
 
     /**
      * The IComponentFactory interface describes valid factory signatures of a

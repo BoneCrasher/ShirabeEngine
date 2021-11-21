@@ -21,7 +21,7 @@
 namespace engine
 {
     /**
-     * The CString class provides helpers to convert 8 and 16-bit
+     * The StaticStringHelpers class provides helpers to convert 8 and 16-bit
      * strings to each other or format a string with a variadic number
      * of arguments.
      */
@@ -155,9 +155,9 @@ namespace engine
                 typename... TArgs
                 >
         static void formatArguments(
-                std::array<std::string, NArgs>     &aOutFormatted,
-                TArg                              &&aInArg,
-                TArgs                          &&...aInArgs);
+                std::array<std::string, NArgs> &aOutFormatted,
+                TArg                          &&aInArg,
+                TArgs                      &&...aInArgs);
     };
     //<-----------------------------------------------------------------------------
 
@@ -165,9 +165,9 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <typename... TArgs>
-    std::string CString::format(
-            std::string const &aFormat,
-            TArgs         &&...aArgs)
+    std::string StaticStringHelpers::format(
+        std::string const &aFormat,
+        TArgs         &&...aArgs)
     {
     #define SHIRABE_USE_FMT 1
     #if defined SHIRABE_USE_FMT
@@ -244,7 +244,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <typename TArg, typename enable>
-    std::string CString::toString(TArg const &aArg)
+    std::string StaticStringHelpers::toString(TArg const &aArg)
     {
         std::ostringstream stream;
         stream << aArg;
@@ -259,7 +259,7 @@ namespace engine
             typename TArg,
             typename std::enable_if<std::is_floating_point<TArg>::value, TArg>::type
             >
-    std::string CString::toString(const float& arg) {
+    std::string StaticStringHelpers::toString(const float& arg) {
         std::ostringstream stream;
         stream << std::setprecision(12) << arg;
         return stream.str();
@@ -270,7 +270,7 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <std::size_t argCount>
-    void CString::formatArguments(std::array<std::string, argCount> const&aArgs)
+    void StaticStringHelpers::formatArguments(std::array<std::string, argCount> const&aArgs)
     {
         SHIRABE_UNUSED(aArgs);
     }
@@ -280,10 +280,10 @@ namespace engine
     //<
     //<-----------------------------------------------------------------------------
     template <std::size_t argCount, typename TArg, typename... TArgs>
-    void CString::formatArguments(
-            std::array<std::string, argCount>     &outFormatted,
-            TArg                                 &&inArg,
-            TArgs                             &&...inArgs)
+    void StaticStringHelpers::formatArguments(
+            std::array<std::string, argCount> &outFormatted,
+            TArg                             &&inArg,
+            TArgs                         &&...inArgs)
     {
         // Executed for each, recursively until there's no param left.
         uint32_t const index = (argCount - 1 - sizeof...(TArgs));
@@ -304,7 +304,7 @@ namespace engine
                         TData
                      >::type
             >
-    TData CString::fromString(std::string const &aString)
+    TData StaticStringHelpers::fromString(std::string const &aString)
     {
         TData const result{};
 

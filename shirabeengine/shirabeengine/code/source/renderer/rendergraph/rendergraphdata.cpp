@@ -527,7 +527,7 @@ namespace engine
     std::string convert_to_string<framegraph::SRenderGraphImage>(framegraph::SRenderGraphImage const &aTexture)
     {
         std::string s =
-                CString::format(
+                StaticStringHelpers::format(
                     "  {} (RID: {})"
                     "\n    Name:            {}"
                     "\n    Sizes:           {} x {} x {}"
@@ -558,7 +558,7 @@ namespace engine
         bool viewIsReadMode  = aTextureView.description.mode.check(ERenderGraphViewAccessMode::Read);
 
         std::string s =
-                CString::format(
+                StaticStringHelpers::format(
                     "  {} (RID: {})"
                     "\n    SubjacentResourceId: {}"
                     "\n    Mode:                {}"
@@ -585,7 +585,7 @@ namespace engine
     std::string convert_to_string<framegraph::SRenderGraphBuffer>(framegraph::SRenderGraphBuffer const &aBuffer)
     {
         std::string s =
-                CString::format(
+                StaticStringHelpers::format(
                     "  {} (RID: {})",
                     "Buffer",
                     aBuffer.resourceId);
@@ -600,7 +600,7 @@ namespace engine
     std::string convert_to_string<framegraph::SRenderGraphBufferView>(framegraph::SRenderGraphBufferView const &aBufferView)
     {
         std::string s =
-                CString::format(
+                StaticStringHelpers::format(
                     "  {} (RID: {})",
                     "BufferView",
                     aBufferView.resourceId);

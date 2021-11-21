@@ -176,7 +176,7 @@ namespace engine
                 }
                 else
                 {
-                    mStream << CString::format("\n  subgraph pass{} {\n", sourceUID);
+                    mStream << StaticStringHelpers::format("\n  subgraph pass{} {\n", sourceUID);
 
                     Shared<CPassBase> sourcePass = aGraph.passes().at(sourceUID);
 
@@ -339,7 +339,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         void CRenderGraphGraphVizSerializer::writePass(CPassBase const &aPass)
         {
-            std::string const passLabel = CString::format(
+            std::string const passLabel = StaticStringHelpers::format(
                         "<<table bgcolor=\"#429692\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Pass (PID: {})</b></font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"16\">{}</font></td></tr>"
@@ -371,7 +371,7 @@ namespace engine
         {
             static constexpr char const*listStyle = "shape=none";
             std::string const listLabel =
-                    CString::format(
+                    StaticStringHelpers::format(
                         "<<table bgcolor=\"#edb036\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;{}&gt;&gt;</font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>RenderableList (RID: {})</b></font></td></tr>"
@@ -391,11 +391,11 @@ namespace engine
                 SRenderGraphResource           const &aParentResource,
                 SRenderGraphRenderableListView const &aView)
         {
-            std::string viewId = CString::format("RenderableListView{}", aView.resourceId);
+            std::string viewId = StaticStringHelpers::format("RenderableListView{}", aView.resourceId);
 
             static constexpr char const*viewStyle = "shape=none";
             std::string viewLabel =
-                    CString::format(
+                    StaticStringHelpers::format(
                         "<<table bgcolor=\"#{}\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\"><b>RenderableListView (RID: {})</b></font></td></tr>"
                         "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">{}</td></tr>"
@@ -415,17 +415,17 @@ namespace engine
                 SRenderGraphResource           const &aParentResource,
                 SRenderGraphRenderableListView const &aView)
         {
-            std::string const passId   = CString::format("Pass{}", aView.assignedPassUID);
-            std::string const viewId   = CString::format("RenderableListView{}", aView.resourceId);
+            std::string const passId   = StaticStringHelpers::format("Pass{}", aView.assignedPassUID);
+            std::string const viewId   = StaticStringHelpers::format("RenderableListView{}", aView.resourceId);
             std::string       parentId = "";
 
             if(aParentResource.type == ERenderGraphResourceType::RenderableList)
             {
-                parentId = CString::format("RenderableList{}", aParentResource.resourceId);
+                parentId = StaticStringHelpers::format("RenderableList{}", aParentResource.resourceId);
             }
             else
             {
-                parentId = CString::format("RenderableListView{}", aParentResource.resourceId);
+                parentId = StaticStringHelpers::format("RenderableListView{}", aParentResource.resourceId);
             }
 
             static constexpr char const *pass2ViewEdgeStyle = "tailport=e,headport=w,weight=2,style=dashed";
@@ -447,7 +447,7 @@ namespace engine
 
             static constexpr char const *textureStyle = "shape=none";
             std::string const textureLabel =
-                    CString::format(
+                    StaticStringHelpers::format(
                         "<<table bgcolor=\"#e0b867\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\">&lt;&lt;{}&gt;&gt;</font></td></tr>"
                         "<tr><td colspan=\"2\" height=\"20\"><font point-size=\"18\"><b>Texture (RID: {})</b></font></td></tr>"
@@ -507,11 +507,11 @@ namespace engine
             bool const viewIsFwdMode   = aView.mode.check(ERenderGraphViewAccessMode::Forward);
             bool const viewIsAckMode   = aView.mode.check(ERenderGraphViewAccessMode::Accept);
 
-            std::string viewId   = CString::format("TextureView{}", aView.resourceId);
+            std::string viewId   = StaticStringHelpers::format("TextureView{}", aView.resourceId);
 
             static constexpr char const *viewStyle = "shape=none";
             std::string const viewLabel =
-                    CString::format(
+                    StaticStringHelpers::format(
                         "<<table bgcolor=\"#{}\" style=\"rounded\" border=\"0\" cellspacing=\"1\" cellpadding=\"5\">"
                         "<tr><td colspan=\"2\"><font point-size=\"16\"><b>TextureView (RID: {})</b></font></td></tr>"
                         "<tr><td align=\"left\">SubjacentResourceId:</td><td align=\"left\">{}</td></tr>"
@@ -561,18 +561,18 @@ namespace engine
             bool viewIsFwdMode               = aView.mode.check(ERenderGraphViewAccessMode::Forward);
             bool viewIsAckMode               = aView.mode.check(ERenderGraphViewAccessMode::Accept);
 
-            std::string const passId   = CString::format("Pass{}", aPassUID);
-            std::string const viewId   = CString::format("TextureView{}", aView.resourceId);
+            std::string const passId   = StaticStringHelpers::format("Pass{}", aPassUID);
+            std::string const viewId   = StaticStringHelpers::format("TextureView{}", aView.resourceId);
             std::string       parentId = "";
 
             if(parentResourceIsTexture)
             {
-                parentId = CString::format("Texture{}", aParentResource.resourceId);
+                parentId = StaticStringHelpers::format("Texture{}", aParentResource.resourceId);
 
             }
             else if(parentResourceIsTextureView)
             {
-                parentId = CString::format("TextureView{}", aParentResource.resourceId);
+                parentId = StaticStringHelpers::format("TextureView{}", aParentResource.resourceId);
             }
 
             std::string color = "black";

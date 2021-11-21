@@ -18,6 +18,12 @@ namespace engine::ecws
         using ComponentAssignmentMap_t = Map<PublicComponentId_t, Shared<IComponent>>;
         using ComponentHierarchyTree_t = CAdjacencyTree<PublicComponentId_t>;
 
+    private_members:
+        String                   mName;
+        Shared<IComponent>       mRootComponent;
+        ComponentAssignmentMap_t mAssignedComponents;
+        ComponentHierarchyTree_t mComponentHierarchy;
+
     public_constructors:
         explicit CEntity(std::string aName);
 
@@ -58,6 +64,11 @@ namespace engine::ecws
          */
         EEngineStatus update(CTimer const &aTimer);
 
+        SHIRABE_INLINE String const &name() const
+        {
+            return mName;
+        }
+
     protected_methods:
         bool addComponent(PublicComponentId_t   aParentComponentId
                           , Shared<IComponent>  aComponent);
@@ -65,12 +76,6 @@ namespace engine::ecws
         bool removeComponent(PublicComponentId_t aComponentId);
 
         bool containsComponent(PublicComponentId_t aComponentId);
-
-    private_members:
-        std::string mName;
-        Shared<IComponent>       mRootComponent;
-        ComponentAssignmentMap_t mAssignedComponents;
-        ComponentHierarchyTree_t mComponentHierarchy;
     };
 
     //<-----------------------------------------------------------------------------

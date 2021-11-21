@@ -178,13 +178,13 @@ namespace engine
     {
         if constexpr(std::is_same_v<TResult, EEngineStatus>)
         {
-            EngineStatusPrintOnError(aPotentialErrorValue, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+            EngineStatusPrintOnError(aPotentialErrorValue, aLogTag, StaticStringHelpers::format(aFormat, std::forward<TArgs>(aArgs)...));
         }
         else if constexpr(std::is_same_v<TResult, bool>)
         {
             if(aPotentialErrorValue)
             {
-                EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, CString::format(aFormat, std::forward<TArgs>(aArgs)...));
+                EngineStatusPrintOnError(EEngineStatus::Error, aLogTag, StaticStringHelpers::format(aFormat, std::forward<TArgs>(aArgs)...));
             }
         }
     }

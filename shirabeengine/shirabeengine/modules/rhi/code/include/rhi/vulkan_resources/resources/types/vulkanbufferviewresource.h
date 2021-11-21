@@ -88,7 +88,7 @@ namespace engine
             VkResult result = vkCreateBufferView(aVulkanEnvironment->getLogicalDevice(), &(createInfo), nullptr, &vkBufferView);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(bufferview_log::logTag(), CString::format("Failed to create buffer view. Vulkan error: {}", result));
+                CLog::Error(bufferview_log::logTag(), StaticStringHelpers::format("Failed to create buffer view. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 

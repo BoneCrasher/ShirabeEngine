@@ -100,7 +100,7 @@ namespace engine
             VkResult result = vkCreateFramebuffer(aVulkanEnvironment->getLogicalDevice(), &vkFrameBufferCreateInfo, nullptr, &vkFrameBuffer);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error("SVulkanRHIFrameBufferResource::initialize", CString::format("Failed to create frame buffer instance. Vulkan result: {}", result));
+                CLog::Error("SVulkanRHIFrameBufferResource::initialize", StaticStringHelpers::format("Failed to create frame buffer instance. Vulkan result: {}", result));
                 return EEngineStatus::Error;
             }
 

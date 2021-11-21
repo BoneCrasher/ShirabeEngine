@@ -104,7 +104,7 @@ namespace engine
      * @param instance
      * @return
      */
-    template <typename T, typename TDeleter, typename TPtr = Shared<T>>
+    template <typename T, typename TPtr = Shared<T>, typename TDeleter = DefaultDelete_t<T>>
     static inline TPtr makeManagingPtrFromInstance(T* aInstance, TDeleter &&aDeleter = DefaultDelete_t<T>())
     {
         return TPtr(aInstance, aDeleter);

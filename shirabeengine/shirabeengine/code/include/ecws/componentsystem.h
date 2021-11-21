@@ -22,6 +22,8 @@ namespace engine::ecws
     constexpr ComponentId_t       gInvalidComponentId       = -1;
     constexpr PublicComponentId_t gInvalidPublicComponentId = -1;
 
+    class IEntity;
+
     /**
      * Shared public interface of all components.
      */
@@ -52,6 +54,7 @@ namespace engine::ecws
          * @return EEngineStatus::Ok, if successful.
          * @return Any EEngineStatus error code, on error.
          */
+        [[nodiscard]]
         virtual EEngineStatus initialize() = 0;
 
         /**
@@ -61,6 +64,7 @@ namespace engine::ecws
          * @return EEngineStatus::Ok, if successful.
          * @return An error code, on if something went wrong.
          */
+        [[nodiscard]]
         virtual EEngineStatus deinitialize() = 0;
 
         /**
@@ -70,6 +74,7 @@ namespace engine::ecws
          * @return EEngineStatus::Ok, if successful.
          * @return An error code, on if something went wrong.
          */
+        [[nodiscard]]
         virtual EEngineStatus update(CTimer const &aTimer) = 0;
 
     protected_api:
@@ -117,11 +122,13 @@ namespace engine::ecws
         /**
          * @copydoc IComponent::initialize()
          */
+        [[nodiscard]]
         EEngineStatus initialize() override;
 
         /**
          * @copydoc IComponent::deinitialize()
          */
+        [[nodiscard]]
         EEngineStatus deinitialize() override;
 
     protected_methods:
@@ -160,6 +167,29 @@ namespace engine::ecws
     };
 
     /**
+     * Concept that can be employed to make sure an externally provided/forwarded component state class of
+     * a derived component class matches the local/base-class component state.
+     *
+     * Use like, e.g.:
+     * template<CompatibleComponentState_c<S~ComponentState> TForwardedComponentState, typename... TForwardedSubsystems>
+     * class C~ComponentImpl
+     *     : public ASubsystemIntegratedComponentBase<TForwardedComponentState, C~ComponentState, TForwardedSubsystems...>
+     * { ... };
+     *
+     * or
+     *
+     * template<CompatibleComponentState_c<S~ComponentState> TForwardedComponentState>
+     * class C~ComponentImpl
+     *     : public AComponentBase<TForwardedComponentState>
+     * { ... };
+     *
+     * @tparam TForwardedComponentState
+     * @tparam TLocalComponentState
+     */
+    template<typename TForwardedComponentState, typename TLocalComponentState>
+    concept CompatibleComponentState_c = (std::is_base_of_v<TLocalComponentState, TForwardedComponentState> || std::is_same_v<TLocalComponentState, TForwardedComponentState>);
+
+    /**
      * Base class for all components that are integrated into any engine subsystem.
      * On creation, these components will receive a reference to the respective subsystem they integrate with.
      * Additionally, the subsystem shall provide a component state through the parent class' setComponentState-method.
@@ -173,6 +203,7 @@ namespace engine::ecws
     {
         using Variant_t = Variant<Shared<TAttachedSubsystems>...>;
         using Pair_t    = Pair<std::type_index, Variant_t>;
+
     private_members:
         /**
          * Reference to the subsystem the component integrates with.
@@ -189,11 +220,13 @@ namespace engine::ecws
         /**
          * @copydoc IComponent::initialize()
          */
+        [[nodiscard]]
         EEngineStatus initialize() override;
 
         /**
          * @copydoc IComponent::deinitialize()
          */
+        [[nodiscard]]
         EEngineStatus deinitialize() override;
 
     protected_methods:

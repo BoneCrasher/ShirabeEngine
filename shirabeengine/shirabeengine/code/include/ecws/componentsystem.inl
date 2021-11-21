@@ -311,6 +311,7 @@ template <typename... TSupportedComponentTypes>
 EEngineStatus AComponentSystemBase<TSupportedComponentTypes...>::bindToManager(ComponentSystemId_t aComponentSystemId)
 {
     mComponentSystemId = aComponentSystemId;
+    return EEngineStatus::Ok;
 }
 //<-----------------------------------------------------------------------------
 

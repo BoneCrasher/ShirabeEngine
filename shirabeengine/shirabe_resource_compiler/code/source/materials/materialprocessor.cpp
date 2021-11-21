@@ -97,7 +97,7 @@ namespace materials
 
         if(EShadingLanguage::Unknown == language)
         {
-            CLog::Error(logTag(), CString::format("Invalid extension '{}'. Cannot adapt language.", stageName));
+            CLog::Error(logTag(), StaticStringHelpers::format("Invalid extension '{}'. Cannot adapt language.", stageName));
             return { EShadingLanguage::Unknown, VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM };
         }
 
@@ -122,7 +122,7 @@ namespace materials
 
         if(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_FLAG_BITS_MAX_ENUM == stage)
         {
-            CLog::Error(logTag(), CString::format("Invalid file extension '{}'. Cannot map to stage.", stageName));
+            CLog::Error(logTag(), StaticStringHelpers::format("Invalid file extension '{}'. Cannot map to stage.", stageName));
             return { EShadingLanguage::Unknown, stage };
         }
 
@@ -194,7 +194,7 @@ namespace materials
 
         extension = mapValue<EShadingLanguage, std::string>(aLanguage, std::move(languageAssignment));
 
-        return CString::format("{}.{}", aFileBaseName, extension);
+        return StaticStringHelpers::format("{}.{}", aFileBaseName, extension);
     }
 
     /**
@@ -219,7 +219,7 @@ namespace materials
             std::string shaderString = readFile(aFilename);
             if(shaderString.empty())
             {
-                CLog::Error(logTag(), CString::format("Shader file {} is empty.", aFilename));
+                CLog::Error(logTag(), StaticStringHelpers::format("Shader file {} is empty.", aFilename));
                 return {};
             }
 
@@ -238,7 +238,7 @@ namespace materials
             if(EShaderCompiler::Unknown != compiler && fileCompiler != compiler )
             {
                 // Different compilers detected. This implies different languages...
-                CLog::Error(logTag(), CString::format("Different compilers detected for a pair of files. C1: {}, C2: {}", EnumValueOf(compiler), EnumValueOf(fileCompiler)));
+                CLog::Error(logTag(), StaticStringHelpers::format("Different compilers detected for a pair of files. C1: {}, C2: {}", EnumValueOf(compiler), EnumValueOf(fileCompiler)));
                 return {};
             }
 
@@ -278,7 +278,7 @@ namespace materials
      */
     static CResult<EResult> runSpirVDisassembler(SShaderCompilationUnit &aUnit)
     {
-        std::string const application = CString::format("{}/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path().string());
+        std::string const application = StaticStringHelpers::format("{}/tools/spirv-tools/bin/spirv-dis", std::filesystem::current_path().string());
         std::string const options     = "";
 
         std::underlying_type_t<EResult> result = 0;
@@ -288,7 +288,7 @@ namespace materials
                 std::filesystem::path const inputFile  = aFilename;
                 std::filesystem::path const outputFile = fmt::format("{}{}", inputFile.string(), ".dis");
 
-                std::string                const command       = CString::format("{} {} -o {} {}", application, options, outputFile.string(), inputFile.string());
+                std::string                const command       = StaticStringHelpers::format("{} {} -o {} {}", application, options, outputFile.string(), inputFile.string());
                 CEngineResult<std::string> const commandResult = executeCmd(command);
                 if(not commandResult.successful())
                 {
@@ -318,7 +318,7 @@ namespace materials
                                      , std::string const      &aAdditionalIncludePath
                                      , bool const              aCompileStagesIndividually = false)
     {
-        std::string const application = CString::format("{}/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
+        std::string const application = StaticStringHelpers::format("{}/tools/glslang/bin/glslangValidator", std::filesystem::current_path().string());
         std::string       options     = "-v -d -g -Od -H --target-env vulkan1.1";
 
         auto const appendIncludes = [&options] (std::string const &aInclude) -> void
@@ -331,7 +331,7 @@ namespace materials
 
         auto const once = [&] (std::string const &aInputFilenames, std::string const &aOutputFilename) -> void
         {
-            std::string                const command       = CString::format("{} {} {} -o {} {}", application, options, aAdditionalIncludePath, aOutputFilename, aInputFilenames);
+            std::string                const command       = StaticStringHelpers::format("{} {} {} -o {} {}", application, options, aAdditionalIncludePath, aOutputFilename, aInputFilenames);
             CEngineResult<std::string> const commandResult = executeCmd(command);
 
             bool const compilationError = (std::string::npos != commandResult.data().find("compilation error")

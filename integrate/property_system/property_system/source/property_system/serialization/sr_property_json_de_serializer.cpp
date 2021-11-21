@@ -192,7 +192,7 @@ bool CPropertySerializer::writeAttributeImpl(const std::string& aIdentifier, con
     }
     else if constexpr (TIsWideString<TDataType>)
     {
-        const std::string narrowed = CString::narrow(aValue);
+        const std::string narrowed = StaticStringHelpers::narrow(aValue);
         current[aIdentifier] = narrowed;
     }
     else
@@ -248,7 +248,7 @@ bool CPropertySerializer::writeValueListImpl(const std::string& aIdentifier, con
             if constexpr (std::is_same_v<TDataType, std::wstring>)
             {
                 const std::wstring& widened  = aValues.at(k);
-                const std::string   narrowed = CString::narrow(widened);
+                const std::string   narrowed = StaticStringHelpers::narrow(widened);
                 list[k] = narrowed;
             }
             else
@@ -819,7 +819,7 @@ bool CPropertyDeserializer::readAttributeImpl(const std::string& aIdentifier, TD
         SR_RETURN_IF(false == attributeJSON.is_string(), false);
 
         const std::string& narrowed = attributeJSON;
-        const std::wstring widened  = CString::widen(narrowed);
+        const std::wstring widened  = StaticStringHelpers::widen(narrowed);
         aValue = widened;
 
         return true;
@@ -886,7 +886,7 @@ bool CPropertyDeserializer::readValueListImpl(const std::string& aIdentifier, st
             else if constexpr (std::is_same_v<TDataType, std::wstring>)
             {
                 const std::string  str  = valueJSON;
-                const std::wstring wstr = CString::widen(str);
+                const std::wstring wstr = StaticStringHelpers::widen(str);
 
                 list.push_back(wstr);
             }
@@ -1036,7 +1036,7 @@ bool compilePathMap(
 
                 SR_RESOLVE(SGetPropertyNameResolver, variant, propertyName);
 
-                path = CString::formatString("%s/%s", path.c_str(), propertyName.c_str());
+                path = StaticStringHelpers::formatString("%s/%s", path.c_str(), propertyName.c_str());
             }
 
             AdjacencyList_t adjacencyList = aEdges.at(aNode);
@@ -1065,7 +1065,7 @@ bool compilePathMap(
                     localPath = path;
                     if(isProperty)
                     {
-                        localPath = CString::formatString("%s/%" PRIu16, path.c_str(), k);
+                        localPath = StaticStringHelpers::formatString("%s/%" PRIu16, path.c_str(), k);
                         ++k;
                     }
 

@@ -1310,7 +1310,7 @@ Possible candidates:
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/asset/code/source/filesystemassetdatasource.cpp:19: warning: documented symbol `CEngineResult< ByteBuffer > engine::asset::CFileSystemAssetDataSource::readAsset' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:166: warning: no uniquely matching class member found for 
   template < TArgs >
-  std::string engine::CString::format(std::string const &aFormat, TArgs &&... aArgs)
+  std::string engine::StaticStringHelpers::format(std::string const &aFormat, TArgs &&... aArgs)
 
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/measurementdatastore.h:121: warning: documented symbol `engine::benchmarking::CMeasurementDataStore< TChunk, TTraits >::CMeasurementDataStore' was not declared or defined.
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/core/code/include/core/benchmarking/measurementdatastore.h:133: warning: documented symbol `engine::benchmarking::CMeasurementDataStore< TChunk, TTraits >::~CMeasurementDataStore' was not declared or defined.
@@ -3807,10 +3807,10 @@ Generating XML output for class test::test_blog::Collap/home/dotti/workspaces/sh
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:256: warning: argument 'creationDeferred' of command @param is not found in the argument list of engine::resources::CRHIResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false)
 /home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/resources/code/include/resources/core/resourcemanagerbase.h:267: warning: The following parameters of engine::resources::CRHIResourceManagerBase::createResourceImpl(typename TResource::CCreationRequest const &aRequest, std::string const &aResourceId, bool aCreationDeferred=false) are not documented:
   parameter 'aCreationDeferred'
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'outFormatted' of command @param is not found in the argument list of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'inArg' of command @param is not found in the argument list of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'inArgs' of command @param is not found in the argument list of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
-/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:155: warning: The following parameters of engine::CString::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs) are not documented:
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'outFormatted' of command @param is not found in the argument list of engine::StaticStringHelpers::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'inArg' of command @param is not found in the argument list of engine::StaticStringHelpers::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:144: warning: argument 'inArgs' of command @param is not found in the argument list of engine::StaticStringHelpers::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs)
+/home/dotti/workspaces/shirabeengine/shirabeengine/shirabeengine/modules/base/code/include/base/string.h:155: warning: The following parameters of engine::StaticStringHelpers::formatArguments(std::array< std::string, argCount > &aOutFormatted, TArg &&aInArg, TArgs &&... aInArgs) are not documented:
   parameter 'aOutFormatted'
   parameter 'aInArg'
   parameter 'aInArgs'

@@ -155,7 +155,7 @@ namespace engine
             VkResult result = vkCreateImageView(aVulkanEnvironment->getLogicalDevice(), &vkImageViewCreateInfo, nullptr, &vkImageView);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(textureview_log::logTag(), CString::format("Failed to create render target view. Vulkan error: {}", result));
+                CLog::Error(textureview_log::logTag(), StaticStringHelpers::format("Failed to create render target view. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 

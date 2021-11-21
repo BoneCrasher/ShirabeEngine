@@ -35,7 +35,7 @@ namespace engine::ecws
         void initialize(typename Storage_t::size_type aCapacity)
         {
             mStorage.resize(aCapacity);
-            for(int k=0; k<aCapacity; ++K)
+            for(int k=0; k<aCapacity; ++k)
             {
                 // Don't assume congruency of index and value after initialization.
                 mStorage[k] = k;

@@ -163,7 +163,7 @@ namespace engine
                     aSerializer.beginObject("setBindingCounts");
                     for(uint64_t k=0; k<layoutInfo.setBindingCount.size(); ++k)
                     {
-                        aSerializer.writeValue(CString::format("{}", k), layoutInfo.setBindingCount[k]);
+                        aSerializer.writeValue(StaticStringHelpers::format("{}", k), layoutInfo.setBindingCount[k]);
                     }
                     aSerializer.endObject(); // setBindingCounts
                 }
@@ -412,7 +412,7 @@ namespace engine
                 layoutInfo.setBindingCount.resize(layoutInfo.setCount);
                 for(uint32_t k=0; k<layoutInfo.setCount; ++k)
                 {
-                    aDeserializer.readValue(CString::format("{}", k), *(layoutInfo.setBindingCount.data() + k));
+                    aDeserializer.readValue(StaticStringHelpers::format("{}", k), *(layoutInfo.setBindingCount.data() + k));
                 }
                 aDeserializer.endObject();
             }

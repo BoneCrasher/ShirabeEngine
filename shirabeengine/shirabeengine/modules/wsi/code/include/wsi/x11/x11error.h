@@ -96,7 +96,7 @@ namespace engine
                 if(aErrorCode)
                 {
                     std::string const wrappedMessage
-                            = engine::CString::format("X11 error occurred (code: {}, EngineStatus: {}): {}", aErrorCode, aEngineStatus, aMessage);
+                            = engine::StaticStringHelpers::format("X11 error occurred (code: {}, EngineStatus: {}): {}", aErrorCode, aEngineStatus, aMessage);
 
                     throw CX11Exception(aErrorCode, aEngineStatus, aMessage);
                 }

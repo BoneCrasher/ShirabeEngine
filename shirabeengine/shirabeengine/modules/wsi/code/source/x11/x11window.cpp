@@ -83,7 +83,7 @@ namespace engine
                 }
                 catch(...)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to show window '{}'", name()));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to show window '{}'", name()));
                     return EEngineStatus::WindowEventError;
                 }
             }
@@ -104,7 +104,7 @@ namespace engine
                 }
                 catch(...)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to hide window '{}'", name()));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to hide window '{}'", name()));
                     return EEngineStatus::WindowEventError;
                 }
             }
@@ -124,7 +124,7 @@ namespace engine
                 }
                 catch(...)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to show window '{}'", name()));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to show window '{}'", name()));
                     return EEngineStatus::WindowEventError;
                 }
             }
@@ -165,7 +165,7 @@ namespace engine
                 }
                 catch(...)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to update message queue of window '{}'", name()));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to update message queue of window '{}'", name()));
                     return EEngineStatus::WindowMessageHandlerError;
                 }
             }
@@ -261,7 +261,7 @@ namespace engine
                 }
                 catch(...)
                 {
-                    CLog::Error(logTag(), CString::format("Failed to show window '{}'", name()));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to show window '{}'", name()));
                     return EEngineStatus::WindowEventError;
                 }
             }

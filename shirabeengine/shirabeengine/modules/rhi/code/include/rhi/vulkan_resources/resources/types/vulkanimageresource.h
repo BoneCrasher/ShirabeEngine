@@ -167,7 +167,7 @@ namespace engine
             VkResult result = vkCreateImage(vkLogicalDevice, &vkImageCreateInfo, nullptr, &vkImage);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), CString::format("Failed to create texture. Vulkan result: {}", result));
+                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to create texture. Vulkan result: {}", result));
                 goto fail;
             }
 
@@ -194,7 +194,7 @@ namespace engine
             result = vkCreateSampler(vkLogicalDevice, &vkSamplerCreateInfo, nullptr, &vkSampler);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), CString::format("Failed to create sampler. Vulkan error: {}", result));
+                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to create sampler. Vulkan error: {}", result));
                 goto fail;
             }
 
@@ -259,7 +259,7 @@ namespace engine
             VkResult const result = vkBindImageMemory(vkLogicalDevice, aVkImage, aVkMemory, aVkMemoryOffset);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), CString::format("Failed to bind image memory on GPU. Vulkan error: {}", result));
+                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to bind image memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
             return EEngineStatus::Ok;

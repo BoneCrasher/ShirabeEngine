@@ -148,7 +148,7 @@ namespace engine
                         CEngineResult<Shared<SRenderGraphImageView>> const textureViewFetch = aRenderGraphResources.getResource<SRenderGraphImageView>(resourceId);
                         if(not textureViewFetch.successful())
                         {
-                            CLog::Error(logTag(), CString::format("Fetching texture view w/ id {} failed.", resourceId));
+                            CLog::Error(logTag(), StaticStringHelpers::format("Fetching texture view w/ id {} failed.", resourceId));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
@@ -157,7 +157,7 @@ namespace engine
                         CEngineResult<Shared<SRenderGraphImageView>> const parentTextureViewFetch = aRenderGraphResources.getResource<SRenderGraphImageView>(textureView.parentResource);
                         if(not parentTextureViewFetch.successful())
                         {
-                            CLog::Error(logTag(), CString::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
+                            CLog::Error(logTag(), StaticStringHelpers::format("Fetching parent texture view  w/ id {} failed.", textureView.parentResource));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
@@ -167,7 +167,7 @@ namespace engine
                         CEngineResult<Shared<SRenderGraphImage>> const textureFetch = aRenderGraphResources.getResource<SRenderGraphImage>(textureView.subjacentResource);
                         if(not textureFetch.successful())
                         {
-                            CLog::Error(logTag(), CString::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
+                            CLog::Error(logTag(), StaticStringHelpers::format("Fetching texture w/ id {} failed.", textureView.subjacentResource));
                             return EEngineStatus::ResourceError_NotFound;
                         }
 
@@ -880,7 +880,7 @@ namespace engine
                                     , Shared<CRHIResourceManager>       aResourceManager
                                     , Shared<asset::CAssetStorage>   aAssetStorage
                                     , SRenderGraphPipeline    const &aPipeline
-                                    , resources::ResourceId_t const &aRenderPassResourceId
+                                    , rhi::ResourceId_t const &aRenderPassResourceId
                                     , uint32_t const                &aSubpassIndex) -> EEngineStatus
             {
                 using namespace material;
@@ -971,7 +971,7 @@ namespace engine
                     { return detail::deinitializePersistentTexture(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                              , aTexture); };
             context.createTextureView =
-                [&](resources::ResourceId_t const   &aTexture
+                [&](rhi::ResourceId_t const   &aTexture
                      , SRenderGraphImageView  const &aView)
                     { return detail::createTextureView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                       , aTexture
@@ -1005,7 +1005,7 @@ namespace engine
                     { return detail::deinitializePersistentBuffer(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                                 , aBuffer); };
             context.createBufferView =
-                [&] (resources::ResourceId_t const  &aBuffer
+                [&] (rhi::ResourceId_t const  &aBuffer
                      , SRenderGraphBufferView const &aView)
                     { return detail::createBufferView(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                     , aBuffer
@@ -1053,7 +1053,7 @@ namespace engine
             //---------------------------------------------------------------------------------------------------------------
             context.createPipeline =
                 [&] (SRenderGraphPipeline const      &aPipeline
-                     , resources::ResourceId_t const &aRenderPassResourceId
+                     , rhi::ResourceId_t const &aRenderPassResourceId
                      , uint32_t const                &aSubpassIndex)
                     { return detail::createPipeline(aVulkanEnvironment, aResourceManager, aAssetStorage
                                                    , aPipeline, aRenderPassResourceId, aSubpassIndex); };

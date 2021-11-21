@@ -83,7 +83,7 @@ namespace engine
             if (CheckEngineError(result))
             {
                 CLog::Error(logTag(),
-                            CString::format(
+                            StaticStringHelpers::format(
                                 "ERROR: Timer::initialize: "
                                 "An error occured on requesting the current timestamp from the time interface.\n"
                                 "At: {}:{}", __FILE__, __LINE__));
@@ -137,7 +137,7 @@ namespace engine
             result = mTimeInterface->getTimestamp(current);
             if (CheckEngineError(result))
                 CLog::Error(logTag(),
-                            CString::format(
+                            StaticStringHelpers::format(
                                 "ERROR: Timer::update(): "
                                 "Failed at querying the current timestamp.\n%s: %" PRIu32, __FILE__, __LINE__));
             else {

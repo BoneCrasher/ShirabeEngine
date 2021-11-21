@@ -83,8 +83,8 @@ namespace engine
                 Shared<CRenderPass> const renderpass    = mRenderPasses.at(renderpassUid);
                 std::vector<PassUID_t>    subpasses     = renderpass->getTopologicallySortedSubpassList();
 
-                resources::ResourceId_t renderpassResourceId  = renderpass->getRenderPassName();
-                resources::ResourceId_t framebufferResourceId = renderpassResourceId + "_framebuffer";
+                rhi::ResourceId_t renderpassResourceId  = renderpass->getRenderPassName();
+                rhi::ResourceId_t framebufferResourceId = renderpassResourceId + "_framebuffer";
 
                 initializeRenderPassResources(aResourceContext, renderpass);
 
@@ -103,7 +103,7 @@ namespace engine
                     CEngineResult<> executed = subpass->execute(aPlatformContext, aDataSource, mResourceData, renderContextState, aResourceContext, aRenderContext);
                     if(not executed.successful())
                     {
-                        CLog::Error(logTag(), CString::format("Failed to execute pass {}", subpass->getSubpassUid()));
+                        CLog::Error(logTag(), StaticStringHelpers::format("Failed to execute pass {}", subpass->getSubpassUid()));
                         break;
                     }
 
@@ -124,7 +124,7 @@ namespace engine
                 CEngineResult<Shared<SRenderGraphImageView>> const sourceResourceFetch = mResourceData.getResource<SRenderGraphImageView>(mOutputTextureResourceId);
                 if(not sourceResourceFetch.successful())
                 {
-                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture view."));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to copy pass chain output to backbuffer. Invalid texture view."));
                     return {sourceResourceFetch.result()};
                 }
 
@@ -132,7 +132,7 @@ namespace engine
                                                                                                                                                    ->subjacentResource);
                 if(not parentResourceFetch.successful())
                 {
-                    CLog::Error(logTag(), CString::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
+                    CLog::Error(logTag(), StaticStringHelpers::format("Failed to copy pass chain output to backbuffer. Invalid texture."));
                     return {sourceResourceFetch.result()};
                 }
 

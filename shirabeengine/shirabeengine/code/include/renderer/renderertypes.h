@@ -39,7 +39,7 @@ namespace engine
     {
 
         std::string message =
-                CString::format(
+                StaticStringHelpers::format(
                     "  Renderable: {}\n"
                     "    MeshId:     {}\n"
                     "    MaterialId: {}\n",

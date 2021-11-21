@@ -109,7 +109,7 @@ namespace materials
     {
         if(aFileName.empty() || aOutputPathAbsolute.empty() || aOutputPathRelative.empty() || aContents.empty())
         {
-            CLog::Error(logTag(), CString::format("Invalid input for file {}:\n{}", aFileName, aContents));
+            CLog::Error(logTag(), StaticStringHelpers::format("Invalid input for file {}:\n{}", aFileName, aContents));
             return EResult::InputInvalid;
         }
 
