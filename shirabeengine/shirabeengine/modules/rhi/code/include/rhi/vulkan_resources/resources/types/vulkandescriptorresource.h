@@ -16,15 +16,7 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanDescriptorResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIDescriptor> { using TMappedRHIResource = vulkan::SVulkanDescriptorResource; };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(DescriptorPool)
 
     namespace vulkan
     {
@@ -34,7 +26,7 @@ namespace engine
         /**
          *
          */
-        struct SVulkanDescriptorResource
+        struct SVulkanRHIDescriptorPool
         {
             struct Handles_t
             {
@@ -43,13 +35,13 @@ namespace engine
             };
 
             template <typename TResourceManager>
-            static EEngineStatus initialize(SRHIDescriptorDescription const &aDescription
+            static EEngineStatus initialize(SRHIDescriptorPoolDescription const &aDescription
                                             , Handles_t                     &aGpuApiHandles
                                             , TResourceManager              *aResourceManager
                                             , IVkGlobalContext              *aVulkanEnvironment);
 
             template <typename TResourceManager>
-            static EEngineStatus deinitialize(SRHIDescriptorDescription const &aDescription
+            static EEngineStatus deinitialize(SRHIDescriptorPoolDescription const &aDescription
                                               , Handles_t                     &aGpuApiHandles
                                               , TResourceManager              *aResourceManager
                                               , IVkGlobalContext              *aVulkanEnvironment);
@@ -60,7 +52,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        using RHIDescriptorResourceState_t = SRHIResourceState<SRHIDescriptor>;
+        using RHIDescriptorResourceState_t = SRHIResourceState<SRHIDescriptorPool>;
 
         //<-----------------------------------------------------------------------------
 
@@ -217,10 +209,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanDescriptorResource::initialize(SRHIDescriptorDescription const &aDescription
-                                                          , Handles_t                       &aGpuApiHandles
-                                                          , TResourceManager                *aResourceManager
-                                                          , IVkGlobalContext                *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIDescriptorPool::initialize(SRHIDescriptorPoolDescription const &aDescription
+                                                           , Handles_t                         &aGpuApiHandles
+                                                           , TResourceManager                  *aResourceManager
+                                                           , IVkGlobalContext                  *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -312,10 +304,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanDescriptorResource::deinitialize(SRHIDescriptorDescription const &aDescription
-                                                              , Handles_t                     &aGpuApiHandles
-                                                              , TResourceManager              *aResourceManager
-                                                              , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIDescriptorPool::deinitialize(SRHIDescriptorPoolDescription const &aDescription
+                                                             , Handles_t                         &aGpuApiHandles
+                                                             , TResourceManager                  *aResourceManager
+                                                             , IVkGlobalContext                  *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 

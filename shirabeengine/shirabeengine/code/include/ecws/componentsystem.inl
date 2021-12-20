@@ -245,6 +245,16 @@ Vector<std::type_index> const &AComponentSystemBase<TSupportedComponentTypes...>
 //
 //<-----------------------------------------------------------------------------
 template <typename... TSupportedComponentTypes>
+IComponentSystemManagerBinding *const AComponentSystemBase<TSupportedComponentTypes...>::getManagerBindingInterface() const
+{
+    return this;
+}
+//<-----------------------------------------------------------------------------
+
+//<-----------------------------------------------------------------------------
+//
+//<-----------------------------------------------------------------------------
+template <typename... TSupportedComponentTypes>
 EEngineStatus AComponentSystemBase<TSupportedComponentTypes...>::initialize()
 {
     mSupportedComponentTypes.insert(mSupportedComponentTypes.end(), {typeid(TSupportedComponentTypes)...});

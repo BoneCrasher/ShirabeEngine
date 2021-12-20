@@ -14,25 +14,11 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIMemoryResource;
-    }
-
-    namespace rhi
-    {
-        template <>
-        struct SRHIResourceMap<SRHIMemory> { using TMappedRHIResource = vulkan::SVulkanRHIMemoryResource;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(Memory)
 
     namespace vulkan
     {
         using namespace rhi;
-
-        namespace memory_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanMemoryResource)
-        }
 
         /**
          *
@@ -52,7 +38,7 @@ namespace engine
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanRHIMemoryResource
+        struct SVulkanRHIMemory
         {
             struct Handles_t {
                 VkDeviceMemory        handle;
@@ -84,10 +70,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIMemoryResource::initialize(SRHIMemoryDescription const &aDescription
-                                                           , Handles_t                &aGpuApiHandles
-                                                           , TResourceManager         *aResourceManager
-                                                           , IVkGlobalContext         *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIMemory::initialize(SRHIMemoryDescription const &aDescription
+                                                   , Handles_t                 &aGpuApiHandles
+                                                   , TResourceManager          *aResourceManager
+                                                   , IVkGlobalContext          *aVulkanEnvironment)
         {
             SHIRABE_UNUSED(aResourceManager);
 
@@ -99,7 +85,7 @@ namespace engine
             auto const [result, memory] = __createVkMemory(vkPhysicalDevice, vkLogicalDevice, aDescription.memoryRequirements, aDescription.memoryProperties);
             if(CheckEngineError(result))
             {
-                CLog::Error(memory_log::logTag(), StaticStringHelpers::format("Failed to allocate buffer memory on GPU. Vulkan error: {}", result));
+                CLog::Error(Memory_log::logTag(), StaticStringHelpers::format("Failed to allocate buffer memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 
@@ -115,10 +101,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIMemoryResource::deinitialize(SRHIMemoryDescription const &aDescription
-                                                             , Handles_t                &aGpuApiHandles
-                                                             , TResourceManager         *aResourceManager
-                                                             , IVkGlobalContext         *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIMemory::deinitialize(SRHIMemoryDescription const &aDescription
+                                                     , Handles_t                 &aGpuApiHandles
+                                                     , TResourceManager          *aResourceManager
+                                                     , IVkGlobalContext          *aVulkanEnvironment)
         {
             SHIRABE_UNUSED(aDescription);
             SHIRABE_UNUSED(aResourceManager);

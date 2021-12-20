@@ -20,17 +20,8 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanPipelineLayoutResource;
-        struct SVulkanPipelineResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIPipeline>       { using TMappedRHIResource = vulkan::SVulkanPipelineResource; };
-        template <> struct SRHIResourceMap<SRHIPipelineLayout> { using TMappedRHIResource = vulkan::SVulkanPipelineLayoutResource; };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(PipelineLayout)
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(Pipeline)
 
     namespace vulkan
     {
@@ -41,7 +32,7 @@ namespace engine
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanPipelineLayoutResource
+        struct SVulkanRHIPipelineLayout
         {
             struct Handles_t
             {
@@ -86,18 +77,12 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         template <typename TResourceManager>
-        EEngineStatus SVulkanPipelineLayoutResource::initialize(SRHIPipelineLayoutDescriptor const &aDescription
-                                                                , Handles_t                        &aGpuApiHandles
-                                                                , TResourceManager                 *aResourceManager
-                                                                , IVkGlobalContext                 *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIPipelineLayout::initialize(SRHIPipelineLayoutDescriptor const &aDescription
+                                                           , Handles_t                        &aGpuApiHandles
+                                                           , TResourceManager                 *aResourceManager
+                                                           , IVkGlobalContext                 *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
-
-            auto const &[fetchSystemPipelineSuccess, systemPipelineOptRef] = aResourceManager->template getResource<RHIPipelineLayoutResourceState_t>(aDescription.systemBasePipelineId, aVulkanEnvironment);
-            if(CheckEngineError(fetchSystemPipelineSuccess))
-            {
-                return fetchSystemPipelineSuccess;
-            }
 
             //<-----------------------------------------------------------------------------
             // Local helpers
@@ -106,15 +91,15 @@ namespace engine
             // Derive descriptor set layouts based on a pipeline descriptor's signature data.
             //
             auto const createDescriptorSetLayouts =
-                [&device](SRHIPipelineLayoutDescriptor const &aDescriptor, uint8_t const aSetOffset, std::vector<VkDescriptorSetLayout> &aTargetSet) -> EEngineStatus
+                [&device](SRHIPipelineLayoutDescriptor const &aDescriptor, uint8_t const aSetOffset, Vector<VkDescriptorSetLayout> &aTargetSet) -> EEngineStatus
             {
                 uint64_t const setCount = aDescriptor.descriptorSetLayoutCreateInfos.size();
                 assert(setCount > aSetOffset);
 
                 for(uint64_t k=aSetOffset; k<setCount; ++k)
                 {
-                    std::vector<VkDescriptorSetLayoutBinding> bindings = aDescriptor.descriptorSetLayoutBindings[k];
-                    VkDescriptorSetLayoutCreateInfo           info     = aDescriptor.descriptorSetLayoutCreateInfos[k];
+                    Vector<VkDescriptorSetLayoutBinding> bindings = aDescriptor.descriptorSetLayoutBindings[k];
+                    VkDescriptorSetLayoutCreateInfo      info     = aDescriptor.descriptorSetLayoutCreateInfos[k];
 
                     info.pBindings    = bindings.data();
                     info.bindingCount = bindings.size();
@@ -145,35 +130,41 @@ namespace engine
             };
             //<-----------------------------------------------------------------------------
 
-            std::vector<VkDescriptorSetLayout> systemSets;
-            std::vector<VkDescriptorSetLayout> materialSets;
+            std::vector<VkDescriptorSetLayout> systemSetLayouts;
+            std::vector<VkDescriptorSetLayout> materialSetLayouts;
+
+            auto const &[fetchSystemPipelineSuccess, systemPipelineLayoutOptRef] = aResourceManager->template getResource<RHIPipelineLayoutResourceState_t>(aDescription.systemBasePipelineId, aVulkanEnvironment);
+            if(CheckEngineError(fetchSystemPipelineSuccess))
+            {
+                return fetchSystemPipelineSuccess;
+            }
 
             //
             // First of all, push back all system UBOs...
             //
-            if(systemPipelineOptRef.has_value())
+            if(systemPipelineLayoutOptRef.has_value())
             {
-                RHIPipelineLayoutResourceState_t const &systemUBOPipeline = *systemPipelineOptRef;
+                RHIPipelineLayoutResourceState_t const &systemUBOPipelineLayout = *systemPipelineLayoutOptRef;
 
                 // Fetch the system UBO layouts in order to have them included in the pipeline layout.
                 // If the base pipeline hasn't been initialized yet, we're f*****.
-                systemSets = systemUBOPipeline.rhiHandles.descriptorSetLayouts;
+                systemSetLayouts = systemUBOPipelineLayout.rhiHandles.descriptorSetLayouts;
             }
 
             //
             // Then everything else...
             //
             uint8_t const systemPipelineOffset = 2; // System descriptor sets are bounds to set indices 0 and 1! Ignore them.
-            EEngineStatus const status = createDescriptorSetLayouts(aDescription, systemPipelineOffset, materialSets);
+            EEngineStatus const status = createDescriptorSetLayouts(aDescription, systemPipelineOffset, materialSetLayouts);
             if(CheckEngineError(status))
             {
-                destroyDescriptorSetLayouts(materialSets);
+                destroyDescriptorSetLayouts(materialSetLayouts);
                 return EEngineStatus::Error;
             }
 
             std::vector<VkDescriptorSetLayout> setLayouts {};
-            setLayouts.insert(setLayouts.end(), systemSets.begin(),   systemSets.end());
-            setLayouts.insert(setLayouts.end(), materialSets.begin(), materialSets.end());
+            setLayouts.insert(setLayouts.end(), systemSetLayouts.begin(),   systemSetLayouts.end());
+            setLayouts.insert(setLayouts.end(), materialSetLayouts.begin(), materialSetLayouts.end());
 
             VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo {};
             pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -190,13 +181,13 @@ namespace engine
                 if( VkResult::VK_SUCCESS!=result )
                 {
                     CLog::Error("SVulkanPipelineLayoutResource::initialize", "Failed to create pipeline layout. Result {}", result);
-                    destroyDescriptorSetLayouts(materialSets); // Do not clear out system set layouts! This will corrupt dependent functionality.
+                    destroyDescriptorSetLayouts(materialSetLayouts); // Do not clear out system set layouts! This will corrupt dependent functionality.
                     return EEngineStatus::Error;
                 }
             }
 
             aGpuApiHandles.pipelineLayout       = vkPipelineLayout;
-            aGpuApiHandles.descriptorSetLayouts = materialSets; // System-Sets won't be stored, as they are joined back in on descriptor set update and binding.
+            aGpuApiHandles.descriptorSetLayouts = materialSetLayouts; // System-Sets won't be stored, as they are joined back in on descriptor set update and binding.
 
             return EEngineStatus::Ok;
         }
@@ -206,10 +197,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanPipelineLayoutResource::deinitialize(SRHIPipelineLayoutDescriptor const &aDescription
-                                                                  , Handles_t                        &aGpuApiHandles
-                                                                  , TResourceManager                 *aResourceManager
-                                                                  , IVkGlobalContext                 *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIPipelineLayout::deinitialize(SRHIPipelineLayoutDescriptor const &aDescription
+                                                             , Handles_t                        &aGpuApiHandles
+                                                             , TResourceManager                 *aResourceManager
+                                                             , IVkGlobalContext                 *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -230,7 +221,7 @@ namespace engine
         /**
          *
          */
-        struct SVulkanPipelineResource
+        struct SVulkanRHIPipeline
         {
             struct Handles_t
             {
@@ -264,13 +255,17 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanPipelineResource::initialize(SRHIPipelineDescriptor const &aDescription
-                                                          , Handles_t                  &aGpuApiHandles
-                                                          , TResourceManager           *aResourceManager
-                                                          , IVkGlobalContext           *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIPipeline::initialize(SRHIPipelineDescriptor const &aDescription
+                                                     , Handles_t                  &aGpuApiHandles
+                                                     , TResourceManager           *aResourceManager
+                                                     , IVkGlobalContext           *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
+            /**********************************************************************************************
+             * VkPipeline-objects are created based on a VkPipelineLayout.
+             * Fetch the referenced PipelineLayout-instance.
+             **********************************************************************************************/
             auto const &[fetchPipelineLayoutStatus, pipelineLayoutOptRef] = aResourceManager->template getResource<RHIPipelineLayoutResourceState_t>(aDescription.pipelineLayoutResourceId, aVulkanEnvironment);
             if(CheckEngineError(fetchPipelineLayoutStatus))
             {
@@ -278,6 +273,10 @@ namespace engine
             }
             RHIPipelineLayoutResourceState_t const &pipelineLayout = *pipelineLayoutOptRef;
 
+            /**********************************************************************************************
+             * VkPipeline-objects are referenced against the attachment and subpass layout of a renderpass.
+             * Fetch the referenced RenderPass-instance.
+             **********************************************************************************************/
             auto const &[fetchRenderPassSuccess, renderPassOptRef] = aResourceManager->template getResource<RHIRenderPassResourceState_t>(aDescription.referenceRenderPassId, aVulkanEnvironment);
             if(CheckEngineError(fetchRenderPassSuccess))
             {
@@ -365,7 +364,7 @@ namespace engine
                 }
             }
 
-            aGpuApiHandles.pipeline       = pipelineHandle;
+            aGpuApiHandles.pipeline = pipelineHandle;
 
             return EEngineStatus::Ok;
         }
@@ -375,10 +374,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanPipelineResource::deinitialize(SRHIPipelineDescriptor const &aDescription
-                                                            , Handles_t                  &aGpuApiHandles
-                                                            , TResourceManager           *aResourceManager
-                                                            , IVkGlobalContext           *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIPipeline::deinitialize(SRHIPipelineDescriptor const &aDescription
+                                                       , Handles_t                  &aGpuApiHandles
+                                                       , TResourceManager           *aResourceManager
+                                                       , IVkGlobalContext           *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 

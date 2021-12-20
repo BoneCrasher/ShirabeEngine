@@ -25,7 +25,7 @@ namespace engine::ecws
         ComponentHierarchyTree_t mComponentHierarchy;
 
     public_constructors:
-        explicit CEntity(std::string aName);
+        explicit CEntity(String aName);
 
     public_destructors:
         ~CEntity();

@@ -13,15 +13,7 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIFrameBufferResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIFrameBuffer> { using TMappedRHIResource = vulkan::SVulkanRHIFrameBufferResource;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(FrameBuffer)
 
     namespace vulkan
     {
@@ -31,7 +23,7 @@ namespace engine
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanRHIFrameBufferResource
+        struct SVulkanRHIFrameBuffer
         {
             struct Handles_t
             {
@@ -59,10 +51,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIFrameBufferResource::initialize(SRHIFrameBufferDescription const &aDescription
-                                                                , Handles_t                      &aGpuApiHandles
-                                                                , TResourceManager               *aResourceManager
-                                                                , IVkGlobalContext               *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIFrameBuffer::initialize(SRHIFrameBufferDescription const &aDescription
+                                                        , Handles_t                      &aGpuApiHandles
+                                                        , TResourceManager               *aResourceManager
+                                                        , IVkGlobalContext               *aVulkanEnvironment)
         {
             auto const &[success, renderPassOptRef] = aResourceManager->template getResource<RHIRenderPassResourceState_t>(aDescription.renderPassResourceId);
             if(CheckEngineError(success))
@@ -114,10 +106,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIFrameBufferResource::deinitialize(SRHIFrameBufferDescription const &aDescription
-                                                                  , Handles_t                     &aGpuApiHandles
-                                                                  , TResourceManager              *aResourceManager
-                                                                  , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIFrameBuffer::deinitialize(SRHIFrameBufferDescription const &aDescription
+                                                          , Handles_t                      &aGpuApiHandles
+                                                          , TResourceManager               *aResourceManager
+                                                          , IVkGlobalContext               *aVulkanEnvironment)
         {
             vkDestroyFramebuffer(aVulkanEnvironment->getLogicalDevice(), aGpuApiHandles.handle, nullptr);
 

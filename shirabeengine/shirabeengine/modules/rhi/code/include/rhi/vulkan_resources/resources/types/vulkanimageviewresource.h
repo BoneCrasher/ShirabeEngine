@@ -13,30 +13,17 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIImageViewResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIImageView>  { using TMappedRHIResource = vulkan::SVulkanRHIImageViewResource;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(ImageView)
 
     namespace vulkan
     {
         using namespace rhi;
 
-        namespace textureview_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanTextureViewResource)
-        }
-
         /**
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanRHIImageViewResource
+        struct SVulkanRHIImageView
         {
             struct Handles_t
             {
@@ -67,10 +54,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIImageViewResource::initialize(SRHIImageViewDescription const &aDescription
-                                                              , Handles_t                    &aGpuApiHandles
-                                                              , TResourceManager             *aResourceManager
-                                                              , IVkGlobalContext             *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIImageView::initialize(SRHIImageViewDescription const &aDescription
+                                                      , Handles_t                    &aGpuApiHandles
+                                                      , TResourceManager             *aResourceManager
+                                                      , IVkGlobalContext             *aVulkanEnvironment)
         {
             OptionalRef_t<RHIImageResourceState_t> const textureOpt = aResourceManager->getResource(aDescription.subjacentImageId, aVulkanEnvironment);
             if(not textureOpt.has_value())
@@ -155,7 +142,7 @@ namespace engine
             VkResult result = vkCreateImageView(aVulkanEnvironment->getLogicalDevice(), &vkImageViewCreateInfo, nullptr, &vkImageView);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(textureview_log::logTag(), StaticStringHelpers::format("Failed to create render target view. Vulkan error: {}", result));
+                CLog::Error(ImageView_log::logTag(), StaticStringHelpers::format("Failed to create render target view. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 
@@ -169,10 +156,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIImageViewResource::deinitialize(SRHIImageViewDescription const &aDescription
-                                                                , Handles_t                    &aGpuApiHandles
-                                                                , TResourceManager             *aResourceManager
-                                                                , IVkGlobalContext             *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIImageView::deinitialize(SRHIImageViewDescription const &aDescription
+                                                        , Handles_t                    &aGpuApiHandles
+                                                        , TResourceManager             *aResourceManager
+                                                        , IVkGlobalContext             *aVulkanEnvironment)
         {
             VkImageView vkImageView     = aGpuApiHandles.handle;
             VkDevice    vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();

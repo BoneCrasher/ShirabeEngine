@@ -7,13 +7,13 @@
 
 namespace engine::vulkan
 {
-    auto __performImageLayoutTransfer(IVkGlobalContext                          *aVulkanEnvironment
-                                      , SVulkanRHIImageResource::Handles_t const &aTexture
-                                      , CRange                            const &aArrayRange
-                                      , CRange                            const &aMipRange
-                                      , VkImageAspectFlags                const &aAspectFlags
-                                      , VkImageLayout                     const &aSourceLayout
-                                      , VkImageLayout                     const &aTargetLayout) -> EEngineStatus
+    auto __performImageLayoutTransfer(IVkGlobalContext                   *aVulkanEnvironment
+                                      , SVulkanRHIImage::Handles_t const &aTexture
+                                      , CRange                     const &aArrayRange
+                                      , CRange                     const &aMipRange
+                                      , VkImageAspectFlags         const &aAspectFlags
+                                      , VkImageLayout              const &aSourceLayout
+                                      , VkImageLayout              const &aTargetLayout) -> EEngineStatus
     {
         VkCommandBuffer commandBuffer = aVulkanEnvironment->getVkCurrentFrameContext()->getTransferCommandBuffer();
 

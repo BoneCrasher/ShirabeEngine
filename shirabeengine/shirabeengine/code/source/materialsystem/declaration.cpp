@@ -100,11 +100,11 @@ namespace engine::material
                          , uint64_t const &)> iterate = nullptr;
 
         iterate = [&iterate, &nextMultiple, &alignment] (
-                              CMaterialConfig::BufferValueIndex_t       &aIndex
-                            , Shared<SBufferMember>                     &aMember
-                            , std::string                         const &aParentPath
-                            , uint64_t                            const &aOffsetBackshift
-                            , uint64_t                            const &aCurrentBaseOffset)
+                              CMaterialConfig::BufferValueIndex_t &aIndex
+                            , Shared<SBufferMember>               &aMember
+                            , std::string const                   &aParentPath
+                            , uint64_t const                      &aOffsetBackshift
+                            , uint64_t const                      &aCurrentBaseOffset)
         {
             std::string const path = fmt::format("{}.{}", aParentPath, aMember->name);
             aIndex.insert({path, aMember});

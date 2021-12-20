@@ -433,12 +433,12 @@ namespace engine
             StageMap_t                  stages;
             // Although each stage defines uniform buffers individually, they are shared
             // across all stages, due to indexing them with set and binding.
-            std::vector<SUniformBuffer> uniformBuffers;
-            std::vector<SUniformBuffer> storageBuffers;
-            std::vector<SUniformBuffer> pushConstantRanges;
-            std::vector<SSampledImage>  sampledImages;
+            Vector<SUniformBuffer> uniformBuffers;
+            Vector<SUniformBuffer> storageBuffers;
+            Vector<SUniformBuffer> pushConstantRanges;
+            Vector<SSampledImage>  sampledImages;
             // Fragment shader only
-            std::vector<SSubpassInput>  subpassInputs;
+            Vector<SSubpassInput>  subpassInputs;
 
         public_methods:
             /**

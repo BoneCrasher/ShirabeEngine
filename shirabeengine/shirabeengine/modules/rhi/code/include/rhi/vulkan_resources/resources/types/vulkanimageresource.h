@@ -10,20 +10,7 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIImageResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIImage>  { using TMappedRHIResource = vulkan::SVulkanRHIImageResource;  };
-    }
-
-    namespace texture_log
-    {
-        SHIRABE_DECLARE_LOG_TAG(SVulkanRHIImage)
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(Image)
 
     namespace vulkan
     {
@@ -33,7 +20,7 @@ namespace engine
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanRHIImageResource
+        struct SVulkanRHIImage
         {
             struct Handles_t
             {
@@ -61,13 +48,13 @@ namespace engine
                                                     , VkDeviceSize      aVkMemoryOffset = 0);
         };
 
-        auto __performImageLayoutTransfer(IVkGlobalContext                          *aVulkanEnvironment
-                                          , SVulkanRHIImageResource::Handles_t const &aTexture
-                                          , CRange                            const &aArrayRange
-                                          , CRange                            const &aMipRange
-                                          , VkImageAspectFlags                const &aAspectFlags
-                                          , VkImageLayout                     const &aSourceLayout
-                                          , VkImageLayout                     const &aTargetLayout) -> EEngineStatus;
+        auto __performImageLayoutTransfer(IVkGlobalContext                   *aVulkanEnvironment
+                                          , SVulkanRHIImage::Handles_t const &aTexture
+                                          , CRange                     const &aArrayRange
+                                          , CRange                     const &aMipRange
+                                          , VkImageAspectFlags         const &aAspectFlags
+                                          , VkImageLayout              const &aSourceLayout
+                                          , VkImageLayout              const &aTargetLayout) -> EEngineStatus;
 
         //<--------
         // ---------------------------------------------------------------------
@@ -81,10 +68,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIImageResource::initialize(SRHIImageDescription const &aDescription
-                                                          , Handles_t                 &aGpuApiHandles
-                                                          , TResourceManager          *aResourceManager
-                                                          , IVkGlobalContext          *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIImage::initialize(SRHIImageDescription const &aDescription
+                                                 , Handles_t                 &aGpuApiHandles
+                                                 , TResourceManager          *aResourceManager
+                                                 , IVkGlobalContext          *aVulkanEnvironment)
         {
             /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
 
@@ -167,7 +154,7 @@ namespace engine
             VkResult result = vkCreateImage(vkLogicalDevice, &vkImageCreateInfo, nullptr, &vkImage);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to create texture. Vulkan result: {}", result));
+                CLog::Error(Image_log::logTag(), StaticStringHelpers::format("Failed to create texture. Vulkan result: {}", result));
                 goto fail;
             }
 
@@ -194,7 +181,7 @@ namespace engine
             result = vkCreateSampler(vkLogicalDevice, &vkSamplerCreateInfo, nullptr, &vkSampler);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to create sampler. Vulkan error: {}", result));
+                CLog::Error(Image_log::logTag(), StaticStringHelpers::format("Failed to create sampler. Vulkan error: {}", result));
                 goto fail;
             }
 
@@ -219,10 +206,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIImageResource::deinitialize(SRHIImageDescription const &aDescription
-                                                            , Handles_t                 &aGpuApiHandles
-                                                            , TResourceManager          *aResourceManager
-                                                            , IVkGlobalContext          *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIImage::deinitialize(SRHIImageDescription  const &aDescription
+                                                    , Handles_t                 &aGpuApiHandles
+                                                    , TResourceManager          *aResourceManager
+                                                    , IVkGlobalContext          *aVulkanEnvironment)
         {
             SHIRABE_UNUSED(aDescription);
             SHIRABE_UNUSED(aResourceManager);
@@ -249,17 +236,17 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIImageResource::bindImageAndMemory(TResourceManager   *aResourceManager
-                                                                  , IVkGlobalContext *aVulkanEnvironment
-                                                                  , VkImage           aVkImage
-                                                                  , VkDeviceMemory    aVkMemory
-                                                                  , VkDeviceSize      aVkMemoryOffset)
+        EEngineStatus SVulkanRHIImage::bindImageAndMemory(TResourceManager   *aResourceManager
+                                                          , IVkGlobalContext *aVulkanEnvironment
+                                                          , VkImage           aVkImage
+                                                          , VkDeviceMemory    aVkMemory
+                                                          , VkDeviceSize      aVkMemoryOffset)
         {
             VkDevice vkLogicalDevice = aVulkanEnvironment->getLogicalDevice();
             VkResult const result = vkBindImageMemory(vkLogicalDevice, aVkImage, aVkMemory, aVkMemoryOffset);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(texture_log::logTag(), StaticStringHelpers::format("Failed to bind image memory on GPU. Vulkan error: {}", result));
+                CLog::Error(Image_log::logTag(), StaticStringHelpers::format("Failed to bind image memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
             return EEngineStatus::Ok;

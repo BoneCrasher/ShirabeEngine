@@ -26,10 +26,20 @@ namespace engine
             ResourceId_t pipelineDescriptorResourceId;
             ResourceId_t pipelineTemplateResourceId;
             std::vector<ResourceId_t> imageResourceIds;
+
+            static SMaterialInstanceRHIResourceCollection Uninitialized()
+            {
+                SMaterialInstanceRHIResourceCollection v;
+                v.shaderModuleResourceId       = "";
+                v.pipelineLayoutResourceId     = "";
+                v.pipelineDescriptorResourceId = "";
+                v.pipelineTemplateResourceId   = "";
+                return v;
+            }
         };
 
         template<>
-        class CResourceCreator<CMaterialInstance, SRHIDescriptorDescription>
+        class CResourceCreator<CMaterialInstance, SRHIDescriptorPoolDescription>
         {
         public:
             static OptionalRef_t<SMaterialInstanceRHIResourceCollection>
@@ -116,6 +126,8 @@ namespace engine
                             viewPort.maxDepth = 1.0;
                             aPipelineDescriptor.viewPort = viewPort;
                         };
+
+                static SMaterialInstanceRHIResourceCollection sUninitializedResourceCollection = SMaterialInstanceRHIResourceCollection::Uninitialized();
 
                 static constexpr char const *SHIRABE_MATERIALSYSTEM_CORE_MATERIAL_RESOURCEID = "Core";
 

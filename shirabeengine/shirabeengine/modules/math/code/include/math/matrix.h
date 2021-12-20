@@ -59,7 +59,7 @@ namespace engine
 
         private_members:
             ValueType_t* mRow;
-            size_t       mRowOffset;
+            std::size_t  mRowOffset;
 		};
 
         /**
@@ -74,8 +74,8 @@ namespace engine
          * @tparam NColumnCount
          */
         template <
-                size_t NRowCount = 4,
-                size_t NColumnCount = 4
+                std::size_t NRowCount    = 4,
+                std::size_t NColumnCount = 4
                 >
         class CMatrix
             : public CField<float, sizeof(float), (NRowCount * NColumnCount), NColumnCount>
@@ -122,11 +122,20 @@ namespace engine
                 : BaseType_t(aOther)
             {}
 
+            /**
+             * Move-Construct matrix of size NRowCount * NColumnCount from another equally sized matrix.
+             *
+             * @param aOther
+             */
+            CMatrix<NRowCount, NColumnCount>(MatrixType_t &&aOther) noexcept
+                : BaseType_t(std::move(aOther))
+            {}
+
         public_destructors:
             /**
              * Default destroy this matrix instance.
              */
-            virtual ~CMatrix<NRowCount, NColumnCount>() = default;
+            ~CMatrix<NRowCount, NColumnCount>() override = default;
 
         public_static_functions:
             /**
@@ -154,6 +163,18 @@ namespace engine
 			}
 
         public_operators:
+            CMatrix &operator=(MatrixType_t const&aOther)
+            {
+                BaseType_t::operator=(aOther);
+                return *this;
+            };
+
+            CMatrix &operator=(MatrixType_t &&aOther) noexcept
+            {
+                BaseType_t::operator=(std::move(aOther));
+                return *this;
+            };
+
             /**
              * Conversion-Constructor: Convert to CField representation.
              */
@@ -364,33 +385,12 @@ namespace engine
 		{
         public_typedefs:
             using BaseType_t   =          CMatrix<N, N>          ;
-            using ClassType_t  =          CSquareMatrix<N>       ;
+            using MatrixType_t =          CSquareMatrix<N>       ;
             using ValueType_t  = typename BaseType_t::ValueType_t;
             using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
-            /**
-             * Default construct a zero-square matrix.
-             */
-            CSquareMatrix<N>() = default;
-
-            /**
-             * Construct a square matrix from a list of values.
-             *
-             * @param aSource
-             */
-            CSquareMatrix<N>(std::array<ValueType_t, (N * N)> const &aSource)
-                : CMatrix<N, N>(aSource)
-			{}
-
-            /**
-             * Construct a square matrix from an equally sized regular matrix.
-             *
-             * @param aOther
-             */
-            CSquareMatrix<N>(BaseType_t const &aOther)
-                : CMatrix<N, N>(aOther)
-			{}
+            using CMatrix<N, N>::CMatrix;
 
             /**
              * Construct a square matrix from another, equally sized square matrix.
@@ -401,11 +401,33 @@ namespace engine
                 : CMatrix<N, N>(aOther)
 			{}
 
+            /**
+             * Construct a square matrix from another, equally sized square matrix.
+             *
+             * @param aOther
+             */
+            CSquareMatrix<N>(CSquareMatrix<N> &&aOther) noexcept
+                : CMatrix<N, N>(std::move(aOther))
+            {}
+
         public_destructors:
             /**
              * Cleanly destroy this matrix instance.
              */
-            virtual ~CSquareMatrix<N>() = default;
+            ~CSquareMatrix<N>() override = default;
+
+        public_operators:
+            CSquareMatrix &operator=(MatrixType_t const&aOther)
+            {
+                BaseType_t::operator=(aOther);
+                return *this;
+            };
+
+            CSquareMatrix &operator=(MatrixType_t &&aOther) noexcept
+            {
+                BaseType_t::operator=(std::move(aOther));
+                return *this;
+            };
 		};
 
         /**
@@ -416,62 +438,59 @@ namespace engine
             : public CSquareMatrix<2>
 		{
         public_typedefs:
-            using BaseType_t  = CSquareMatrix<2>                ;
-            using ClassType_t = CMatrix2x2                      ;
-            using ValueType_t = typename BaseType_t::ValueType_t;
+            using BaseType_t   = CSquareMatrix<2>                ;
+            using MatrixType_t = CMatrix2x2                      ;
+            using ValueType_t  = typename BaseType_t::ValueType_t;
             using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
-            /**
-             * Default construct an empty 2x2 matrix.
-             */
-            CMatrix2x2() = default;
-
-            /**
-             * Construct a 2x2 matrix from a list of values.
-             *
-             * @param aSource
-             */
-            CMatrix2x2(std::array<ValueType_t, 4> const &aSource)
-                : CSquareMatrix<2>(aSource)
-			{}
-
-            /**
-             * Construct a 2x2 matrix from another, equally sized square matrix.
-             *
-             * @param aOther
-             */
-            CMatrix2x2(BaseType_t const &aOther)
-                : BaseType_t(aOther)
-			{}
+            using CSquareMatrix<2>::CSquareMatrix;
 
             /**
              * Construct a 2x2 matrix from another 2x2 matrix.
              *
              * @param aOther
              */
-            CMatrix2x2(CMatrix2x2 const &aOther)
-                : CSquareMatrix<2>(aOther)
-			{}
+            CMatrix2x2(CMatrix2x2 const &aOther) = default;
+
+            /**
+             * Construct a 2x2 matrix moving in another one.
+             *
+             * @param aOther
+             */
+            CMatrix2x2(CMatrix2x2 &&aOther) noexcept = default;
 
         public_destructors:
             /**
              * Destroy and run...
              */
-            virtual ~CMatrix2x2() = default;
+            ~CMatrix2x2() override = default;
+
+        public_operators:
+            CMatrix2x2 &operator=(MatrixType_t const&aOther)
+            {
+                BaseType_t::operator=(aOther);
+                return *this;
+            };
+
+            CMatrix2x2 &operator=(MatrixType_t &&aOther) noexcept
+            {
+                BaseType_t::operator=(std::move(aOther));
+                return *this;
+            };
 
         public_methods:
             // Per-Component read access.
-            ValueType_t const &r00() const { return const_data().field[0]; }
-            ValueType_t const &r01() const { return const_data().field[1]; }
-            ValueType_t const &r10() const { return const_data().field[2]; }
-            ValueType_t const &r11() const { return const_data().field[3]; }
+            [[nodiscard]] ValueType_t const &r00() const { return const_data().field[0]; }
+            [[nodiscard]] ValueType_t const &r01() const { return const_data().field[1]; }
+            [[nodiscard]] ValueType_t const &r10() const { return const_data().field[2]; }
+            [[nodiscard]] ValueType_t const &r11() const { return const_data().field[3]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[2] = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[3] = aValue); }
+            [[nodiscard]] ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
+            [[nodiscard]] ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
+            [[nodiscard]] ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[2] = aValue); }
+            [[nodiscard]] ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[3] = aValue); }
 
             /**
              * Calculate the 2x2 matrix's determinant applying the fish-rule.
@@ -495,72 +514,68 @@ namespace engine
             : public CSquareMatrix<3>
 		{
         public_typedefs:
-            using BaseType_t  = CSquareMatrix<3>       ;
-            using ClassType_t = CMatrix3x3             ;
-            using ValueType_t = BaseType_t::ValueType_t;
+            using BaseType_t   = CSquareMatrix<3>       ;
+            using MatrixType_t = CMatrix3x3             ;
+            using ValueType_t  = BaseType_t::ValueType_t;
             using MatrixData_t = typename BaseType_t::MatrixData_t;
 
         public_constructors:
-            /**
-             * Default construct a 3x3 matrix.
-             */
-            CMatrix3x3() = default;
-
-            /**
-             * Construct a 3x3 matrix from a list of values.
-             *
-             * @param aSource
-             */
-            CMatrix3x3(std::array<ValueType_t, 9> aSource)
-                : CSquareMatrix<3>(aSource)
-			{}
-
-            /**
-             * Construct a 3x3 matrix from an equally sized square matrix.
-             *
-             * @param aOther
-             */
-            CMatrix3x3(BaseType_t const &aOther)
-                : BaseType_t(aOther)
-			{}
+            using CSquareMatrix<3>::CSquareMatrix;
 
             /**
              * Copy-Construct a 3x3 matrix from another 3x3 matrix.
              *
              * @param aOther
              */
-            CMatrix3x3(CMatrix3x3 const &aOther)
-                : CSquareMatrix<3>(aOther)
-			{}
+            CMatrix3x3(CMatrix3x3 const &aOther) = default;
+
+            /**
+             * Construct a 3x3 matrix moving in another one.
+             * @param aOther
+             */
+            CMatrix3x3(CMatrix3x3 &&aOther) noexcept = default;
 			
         public_destructors:
             /**
              * Destroy and run
              */
-            virtual ~CMatrix3x3() = default;
+            ~CMatrix3x3() override = default;
+
+        public_operators:
+            CMatrix3x3 &operator=(MatrixType_t const&aOther)
+            {
+                BaseType_t::operator=(aOther);
+                return *this;
+            };
+
+            CMatrix3x3 &operator=(MatrixType_t &&aOther) noexcept
+            {
+                BaseType_t::operator=(std::move(aOther));
+                return *this;
+            };
 
         public_methods:
             // Per-Component read access.
-            ValueType_t const &r00() const { return const_data().field[0]; }
-            ValueType_t const &r01() const { return const_data().field[1]; }
-            ValueType_t const &r02() const { return const_data().field[2]; }
-            ValueType_t const &r10() const { return const_data().field[3]; }
-            ValueType_t const &r11() const { return const_data().field[4]; }
-            ValueType_t const &r12() const { return const_data().field[5]; }
-            ValueType_t const &r20() const { return const_data().field[6]; }
-            ValueType_t const &r21() const { return const_data().field[7]; }
-            ValueType_t const &r22() const { return const_data().field[8]; }
+            [[nodiscard]] ValueType_t const &r00() const { return const_data().field[0]; }
+            [[nodiscard]] ValueType_t const &r01() const { return const_data().field[1]; }
+            [[nodiscard]] ValueType_t const &r02() const { return const_data().field[2]; }
+            [[nodiscard]] ValueType_t const &r10() const { return const_data().field[3]; }
+            [[nodiscard]] ValueType_t const &r11() const { return const_data().field[4]; }
+            [[nodiscard]] ValueType_t const &r12() const { return const_data().field[5]; }
+            [[nodiscard]] ValueType_t const &r20() const { return const_data().field[6]; }
+            [[nodiscard]] ValueType_t const &r21() const { return const_data().field[7]; }
+            [[nodiscard]] ValueType_t const &r22() const { return const_data().field[8]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
-            ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2] = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[3] = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[4] = aValue); }
-            ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[5] = aValue); }
-            ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[6] = aValue); }
-            ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[7] = aValue); }
-            ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[8] = aValue); }
+            [[nodiscard]] ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0] = aValue); }
+            [[nodiscard]] ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1] = aValue); }
+            [[nodiscard]] ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2] = aValue); }
+            [[nodiscard]] ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[3] = aValue); }
+            [[nodiscard]] ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[4] = aValue); }
+            [[nodiscard]] ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[5] = aValue); }
+            [[nodiscard]] ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[6] = aValue); }
+            [[nodiscard]] ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[7] = aValue); }
+            [[nodiscard]] ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[8] = aValue); }
 
             /**
              * Calculate the determinant of this matrix using sarrus' rule.
@@ -584,97 +599,83 @@ namespace engine
             : public CSquareMatrix<4>
 		{
         public_typedefs:
-            using BaseType_t  = CSquareMatrix<4>       ;
-            using ClassType_t = CMatrix4x4             ;
-            using ValueType_t = BaseType_t::ValueType_t;
+            using BaseType_t   = CSquareMatrix<4>       ;
+            using MatrixType_t = CMatrix4x4             ;
+            using ValueType_t  = BaseType_t::ValueType_t;
             using MatrixData_t = BaseType_t::MatrixData_t;
 
-
         public_constructors:
-            /**
-             * Default construct a 4x4 matrix.
-             */
-            CMatrix4x4() = default;
-
-            /**
-             * Construct a 4x4 matrix from a list of values.
-             *
-             * @param aSource
-             */
-            CMatrix4x4(std::array<ValueType_t, 16> aSource)
-                : CSquareMatrix<4>(aSource)
-			{}
-
-            /**
-             * Construct a 4x4 matrix from another, equally sized square matrix.
-             *
-             * @param aOther
-             */
-            CMatrix4x4(BaseType_t const &aOther)
-                : BaseType_t(aOther)
-			{}
+            using CSquareMatrix<4>::CSquareMatrix;
 
             /**
              * Construct a 4x4 for matrix from another 4x4 matrix.
              *
              * @param aOther
              */
-            CMatrix4x4(CMatrix4x4 const &aOther)
-                : BaseType_t(aOther)
-			{}
+            CMatrix4x4(CMatrix4x4 const &aOther) = default;
 
-            /**
+			/**
              * Construct a 4x4 for matrix from another 4x4 matrix.
              *
              * @param aOther
              */
-            CMatrix4x4(CMatrix4x4::MatrixType_t const &aOther)
-                    : BaseType_t(aOther)
-            {}
-
+            CMatrix4x4(CMatrix4x4 &&aOther) noexcept = default;
 
         public_destructors:
             /**
              * Destroy and run
              */
-            virtual ~CMatrix4x4() = default;
+            ~CMatrix4x4() override = default;
+
+        public_operators:
+            CMatrix4x4 &operator=(MatrixType_t const&aOther)
+            {
+                BaseType_t::operator=(aOther);
+                return *this;
+            };
+
+            CMatrix4x4 &operator=(MatrixType_t &&aOther) noexcept
+            {
+                BaseType_t::operator=(std::move(aOther));
+                return *this;
+            };
 
         public_methods:
             // Per-Component read only access.
-            ValueType_t const &r00() const { return const_data().field[0];  }
-            ValueType_t const &r01() const { return const_data().field[1];  }
-            ValueType_t const &r02() const { return const_data().field[2];  }
-            ValueType_t const &r03() const { return const_data().field[3];  }
-            ValueType_t const &r10() const { return const_data().field[4];  }
-            ValueType_t const &r11() const { return const_data().field[5];  }
-            ValueType_t const &r12() const { return const_data().field[6];  }
-            ValueType_t const &r13() const { return const_data().field[7];  }
-            ValueType_t const &r20() const { return const_data().field[8];  }
-            ValueType_t const &r21() const { return const_data().field[9];  }
-            ValueType_t const &r22() const { return const_data().field[10]; }
-            ValueType_t const &r23() const { return const_data().field[11]; }
-            ValueType_t const &r30() const { return const_data().field[12]; }
-            ValueType_t const &r31() const { return const_data().field[13]; }
-            ValueType_t const &r32() const { return const_data().field[14]; }
-            ValueType_t const &r33() const { return const_data().field[15]; }
+            [[nodiscard]] ValueType_t const &r00() const { return const_data().field[0];  }
+            [[nodiscard]] ValueType_t const &r01() const { return const_data().field[1];  }
+            [[nodiscard]] ValueType_t const &r02() const { return const_data().field[2];  }
+            [[nodiscard]] ValueType_t const &r03() const { return const_data().field[3];  }
+            [[nodiscard]] ValueType_t const &r10() const { return const_data().field[4];  }
+            [[nodiscard]] ValueType_t const &r11() const { return const_data().field[5];  }
+            [[nodiscard]] ValueType_t const &r12() const { return const_data().field[6];  }
+            [[nodiscard]] ValueType_t const &r13() const { return const_data().field[7];  }
+            [[nodiscard]] ValueType_t const &r20() const { return const_data().field[8];  }
+            [[nodiscard]] ValueType_t const &r21() const { return const_data().field[9];  }
+            [[nodiscard]] ValueType_t const &r22() const { return const_data().field[10]; }
+            [[nodiscard]] ValueType_t const &r23() const { return const_data().field[11]; }
+            [[nodiscard]] ValueType_t const &r30() const { return const_data().field[12]; }
+            [[nodiscard]] ValueType_t const &r31() const { return const_data().field[13]; }
+            [[nodiscard]] ValueType_t const &r32() const { return const_data().field[14]; }
+            [[nodiscard]] ValueType_t const &r33() const { return const_data().field[15]; }
 
             // Per-Component write access.
-            ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0]  = aValue); }
-            ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1]  = aValue); }
-            ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2]  = aValue); }
-            ValueType_t const &r03(ValueType_t const &aValue) { return (data().field[3]  = aValue); }
-            ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[4]  = aValue); }
-            ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[5]  = aValue); }
-            ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[6]  = aValue); }
-            ValueType_t const &r13(ValueType_t const &aValue) { return (data().field[7]  = aValue); }
-            ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[8]  = aValue); }
-            ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[9]  = aValue); }
-            ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[10] = aValue); }
-            ValueType_t const &r23(ValueType_t const &aValue) { return (data().field[11] = aValue); }
-            ValueType_t const &r30(ValueType_t const &aValue) { return (data().field[12] = aValue); }
-            ValueType_t const &r31(ValueType_t const &aValue) { return (data().field[13] = aValue); }
-            ValueType_t const &r32(ValueType_t const &aValue) { return (data().field[14] = aValue); }
-            ValueType_t const &r33(ValueType_t const &aValue) { return (data().field[15] = aValue); }
+            [[nodiscard]] ValueType_t const &r00(ValueType_t const &aValue) { return (data().field[0]  = aValue); }
+            [[nodiscard]] ValueType_t const &r01(ValueType_t const &aValue) { return (data().field[1]  = aValue); }
+            [[nodiscard]] ValueType_t const &r02(ValueType_t const &aValue) { return (data().field[2]  = aValue); }
+            [[nodiscard]] ValueType_t const &r03(ValueType_t const &aValue) { return (data().field[3]  = aValue); }
+            [[nodiscard]] ValueType_t const &r10(ValueType_t const &aValue) { return (data().field[4]  = aValue); }
+            [[nodiscard]] ValueType_t const &r11(ValueType_t const &aValue) { return (data().field[5]  = aValue); }
+            [[nodiscard]] ValueType_t const &r12(ValueType_t const &aValue) { return (data().field[6]  = aValue); }
+            [[nodiscard]] ValueType_t const &r13(ValueType_t const &aValue) { return (data().field[7]  = aValue); }
+            [[nodiscard]] ValueType_t const &r20(ValueType_t const &aValue) { return (data().field[8]  = aValue); }
+            [[nodiscard]] ValueType_t const &r21(ValueType_t const &aValue) { return (data().field[9]  = aValue); }
+            [[nodiscard]] ValueType_t const &r22(ValueType_t const &aValue) { return (data().field[10] = aValue); }
+            [[nodiscard]] ValueType_t const &r23(ValueType_t const &aValue) { return (data().field[11] = aValue); }
+            [[nodiscard]] ValueType_t const &r30(ValueType_t const &aValue) { return (data().field[12] = aValue); }
+            [[nodiscard]] ValueType_t const &r31(ValueType_t const &aValue) { return (data().field[13] = aValue); }
+            [[nodiscard]] ValueType_t const &r32(ValueType_t const &aValue) { return (data().field[14] = aValue); }
+            [[nodiscard]] ValueType_t const &r33(ValueType_t const &aValue) { return (data().field[15] = aValue); }
 		};
 
 		// Transposition functions. Will always return copies and leave the passed matrix unchanged.

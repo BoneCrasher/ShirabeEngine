@@ -1,8 +1,10 @@
 #ifndef __SHIRABE_COMPONENT_CAMERA_H__
 #define __SHIRABE_COMPONENT_CAMERA_H__
 
-#include "../componentsystem.h"
-#include "../../buildingblocks/camera.h"
+#include "ecws/components/transformcomponent.h"
+#include "ecws/componentsystem.h"
+#include "ecws/componentbase.h"
+#include "buildingblocks/camera.h"
 
 class CCameraSubsystem;
 
@@ -13,6 +15,12 @@ namespace engine::ecws
         Shared<CCamera> camera;
     };
 
+    /**
+     *
+     *
+     * @tparam TForwardedComponentState
+     * @tparam TForwardedSubsystems
+     */
     template<CompatibleComponentState_c<SCameraComponentState> TForwardedComponentState, typename... TForwardedSubsystems>
 	class CCameraComponentImpl
 		: public ASubsystemIntegratedComponentBase<TForwardedComponentState, CCameraSubsystem, TForwardedSubsystems...>
@@ -27,22 +35,14 @@ namespace engine::ecws
 		EEngineStatus update(CTimer const &aTimer) final;
 
 		[[nodiscard]]
-		SHIRABE_INLINE
-        Shared<CCamera> const &getCamera() const {  return getComponentState().camera; }
+        Shared<CCamera> const &getCamera() const;
 
         [[nodiscard]]
-        SHIRABE_INLINE
-        Shared<CCamera> &getMutableCamera() { return getMutableComponentState().camera; }
+        Shared<CCamera> &getMutableCamera();
 
-        SHIRABE_INLINE
-        void setCamera(Shared<CCamera> aCamera)
-        {
-		    getMutableComponentState().camera = std::move(aCamera);
-        }
+        void setCamera(Shared<CCamera> const &aCamera);
 	};
 
-    class CCameraComponent final
-        : public CCameraComponentImpl<SCameraComponentState>
-    {};
+    #include "ecws/components/cameracomponent.inl"
 }
 #endif

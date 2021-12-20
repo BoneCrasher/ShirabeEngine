@@ -9,6 +9,23 @@
 #include <base/declaration.h>
 #include <core/bitfield.h>
 
+#define SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(name)\
+    namespace vulkan\
+    {\
+        struct SVulkanRHI##name;\
+    }\
+    \
+    namespace rhi\
+    {\
+        template <>\
+        struct SRHIResourceMap<SRHI##name> { using TMappedRHIResource = vulkan::SVulkanRHI##name;  };\
+    }\
+\
+    namespace name##_log\
+    {\
+        SHIRABE_DECLARE_LOG_TAG(SVulkanRHI##name)\
+    }
+
 namespace engine::rhi
 {
     enum class

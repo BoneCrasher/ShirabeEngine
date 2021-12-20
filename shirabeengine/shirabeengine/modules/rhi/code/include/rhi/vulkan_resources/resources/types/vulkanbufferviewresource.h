@@ -14,24 +14,11 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIBufferView;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIBufferView>  { using TMappedRHIResource = vulkan::SVulkanRHIBufferView;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(BufferView)
 
     namespace vulkan
     {
         using namespace rhi;
-
-        namespace bufferview_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanBufferViewResource)
-        }
 
         /**
          * The SVulkanRHIImageResource struct describes the relevant data to deal
@@ -88,7 +75,7 @@ namespace engine
             VkResult result = vkCreateBufferView(aVulkanEnvironment->getLogicalDevice(), &(createInfo), nullptr, &vkBufferView);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(bufferview_log::logTag(), StaticStringHelpers::format("Failed to create buffer view. Vulkan error: {}", result));
+                CLog::Error(BufferView_log::logTag(), StaticStringHelpers::format("Failed to create buffer view. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
 

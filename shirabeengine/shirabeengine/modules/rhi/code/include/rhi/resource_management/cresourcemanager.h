@@ -29,7 +29,7 @@ namespace engine::rhi
                                                          , SRHIFrameBuffer
                                                          , SRHIPipelineLayout
                                                          , SRHIPipeline
-                                                         , SRHIDescriptor>;
+                                                         , SRHIDescriptorPool>;
     //<-----------------------------------------------------------------------------
 }
 

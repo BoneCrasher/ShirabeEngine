@@ -245,6 +245,39 @@ namespace engine::ecws
     };
 
     /**
+     * Internal component system manager binding capabilities for component systems.
+     */
+    class IComponentSystemManagerBinding
+    {
+    SHIRABE_DECLARE_INTERFACE(IComponentSystemManagerBinding);
+
+        friend class CComponentSystemManager;
+
+    protected_api:
+        /**
+         * Bind the component system to a manager, which issues the component system id.
+         *
+         * @param aComponentSystemId The component system id issued by a component system manager.
+         * @return EEngineStatus::Ok on success. Error code otherwise.
+         */
+        virtual EEngineStatus bindToManager(ComponentSystemId_t aComponentSystemId) = 0;
+
+        /**
+         * Unbind the component system from a manager bound to the component system.
+         * No-op if not bound.
+         */
+        virtual void unbindFromManager() = 0;
+
+        /**
+         * Check, if the component system is bound.
+         *
+         * @return True, if bound. False otherwise.
+         */
+        [[nodiscard]]
+        virtual bool isRegisteredInManager() const = 0;
+    };
+
+    /**
      * Shared public interface of all component systems.
      */
     class IComponentSystem
@@ -267,6 +300,14 @@ namespace engine::ecws
          */
         [[nodiscard]]
         virtual Vector<std::type_index> const &getSupportedComponentTypes() const = 0;
+
+        /**
+         * Return the interface that is used to bind this component to the component system manager.
+         *
+         * @return See brief.
+         */
+        [[nodiscard]]
+        virtual IComponentSystemManagerBinding *const getManagerBindingInterface() const = 0;
 
         /**
          * Initialize the component system.
@@ -302,39 +343,6 @@ namespace engine::ecws
          */
         [[nodiscard]]
         virtual Weak<IComponent> getComponent(PublicComponentId_t aId) = 0;
-    };
-
-    /**
-     * Internal component system manager binding capabilities for component systems.
-     */
-    class IComponentSystemManagerBinding
-    {
-        SHIRABE_DECLARE_INTERFACE(IComponentSystemManagerBinding);
-
-        friend class CComponentSystemManager;
-
-    protected_api:
-        /**
-         * Bind the component system to a manager, which issues the component system id.
-         *
-         * @param aComponentSystemId The component system id issued by a component system manager.
-         * @return EEngineStatus::Ok on success. Error code otherwise.
-         */
-        virtual EEngineStatus bindToManager(ComponentSystemId_t aComponentSystemId) = 0;
-
-        /**
-         * Unbind the component system from a manager bound to the component system.
-         * No-op if not bound.
-         */
-        virtual void unbindFromManager() = 0;
-
-        /**
-         * Check, if the component system is bound.
-         *
-         * @return True, if bound. False otherwise.
-         */
-         [[nodiscard]]
-        virtual bool isRegisteredInManager() const = 0;
     };
 
     /**
@@ -387,6 +395,11 @@ namespace engine::ecws
          * @copydoc IComponentSystem::getSupportedComponentTypes()
          */
         Vector<std::type_index> const &getSupportedComponentTypes() const final;
+
+        /**
+         * @copydoc IComponentSystem::getManagerBindingInterface()
+         */
+        IComponentSystemManagerBinding *const getManagerBindingInterface() const;
 
         /**
          *  @copydoc IComponentSystem::initialize()

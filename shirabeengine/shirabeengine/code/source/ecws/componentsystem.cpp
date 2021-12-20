@@ -50,7 +50,7 @@ namespace engine::ecws
     {
         if(aComponentSystem)
         {
-            auto base = std::static_pointer_cast<IComponentSystemManagerBinding>(aComponentSystem);
+            auto base = aComponentSystem->getManagerBindingInterface();
             if(base->isRegisteredInManager())
             {
                 return { EEngineStatus::Ok, aComponentSystem->getComponentSystemId() };
@@ -100,7 +100,7 @@ namespace engine::ecws
         }
         mComponentSystemRegistry.erase(aComponentSystemId);
 
-        auto base = std::static_pointer_cast<IComponentSystemManagerBinding>(system);
+        auto base = system->getManagerBindingInterface();
         base->unbindFromManager();
 
         return { EEngineStatus::Ok, system };

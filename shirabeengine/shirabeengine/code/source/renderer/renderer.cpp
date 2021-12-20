@@ -54,7 +54,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        EEngineStatus CRenderer::createDeferredPipeline(resources::CRHIResourceManager const         &aResourceManager
+        EEngineStatus CRenderer::createDeferredPipeline(rhi::CRHIResourceManager            const &aResourceManager
                                                         , framegraph::SRenderGraphResourceContext &aResourceContext)
         {
             using namespace engine;

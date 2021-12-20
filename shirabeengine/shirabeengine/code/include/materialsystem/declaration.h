@@ -41,30 +41,38 @@ namespace engine
         static uint32_t const DEFAULT_DATA_BUFFER_ALIGNMENT      = DEFAULT_BUFFER_ALIGMENT;
 
         /**
-         * A material sharedMaterial is composed by a signature and base configuration.
-         * It will be used to create instances from this material.
+         * A shared material is the base description of a material, from which material instance will be spawned.
+         * It will define data and pipeline layouts, will define the shader module and thus the shader stages and signatures.
          */
         class CSharedMaterial
         {
+        private_members:
+            std::string            mName;
+            //std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
+            SMaterialLayoutInfo    mLayoutInfo;
+            StageMap_t             mStages;
+            // Although each stage defines uniform buffers individually, they are shared
+            // across all stages, due to indexing them with set and binding.
+            Vector<SUniformBuffer> mUniformBuffers;
+            Vector<SUniformBuffer> mStorageBuffers;
+            Vector<SUniformBuffer> mPushConstantRanges;
+            Vector<SSampledImage>  mSampledImages;
+            // Fragment shader only
+            Vector<SSubpassInput>  mSubpassInputs;
+
+            Map<std::string, Shared<memory::allocators::CAllocator>> mInstanceDataAllocators;
+
         public_static_functions:
+            /**
+             * Derive a shared material from a material asset.
+             *
+             * @param aAsset
+             * @return
+             */
             static Shared<CSharedMaterial> fromAsset(SMaterialAsset const &aAsset);
 
         public_constructors:
             CSharedMaterial() = default;
-
-            SHIRABE_INLINE
-            CSharedMaterial(asset::AssetId_t   const &aAssetUID,
-                            std::string        const &aName,
-                            SMaterialAsset          &&aSignature)
-                : mName              (aName)
-                , mLayoutInfo        ({})
-                , mStages            ({})
-                , mUniformBuffers    ({})
-                , mStorageBuffers    ({})
-                , mPushConstantRanges({})
-                , mSampledImages     ({})
-                , mSubpassInputs     ({})
-            {}
 
             SHIRABE_INLINE
             CSharedMaterial(CSharedMaterial const &aOther)
@@ -79,15 +87,15 @@ namespace engine
             {}
 
             SHIRABE_INLINE
-            CSharedMaterial(CSharedMaterial &&aOther)
+            CSharedMaterial(CSharedMaterial &&aOther) noexcept
                 : mName              (std::move(aOther.mName))
-                , mLayoutInfo        (aOther.mLayoutInfo)
+                , mLayoutInfo        (std::move(aOther.mLayoutInfo))
                 , mStages            (std::move(aOther.mStages))
-                , mUniformBuffers    (aOther.mUniformBuffers)
-                , mStorageBuffers    (aOther.mStorageBuffers)
-                , mPushConstantRanges(aOther.mPushConstantRanges)
-                , mSampledImages     (aOther.mSampledImages)
-                , mSubpassInputs     (aOther.mSubpassInputs)
+                , mUniformBuffers    (std::move(aOther.mUniformBuffers))
+                , mStorageBuffers    (std::move(aOther.mStorageBuffers))
+                , mPushConstantRanges(std::move(aOther.mPushConstantRanges))
+                , mSampledImages     (std::move(aOther.mSampledImages))
+                , mSubpassInputs     (std::move(aOther.mSubpassInputs))
             {}
 
         public_destructors:
@@ -127,33 +135,17 @@ namespace engine
         public_methods:
             EEngineStatus initializeMemory(Shared<memory::allocators::CAllocator> aAllocator);
 
-            SHIRABE_INLINE std::string                 const &name()               const { return mName; }
-            SHIRABE_INLINE SMaterialLayoutInfo         const &layoutInfo()         const { return mLayoutInfo; }
-            SHIRABE_INLINE StageMap_t                  const &stages()             const { return mStages; }
-            SHIRABE_INLINE std::vector<SUniformBuffer> const &uniformBuffers()     const { return mUniformBuffers; }
-            SHIRABE_INLINE std::vector<SUniformBuffer> const &storageBuffers()     const { return mStorageBuffers; }
-            SHIRABE_INLINE std::vector<SUniformBuffer> const &pushConstantRanges() const { return mPushConstantRanges; }
-            SHIRABE_INLINE std::vector<SSampledImage>  const &sampledImages()      const { return mSampledImages; }
-            SHIRABE_INLINE std::vector<SSubpassInput>  const &subpassInputs()      const { return mSubpassInputs; }
+            SHIRABE_INLINE std::string            const &name()               const { return mName; }
+            SHIRABE_INLINE SMaterialLayoutInfo    const &layoutInfo()         const { return mLayoutInfo; }
+            SHIRABE_INLINE StageMap_t             const &stages()             const { return mStages; }
+            SHIRABE_INLINE Vector<SUniformBuffer> const &uniformBuffers()     const { return mUniformBuffers; }
+            SHIRABE_INLINE Vector<SUniformBuffer> const &storageBuffers()     const { return mStorageBuffers; }
+            SHIRABE_INLINE Vector<SUniformBuffer> const &pushConstantRanges() const { return mPushConstantRanges; }
+            SHIRABE_INLINE Vector<SSampledImage>  const &sampledImages()      const { return mSampledImages; }
+            SHIRABE_INLINE Vector<SSubpassInput>  const &subpassInputs()      const { return mSubpassInputs; }
 
         private_methods:
             friend class CMaterialLoader; // The below private methods are exclusively to be invoked by the material loader. Ensure this...
-
-        private_members:
-            std::string                 mName;
-            //std::unordered_map<VkPipelineStageFlagBits, SMaterialMetaStage> stages;
-            SMaterialLayoutInfo         mLayoutInfo;
-            StageMap_t                  mStages;
-            // Although each stage defines uniform buffers individually, they are shared
-            // across all stages, due to indexing them with set and binding.
-            std::vector<SUniformBuffer> mUniformBuffers;
-            std::vector<SUniformBuffer> mStorageBuffers;
-            std::vector<SUniformBuffer> mPushConstantRanges;
-            std::vector<SSampledImage>  mSampledImages;
-            // Fragment shader only
-            std::vector<SSubpassInput>  mSubpassInputs;
-
-            Map<std::string, Shared<memory::allocators::CAllocator>> mInstanceDataAllocators;
         };
 
         Shared<CSharedMaterial> CSharedMaterial::fromAsset(SMaterialAsset const &aAsset)
@@ -187,6 +179,9 @@ namespace engine
         class SBufferData
         {
             friend class CMaterialConfig;
+
+        private_members:
+            Map<std::string, SBufferMember> mValueIndex;
 
         public_methods:
 
@@ -223,12 +218,9 @@ namespace engine
              */
             SHIRABE_INLINE bool hasValue(std::string const &aBufferValue) const
             {
-                bool const has = (mValueIndex.end() != mValueIndex.find(aBufferValue));
-                return has;
+                bool const bHasValue = (mValueIndex.end() != mValueIndex.find(aBufferValue));
+                return bHasValue;
             }
-
-        private_members:
-            Map<std::string, SBufferMember> mValueIndex;
         };
 
         /**
@@ -248,12 +240,17 @@ namespace engine
               , public engine::serialization::ISerializable<documents::IJSONSerializer<CMaterialConfig>>
               , public engine::serialization::IDeserializable<documents::IJSONDeserializer<CMaterialConfig>>
         {
-
         public_typedefs:
             using BufferValueIndex_t = Map<std::string, Shared<SBufferMember>>;
             using BufferIndex_t      = Map<std::string, BufferValueIndex_t>;
             using BufferData_t       = Map<std::string, Shared<void>>;
             using SampledImageMap_t  = Map<std::string, asset::AssetId_t>;
+
+        private_members:
+            BufferIndex_t       mBufferIndex;
+            BufferData_t        mData;
+            Vector<std::string> mSampledImageIndex;
+            SampledImageMap_t   mSampledImageMap;
 
         public_static_functions:
             static CMaterialConfig fromMaterialDesc(CSharedMaterial const &aMaterial, bool aIncludeSystemBuffers = false);
@@ -444,12 +441,6 @@ namespace engine
                 return has;
             }
 
-        private_members:
-            BufferIndex_t       mBufferIndex;
-            BufferData_t        mData;
-            Vector<std::string> mSampledImageIndex;
-            SampledImageMap_t   mSampledImageMap;
-
         };
         //<-----------------------------------------------------------------------------
 
@@ -566,70 +557,68 @@ namespace engine
          */
         class CMaterialInstance
         {
-            public_constructors:
-                SHIRABE_INLINE
-                explicit CMaterialInstance(std::string             aName,
-                                           Shared<CSharedMaterial> aSharedMaterial)
-                    : mName          (std::move( aName))
-                    , mConfiguration ()
-                    , mSharedMaterial(std::move(aSharedMaterial))
-                {}
-
-                SHIRABE_INLINE
-                CMaterialInstance(CMaterialInstance &&aOther) noexcept
-                    : mName          (std::move(aOther.mName          ))
-                    , mConfiguration (std::move(aOther.mConfiguration ))
-                    , mSharedMaterial(std::move(aOther.mSharedMaterial))
-                {}
-
-            public_destructors:
-                ~CMaterialInstance() = default;
-
-            public_operators:
-                SHIRABE_INLINE
-                CMaterialInstance &operator=(CMaterialInstance &&aOther) noexcept
-                {
-                    mName           = std::move(aOther.mName           );
-                    mSharedMaterial = std::move(aOther.mSharedMaterial);
-                    mConfiguration  = std::move(aOther.mConfiguration  );
-
-                    return (*this);
-                }
-
-        public_methods:
-                SHIRABE_INLINE
-                std::string const &name() const
-                {
-                    return mName;
-                }
-
-                SHIRABE_INLINE
-                CMaterialConfig const &config() const
-                {
-                    return *mConfiguration;
-                }
-
-                SHIRABE_INLINE
-                CMaterialConfig &getMutableConfiguration()
-                {
-                    return mConfiguration.value();
-                }
-
-                SHIRABE_INLINE
-                Shared<CSharedMaterial> const &sharedMaterial() const
-                {
-                    return mSharedMaterial;
-                }
-
-                EEngineStatus createConfiguration(CSharedMaterial const &aAsset, bool aIncludeSystemBuffers = false);
-
         private_members:
             std::string                    mName;
             std::optional<CMaterialConfig> mConfiguration;
             Shared<CSharedMaterial>        mSharedMaterial;
+
+        public_constructors:
+            SHIRABE_INLINE
+            explicit CMaterialInstance(std::string             aName,
+                                       Shared<CSharedMaterial> aSharedMaterial)
+                : mName          (std::move( aName))
+                , mConfiguration ()
+                , mSharedMaterial(std::move(aSharedMaterial))
+            {}
+
+            SHIRABE_INLINE
+            CMaterialInstance(CMaterialInstance &&aOther) noexcept
+                : mName          (std::move(aOther.mName          ))
+                , mConfiguration (std::move(aOther.mConfiguration ))
+                , mSharedMaterial(std::move(aOther.mSharedMaterial))
+            {}
+
+        public_destructors:
+            ~CMaterialInstance() = default;
+
+        public_operators:
+            SHIRABE_INLINE
+            CMaterialInstance &operator=(CMaterialInstance &&aOther) noexcept
+            {
+                mName           = std::move(aOther.mName           );
+                mSharedMaterial = std::move(aOther.mSharedMaterial);
+                mConfiguration  = std::move(aOther.mConfiguration  );
+
+                return (*this);
+            }
+
+        public_methods:
+            SHIRABE_INLINE
+            std::string const &name() const
+            {
+                return mName;
+            }
+
+            SHIRABE_INLINE
+            CMaterialConfig const &config() const
+            {
+                return *mConfiguration;
+            }
+
+            SHIRABE_INLINE
+            CMaterialConfig &getMutableConfiguration()
+            {
+                return mConfiguration.value();
+            }
+
+            SHIRABE_INLINE
+            Shared<CSharedMaterial> const &sharedMaterial() const
+            {
+                return mSharedMaterial;
+            }
+
+            EEngineStatus createConfiguration(CSharedMaterial const &aAsset, bool aIncludeSystemBuffers = false);
         };
-
-
     }
 }
 

@@ -13,30 +13,17 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanShaderModuleResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIShaderModule>  { using TMappedRHIResource = vulkan::SVulkanShaderModuleResource;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(ShaderModule)
 
     namespace vulkan
     {
         using namespace rhi;
 
-        namespace shadermodule_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanShaderModuleResource)
-        }
-
         /**
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanShaderModuleResource
+        struct SVulkanRHIShaderModule
         {
             struct Handles_t
             {
@@ -45,15 +32,15 @@ namespace engine
 
             template <typename TResourceManager>
             static EEngineStatus initialize(SRHIShaderModuleDescriptor const &aDescription
-                                            , Handles_t                     &aGpuApiHandles
-                                            , TResourceManager              *aResourceManager
-                                            , IVkGlobalContext              *aVulkanEnvironment);
+                                            , Handles_t                      &aGpuApiHandles
+                                            , TResourceManager               *aResourceManager
+                                            , IVkGlobalContext               *aVulkanEnvironment);
 
             template <typename TResourceManager>
             static EEngineStatus deinitialize(SRHIShaderModuleDescriptor const &aDescription
-                                              , Handles_t                     &aGpuApiHandles
-                                              , TResourceManager              *aResourceManager
-                                              , IVkGlobalContext              *aVulkanEnvironment);
+                                              , Handles_t                      &aGpuApiHandles
+                                              , TResourceManager               *aResourceManager
+                                              , IVkGlobalContext               *aVulkanEnvironment);
         };
 
         //<-----------------------------------------------------------------------------
@@ -67,10 +54,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanShaderModuleResource::initialize(SRHIShaderModuleDescriptor const &aDescription
-                                                              , Handles_t                     &aGpuApiHandles
-                                                              , TResourceManager              *aResourceManager
-                                                              , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIShaderModule::initialize(SRHIShaderModuleDescriptor const &aDescription
+                                                         , Handles_t                      &aGpuApiHandles
+                                                         , TResourceManager               *aResourceManager
+                                                         , IVkGlobalContext               *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 
@@ -111,7 +98,7 @@ namespace engine
                 VkResult const moduleCreationResult = vkCreateShaderModule(device, &shaderModuleCreateInfo, nullptr, &vkShaderModule);
                 if(VkResult::VK_SUCCESS != moduleCreationResult)
                 {
-                    CLog::Error(shadermodule_log::logTag(), "Failed to create shader module for stage {}", stage);
+                    CLog::Error(ShaderModule_log::logTag(), "Failed to create shader module for stage {}", stage);
                     continue;
                 }
                 vkShaderModules.insert({ stage, vkShaderModule });
@@ -127,10 +114,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanShaderModuleResource::deinitialize(SRHIShaderModuleDescriptor const &aDescription
-                                                                , Handles_t                     &aGpuApiHandles
-                                                                , TResourceManager              *aResourceManager
-                                                                , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIShaderModule::deinitialize(SRHIShaderModuleDescriptor const &aDescription
+                                                           , Handles_t                      &aGpuApiHandles
+                                                           , TResourceManager               *aResourceManager
+                                                           , IVkGlobalContext               *aVulkanEnvironment)
         {
             VkDevice device = aVulkanEnvironment->getLogicalDevice();
 

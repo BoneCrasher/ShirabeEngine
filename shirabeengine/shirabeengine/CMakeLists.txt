@@ -12,8 +12,8 @@ add_subdirectory(modules/core)
 add_subdirectory(modules/os)
 add_subdirectory(modules/utility)
 add_subdirectory(modules/wsi)
-add_subdirectory(modules/graphicsapi)
 add_subdirectory(modules/asset)
+add_subdirectory(modules/graphicsapi)
 add_subdirectory(modules/rhi)
 
 include(${SHIRABE_BUILDSYSTEM_ENV_FILEPATH}/integration/shirabeengine.environment.cmake)
@@ -35,23 +35,16 @@ set(
         log
         math
         utility
-        wsi
         resources
-        graphicsapi
-        asset)
+		rhi)
 
 set(
     SHIRABE_PROJECT_REQUESTED_LINK_TARGETS
-		SHIRABEMODULERHI
-		SHIRABEMODULEASSET
-		SHIRABEMODULEGRAPHICSAPI
-		SHIRABEMODULEWSI)
+		SHIRABEMODULERHI)
 
 include(project_setup)
 
-add_dependencies(shirabeengine INSTALL_wsi)
-add_dependencies(shirabeengine INSTALL_graphicsapi)
-add_dependencies(shirabeengine INSTALL_asset)
+add_dependencies(shirabeengine INSTALL_rhi)
 add_dependencies(shirabeengine INSTALL_utility)
 add_dependencies(shirabeengine INSTALL_core)
 add_dependencies(shirabeengine INSTALL_os)

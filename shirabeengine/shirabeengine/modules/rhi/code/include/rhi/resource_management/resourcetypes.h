@@ -160,10 +160,10 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_LIBRARY_EXPORT SRHIDescriptor
-            : public CRHIResourceObject<SRHIDescriptorDescription>
+            SHIRABE_LIBRARY_EXPORT SRHIDescriptorPool
+            : public CRHIResourceObject<SRHIDescriptorPoolDescription>
         {
-            using CRHIResourceObject<SRHIDescriptorDescription>::CRHIResourceObject;
+            using CRHIResourceObject<SRHIDescriptorPoolDescription>::CRHIResourceObject;
         };
 
         struct
@@ -193,9 +193,9 @@ namespace engine
         struct
             [[nodiscard]]
             SHIRABE_LIBRARY_EXPORT SMaterial
-            : public CRHIResourceObject<SRHIDescriptorDescription>
+            : public CRHIResourceObject<SRHIDescriptorPoolDescription>
         {
-            using CRHIResourceObject<SRHIDescriptorDescription>::CRHIResourceObject;
+            using CRHIResourceObject<SRHIDescriptorPoolDescription>::CRHIResourceObject;
 
             Shared<SRHIPipeline>       pipelineResource;
             Shared<SRHIShaderModule>   shaderModuleResource;

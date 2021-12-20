@@ -249,7 +249,7 @@ namespace engine
 
         struct
             [[nodiscard]]
-            SHIRABE_TEST_EXPORT SRHIDescriptorDescription
+            SHIRABE_TEST_EXPORT SRHIDescriptorPoolDescription
         {
             std::string  name;
             ResourceId_t pipelineLayoutResourceId;

@@ -12,15 +12,7 @@
 
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIRenderPassResource;
-    }
-
-    namespace rhi
-    {
-        template <> struct SRHIResourceMap<SRHIRenderPass> { using TMappedRHIResource = vulkan::SVulkanRHIRenderPassResource; };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(RenderPass)
 
     namespace vulkan
     {
@@ -30,7 +22,7 @@ namespace engine
          * The SVulkanRHIImageResource struct describes the relevant data to deal
          * with textures inside the vulkan API.
          */
-        struct SVulkanRHIRenderPassResource
+        struct SVulkanRHIRenderPass
         {
             struct Handles_t
             {
@@ -58,10 +50,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIRenderPassResource::initialize(SRHIRenderPassDescription const &aDescription
-                                                               , Handles_t                     &aGpuApiHandles
-                                                               , TResourceManager              *aResourceManager
-                                                               , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIRenderPass::initialize(SRHIRenderPassDescription const &aDescription
+                                                       , Handles_t                     &aGpuApiHandles
+                                                       , TResourceManager              *aResourceManager
+                                                       , IVkGlobalContext              *aVulkanEnvironment)
         {
 
             /// CLog::Debug(logTag(), "Creating texture w/ name {}", aDescription.name);
@@ -69,8 +61,8 @@ namespace engine
             VkDevice const         &vkLogicalDevice  = aVulkanEnvironment->getLogicalDevice();
             VkPhysicalDevice const &vkPhysicalDevice = aVulkanEnvironment->getPhysicalDevice();
 
-            std::vector<VkSubpassDescription>    vkSubpassDescriptions{};
-            std::vector<VkAttachmentDescription> vkAttachmentDescriptions{};
+            Vector<VkSubpassDescription>    vkSubpassDescriptions{};
+            Vector<VkAttachmentDescription> vkAttachmentDescriptions{};
 
             for(auto const &attachmentDesc : aDescription.attachmentDescriptions)
             {
@@ -88,15 +80,15 @@ namespace engine
                 vkAttachmentDescriptions.push_back(vkAttachmentDesc);
             }
 
-            std::vector<std::vector<VkAttachmentReference>> inputAttachmentReferenceList(0);
-            std::vector<std::vector<VkAttachmentReference>> colorAttachmentReferenceList(0);
-            std::vector<std::vector<VkAttachmentReference>> depthAttachmentReferenceList(0);
+            Vector<Vector<VkAttachmentReference>> inputAttachmentReferenceList(0);
+            Vector<Vector<VkAttachmentReference>> colorAttachmentReferenceList(0);
+            Vector<Vector<VkAttachmentReference>> depthAttachmentReferenceList(0);
 
             for(auto const &subpassDesc : aDescription.subpassDescriptions)
             {
-                std::vector<VkAttachmentReference> inputAttachmentReferences(0);
-                std::vector<VkAttachmentReference> colorAttachmentReferences(0);
-                std::vector<VkAttachmentReference> depthAttachmentReferences(0);
+                Vector<VkAttachmentReference> inputAttachmentReferences(0);
+                Vector<VkAttachmentReference> colorAttachmentReferences(0);
+                Vector<VkAttachmentReference> depthAttachmentReferences(0);
 
                 for(SRHIAttachmentReference const &ref : subpassDesc.inputAttachments)
                 {
@@ -164,7 +156,7 @@ namespace engine
                 vkSubpassDescriptions.push_back(vkSubpassDesc);
             }
 
-            std::vector<VkSubpassDependency> subpassDependencies {};
+            Vector<VkSubpassDependency> subpassDependencies {};
             subpassDependencies.resize(aDescription.subpassDependencies.size());
             for(std::size_t k=0; k<subpassDependencies.size(); ++k)
             {
@@ -211,10 +203,10 @@ namespace engine
         //
         //<-----------------------------------------------------------------------------
         template <typename TResourceManager>
-        EEngineStatus SVulkanRHIRenderPassResource::deinitialize(SRHIRenderPassDescription const &aDescription
-                                                                 , Handles_t                     &aGpuApiHandles
-                                                                 , TResourceManager              *aResourceManager
-                                                                 , IVkGlobalContext              *aVulkanEnvironment)
+        EEngineStatus SVulkanRHIRenderPass::deinitialize(SRHIRenderPassDescription const &aDescription
+                                                         , Handles_t                     &aGpuApiHandles
+                                                         , TResourceManager              *aResourceManager
+                                                         , IVkGlobalContext              *aVulkanEnvironment)
         {
             vkDestroyRenderPass(aVulkanEnvironment->getLogicalDevice(), aGpuApiHandles.handle, nullptr);
 

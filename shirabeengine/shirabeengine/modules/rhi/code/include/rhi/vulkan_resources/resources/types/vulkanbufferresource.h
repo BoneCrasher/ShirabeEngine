@@ -12,27 +12,14 @@
 #include "rhi/vulkan_core/vulkanenvironment.h"
 #include "rhi/vulkan_resources/resources/ivkglobalcontext.h"
 
+
 namespace engine
 {
-    namespace vulkan
-    {
-        struct SVulkanRHIBuffer;
-    }
-
-    namespace rhi
-    {
-        template <>
-        struct SRHIResourceMap<SRHIBuffer> { using TMappedRHIResource = vulkan::SVulkanRHIBuffer;  };
-    }
+    SHIRABE_DECLARE_VULKAN_RHI_RESOURCE(Buffer)
 
     namespace vulkan
     {
         using namespace rhi;
-
-        namespace buffer_log
-        {
-            SHIRABE_DECLARE_LOG_TAG(SVulkanRHIBuffer)
-        }
 
         /**
          *
@@ -107,7 +94,7 @@ namespace engine
 
             if(CheckEngineError(result))
             {
-                CLog::Error(buffer_log::logTag(), StaticStringHelpers::format("Failed to create buffer."));
+                CLog::Error(Buffer_log::logTag(), StaticStringHelpers::format("Failed to create buffer."));
                 return EEngineStatus::Error;
             }
 
@@ -116,7 +103,7 @@ namespace engine
             aGpuApiHandles.buffer             = buffer;
             aGpuApiHandles.memoryRequirements = requirements;
 
-            // getVkContext()->registerDebugObjectName((uint64_t)this->stagingBuffer,       VK_OBJECT_TYPE_BUFFER,        std::string(aDescription.name) + "_StagingBuffer");
+            vkContext->registerDebugObjectName((uint64_t)buffer, VK_OBJECT_TYPE_BUFFER, std::string(aDescription.name) + "_Buffer");
 
             return EEngineStatus::Ok;
         }
@@ -157,7 +144,7 @@ namespace engine
             VkResult const result = vkBindBufferMemory(vkLogicalDevice, aVkBuffer, aVkMemory, aVkMemoryOffset);
             if(VkResult::VK_SUCCESS != result)
             {
-                CLog::Error(buffer_log::logTag(), StaticStringHelpers::format("Failed to bind buffer memory on GPU. Vulkan error: {}", result));
+                CLog::Error(Buffer_log::logTag(), StaticStringHelpers::format("Failed to bind buffer memory on GPU. Vulkan error: {}", result));
                 return EEngineStatus::Error;
             }
             return EEngineStatus::Ok;

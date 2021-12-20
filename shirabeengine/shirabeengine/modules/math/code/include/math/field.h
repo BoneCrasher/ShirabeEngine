@@ -34,7 +34,19 @@ namespace engine
         {
             SFieldData& operator=(SFieldData const &aOther)
             {
-                memcpy(field, aOther.field, sizeof(T) * TN);
+                if(&aOther != this)
+                {
+                    memcpy(field, aOther.field, sizeof(T) * TN);
+                }
+                return (*this);
+            }
+
+            SFieldData& operator=(SFieldData &&aOther) noexcept
+            {
+                if(&aOther != this)
+                {
+                    memcpy(field, aOther.field, sizeof(T) * TN);
+                }
                 return (*this);
             }
 
@@ -79,7 +91,7 @@ namespace engine
              *
              * @param aSource An initializer list containing at least N values.
              */
-            CField(std::array<T, TN> const &aSource);
+            explicit CField(std::array<T, TN> const &aSource);
 
             /**
              * Initialize a field from another field.
@@ -87,6 +99,13 @@ namespace engine
              * @param aCopy The other instance to copy from.
              */
             CField(ClassType_t const &aCopy);
+
+            /**
+             * Initialize a field moving in another field.
+             *
+             * @param aCopy The other instance to copy from.
+             */
+            CField(ClassType_t &&aMove) noexcept;
 
         public_destructors:
             /**
@@ -102,7 +121,15 @@ namespace engine
              * @param right Field to assign.
              * @return      Self-Reference
              */
-            ClassType_t&operator= (ClassType_t const &aOther);
+            CField &operator=(ClassType_t const &aOther);
+
+            /**
+             * Move in another field and overwrite contained values.
+             *
+             * @param right Field to assign.
+             * @return      Self-Reference
+             */
+            CField &operator=(ClassType_t &&aOther) noexcept;
 
             /**
              * Returns an immutable value reference to an element in the field at index 'aIndex'.
@@ -111,7 +138,7 @@ namespace engine
              * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
              * @throws        std::out_of_range if: 0 < aIndex < TN.
              */
-            T const &operator[](std::size_t const aIndex) const;
+            T const &operator[](std::size_t aIndex) const;
 
             /**
              * Returns a mutable value reference to an element in the field at index 'aIndex'.
@@ -120,7 +147,7 @@ namespace engine
              * @return        The value contained at 'aIndex' as const-ref, if the index is in bounds.
              * @throws        std::out_of_range if: 0 < aIndex < TN.
              */
-            T &operator[](std::size_t const aIndex);
+            T &operator[](std::size_t aIndex);
 
             /**
              * Compares this instance to another for bitwise equality.
@@ -135,28 +162,28 @@ namespace engine
              *
              * @param aOther The field to be added.
              */
-            void operator+=(ClassType_t const & aRight);
+            void operator+=(ClassType_t const &aOther);
 
             /**
              * Subtract another field from this instance.
              *
              * @param aOther The field to subtract.
              */
-            void operator-=(ClassType_t const & aRight);
+            void operator-=(ClassType_t const & aOther);
 
             /**
              * Multiply this field instance with a given factor.
              *
              * @param aFactor The factor to multiply with.
              */
-            void operator*=(T const aFactor);
+            void operator*=(T aFactor);
 
             /**
              * Divide this field instance by the passed factor.
              *
              * @param aFactor The factor to divide by.
              */
-            void operator/=(T const aFactor);
+            void operator/=(T aFactor);
 
         public_methods:
             /**
@@ -175,7 +202,7 @@ namespace engine
              */
             T *const ptr();
 
-            FieldDataType_t&       data()            ;
+            FieldDataType_t&       data();
             FieldDataType_t const& const_data() const;
 
             /**
@@ -183,14 +210,14 @@ namespace engine
              *
              * @return See above...
              */
-            std::size_t size() const;
+            [[nodiscard]] std::size_t size() const;
 
             /**
              * Return the size of a single element of the field in bytes.
              *
              * @return See also above...
              */
-            std::size_t byte_size() const;
+            [[nodiscard]] std::size_t byte_size() const;
 
             /**
              * Return the number of (imaginary) columns in the field.
@@ -199,7 +226,7 @@ namespace engine
              *
              * @return  See again... you've guessed it...
              */
-            std::size_t byte_stride() const;
+            [[nodiscard]] std::size_t byte_stride() const;
 
             /**
              * Serialize this field to a comma-delimited string.
@@ -216,7 +243,23 @@ namespace engine
              *
              * @param aOther The field instance to assign.
              */
-            void assign(ClassType_t const & aOther);
+            void assign(ClassType_t const &aOther);
+
+            /**
+             * Move another matrix to this instance.
+             * Internally theres a copy operation taking place
+             * overriding the old data of this instance, if any!
+             * Additionally, the moved in field's data will be reset.
+             *
+             * @param aOther The field instance to assign.
+             */
+            void move_assign(ClassType_t &&Other);
+
+            /**
+             * Reset this field's data to the default value of
+             * the field's value type.
+             */
+            void reset();
 
         protected_members:
             SFieldData<T, TN> mData;
@@ -266,14 +309,25 @@ namespace engine
         //<-----------------------------------------------------------------------------
 
         //<-----------------------------------------------------------------------------
-        //<
+        //
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        typename SHIRABE_FIELD::ClassType_t &SHIRABE_FIELD::operator=(ClassType_t const & right)
+        SHIRABE_FIELD::CField(ClassType_t &&aMove) noexcept
         {
             SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
-            assign(right);
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
+        typename SHIRABE_FIELD::ClassType_t &SHIRABE_FIELD::operator=(ClassType_t const &aOther)
+        {
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
+
+            assign(aOther);
             return *this;
         }
         //<-----------------------------------------------------------------------------
@@ -282,7 +336,20 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        T const &SHIRABE_FIELD::operator[] (std::size_t const aIndex) const
+        typename SHIRABE_FIELD::ClassType_t &SHIRABE_FIELD::operator=(ClassType_t &&aOther) noexcept
+        {
+            SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
+
+            move_assign(std::move(aOther));
+            return *this;
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
+        T const &SHIRABE_FIELD::operator[] (std::size_t aIndex) const
         {
             SHIRABE_ASSERT_FIELD_SIZE_AND_STRIDE();
 
@@ -297,7 +364,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        T& SHIRABE_FIELD::operator[] (std::size_t const aIndex)
+        T& SHIRABE_FIELD::operator[] (std::size_t aIndex)
         {
             // Cast to const this, so that we can reuse the const operator[].
             ClassType_t const*const cthis  = static_cast<ClassType_t const*const>(this);
@@ -322,7 +389,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        void SHIRABE_FIELD::operator+=(ClassType_t const & aOther)
+        void SHIRABE_FIELD::operator+=(ClassType_t const &aOther)
         {
             for(size_t i = 0; i < TN; ++i)
                 mData.field[i] += aOther[i];
@@ -333,10 +400,10 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        void SHIRABE_FIELD::operator-=(ClassType_t const & aRight)
+        void SHIRABE_FIELD::operator-=(ClassType_t const &aOther)
         {
             for(size_t i = 0; i < TN; ++i)
-                mData.field[i] -= aRight[i];
+                mData.field[i] -= aOther[i];
         }
         //<-----------------------------------------------------------------------------
 
@@ -375,6 +442,27 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::move_assign(ClassType_t &&aOther)
+        {
+            memcpy(&mData.field[0], (void*)aOther.const_ptr(), (TN * TByteSize));
+            aOther.reset();
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
+        void SHIRABE_FIELD::reset()
+        {
+            memset(&mData.field[0], T{}, (TN * TByteSize));
+        }
+        //<-----------------------------------------------------------------------------
+
+        //<-----------------------------------------------------------------------------
+        //<
+        //<-----------------------------------------------------------------------------
+        SHIRABE_FIELD_TEMPLATE_DECL
         T const* const SHIRABE_FIELD::const_ptr() const
         {
             return &mData.field[0];
@@ -385,7 +473,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         SHIRABE_FIELD_TEMPLATE_DECL
-        T * const SHIRABE_FIELD::ptr()
+        T* const SHIRABE_FIELD::ptr()
         {
             return mData.field;
         }
