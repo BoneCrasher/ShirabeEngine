@@ -601,7 +601,7 @@ namespace engine
             : SRenderGraphResource
         {
         public_members:
-            rhi::ResourceId_t    pipelineResourceId;
+            rhi::ResourceId_t          pipelineResourceId;
             SRenderGraphPipelineConfig pipelineConfiguration;
         };
 

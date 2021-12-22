@@ -14,10 +14,10 @@ namespace engine
         //<-----------------------------------------------------------------------------
         CPassBuilder::CPassBuilder(
             PassUID_t const              &aPassUID,
-                Shared<CPassBase>             aPass,
-                Shared<CRenderPass>           aEnclosingRenderPass,
-                CRHIResourceManager const       &aResourceManager,
-                CRenderGraphMutableResources &aOutResourceData)
+            Shared<CPassBase>             aPass,
+            Shared<CRenderPass>           aEnclosingRenderPass,
+            CRHIResourceManager const    &aResourceManager,
+            CRenderGraphMutableResources &aOutResourceData)
             : mPassUID             (aPassUID                           )
             , mPass                (std::move(aPass                   ))
             , mEnclosingRenderPass (std::move(aEnclosingRenderPass    ))

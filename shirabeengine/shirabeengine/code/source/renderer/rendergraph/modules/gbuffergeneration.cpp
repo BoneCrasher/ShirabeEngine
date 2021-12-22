@@ -156,9 +156,9 @@ namespace engine
                                        auto const materials = renderableResources.materials;
                                        for(std::size_t k=0; k<materials.size(); ++k)
                                        {
-                                           auto const renderableMaterial = materials[k];
+                                           SRenderGraphMaterialDescription const renderableMaterial = materials[k];
 
-                                           auto const [result, material]         = aBuilder.useMaterial(renderableMaterial);
+                                           auto const [result, material]         = aBuilder.useMaterial(renderableMaterial, );
                                            auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, config);
 
                                            SRenderGraphRenderObjectMaterial objectMaterial;
