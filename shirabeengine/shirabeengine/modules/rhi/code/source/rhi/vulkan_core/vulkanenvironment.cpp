@@ -247,6 +247,8 @@ namespace engine::vulkan
         std::vector<char const*> requiredLayers     ={};
         std::vector<char const*> requiredExtensions ={};
         requiredExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+        requiredExtensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+        requiredExtensions.push_back(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME);
 
         std::vector<SVulkanPhysicalDevice> supportedPhysicalDevices = {};
 
@@ -259,10 +261,8 @@ namespace engine::vulkan
             vkPhysicalDevices.resize(vkPhysicalDeviceCount);
             vkEnumeratePhysicalDevices(mVkState.instance, &vkPhysicalDeviceCount, vkPhysicalDevices.data());
 
-            for(uint64_t k = 0; k < vkPhysicalDevices.size(); ++k)
+            for(VkPhysicalDevice const &vkPhysicalDevice : vkPhysicalDevices)
             {
-                VkPhysicalDevice const &vkPhysicalDevice = vkPhysicalDevices.at(k);
-
                 //
                 // Check Physical Device Props and Features
                 //
