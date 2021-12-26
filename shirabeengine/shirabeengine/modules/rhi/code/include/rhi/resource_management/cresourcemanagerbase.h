@@ -416,7 +416,7 @@ namespace engine::rhi
             aResource.rhiLoadState.set(EGpuApiResourceState::Creating);
 
             EEngineStatus const initResult = TResource::RHIMappedResource_t::template initialize<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
-            if(not CheckEngineError(initResult))
+            if(CheckEngineError(initResult))
             {
                 aResource.rhiLoadState.set(EGpuApiResourceState::Error);
                 return initResult;
@@ -474,7 +474,7 @@ namespace engine::rhi
                 aResource.rhiLoadState.set(EGpuApiResourceState::Loading);
 
                 EEngineStatus const loadResult = TResource::RHIMappedResource_t::template load<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
-                if(not CheckEngineError(loadResult))
+                if(CheckEngineError(loadResult))
                 {
                     aResource.rhiLoadState.set(EGpuApiResourceState::Error);
                     return loadResult;
@@ -540,7 +540,7 @@ namespace engine::rhi
                 aResource.rhiLoadState.set(EGpuApiResourceState::Unloading);
 
                 EEngineStatus const unloadResult = TResource::RHIMappedResource_t::template unload<My_t>(aResource.rhiCreateDesc, aResource.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
-                if(not CheckEngineError(unloadResult))
+                if(CheckEngineError(unloadResult))
                 {
                     aResource.rhiLoadState.set(EGpuApiResourceState::Error);
                     return unloadResult;
@@ -597,7 +597,7 @@ namespace engine::rhi
                 aResourceId.rhiLoadState.set(EGpuApiResourceState::Transferring);
 
                 EEngineStatus const transferResult = TResource::RHIMappedResource_t::template transfer<My_t>(aResourceId.rhiCreateDesc, aResourceId.rhiHandles, this, mRhiEnvironment.get(), std::forward<TArgs>(aArgs)...);
-                if(not CheckEngineError(transferResult))
+                if(CheckEngineError(transferResult))
                 {
                     return transferResult;
                 }
