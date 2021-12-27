@@ -198,7 +198,7 @@ namespace engine
                 TArguments       &&...aArguments)
         {
             std::string_view format_view {aFormat.c_str(), aFormat.size()};
-            std::string const message = fmt::vformat(format_view, fmt::make_format_args(std::forward<TArguments>(aArguments)...));
+            std::string const message = fmt::format(aFormat, std::forward<TArguments>(aArguments)...);
             LogImpl(aLevel, aLogTag, message);
         }
 
