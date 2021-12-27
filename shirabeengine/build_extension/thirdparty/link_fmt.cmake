@@ -13,7 +13,6 @@ function(linkLibrary)
         ${DIR}/include
         )
 
-
     # -L
     append_parentscope(
             SHIRABE_PROJECT_LIBRARY_DIRECTORIES

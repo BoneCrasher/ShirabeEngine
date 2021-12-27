@@ -172,7 +172,7 @@ namespace engine
     #define SHIRABE_USE_FMT 1
     #if defined SHIRABE_USE_FMT
         std::string_view format_view = { aFormat.c_str(), aFormat.size() };
-        return fmt::format(aFormat, std::forward<TArgs>(aArgs)...);
+        return fmt::vformat(aFormat, fmt::make_format_args(std::forward<TArgs>(aArgs)...));
     #else
         std::array<std::string, sizeof...(aArgs)> formattedArguments{};
 

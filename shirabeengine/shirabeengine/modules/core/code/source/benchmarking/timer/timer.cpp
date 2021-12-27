@@ -86,7 +86,7 @@ namespace engine
                             StaticStringHelpers::format(
                                 "ERROR: Timer::initialize: "
                                 "An error occured on requesting the current timestamp from the time interface.\n"
-                                "At: {}:{}", __FILE__, __LINE__));
+                                "At: {0}:{1}", __FILE__, __LINE__));
 
                 result = EEngineStatus::Timer_PlatformTimestampFetchFailed;
 			} else
