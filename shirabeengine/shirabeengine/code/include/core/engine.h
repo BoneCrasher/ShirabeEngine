@@ -41,16 +41,16 @@ namespace engine
     /**
      * @brief The CEngineInstance class
      */
-    class SHIRABE_LIBRARY_EXPORT CEngineInstance
+    class SHIRABE_LIBRARY_EXPORT CEngineInstance final
     {
         SHIRABE_DECLARE_LOG_TAG(EngineInstance)
 
-    public_constructors:
+    private_constructors:
         /**
          * @brief CEngineInstance
          * @param aEnvironment
          */
-        explicit CEngineInstance(Shared<os::SApplicationEnvironment> aEnvironment);
+        CEngineInstance();
 
     public_destructors:
         /**
@@ -58,12 +58,19 @@ namespace engine
          */
         ~CEngineInstance();
 
+    public_static_functions:
+        SHIRABE_INLINE static CEngineInstance &get()
+        {
+            static CEngineInstance gEngineInstance = {};
+            return gEngineInstance;
+        }
+
     public_methods:
         /**
          * @brief initialize
          * @return
          */
-        CEngineResult<> initialize();
+        CEngineResult<> initialize(Shared<os::SApplicationEnvironment> aApplicationEnvironment);
 
         /**
          * @brief deinitialize

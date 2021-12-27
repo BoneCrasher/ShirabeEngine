@@ -104,7 +104,7 @@ function read_arguments
     # <option>   No argument
     # <option>:  Required
     # <option>:: Optional
-    SHRT_OPTIONS=d,v,l:a:c:
+    SHRT_OPTIONS=s,d,v,l:a:c:
     LONG_OPTIONS=debug,verbose,libraries:,address_mode:,config:
 
     # -use ! and PIPESTATUS to get exit code with errexit set
@@ -277,13 +277,17 @@ function build
                         rm -rf ${build_directory}
                         rm -rf ${deploy_directory}
                     fi 
-                    
-                    if [ ! -d ${build_directory} ]; then
-                        mkdir -p ${build_directory}
-                    fi
 
                     if [ ! -d ${deploy_directory} ]; then
                         mkdir -p ${deploy_directory}
+                    else 
+                        # Deployment directory (still) exists.
+                        # Assume already built and skip!
+                        continue;
+                    fi
+
+                    if [ ! -d ${build_directory} ]; then
+                        mkdir -p ${build_directory}
                     fi
 
                     # Will inherit the current enclosing scopes and variables

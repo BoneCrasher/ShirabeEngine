@@ -86,8 +86,8 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineInstance::CEngineInstance(Shared<os::SApplicationEnvironment> aEnvironment)
-        : mApplicationEnvironment(std::move(aEnvironment))
+    CEngineInstance::CEngineInstance()
+        : mApplicationEnvironment(nullptr)
         , mWindowManager    (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
         , mMainWindow       (nullptr)
         , mAssetStorage     (nullptr)
@@ -118,8 +118,10 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //<
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CEngineInstance::initialize()
+    CEngineResult<> CEngineInstance::initialize(Shared<os::SApplicationEnvironment> aApplicationEnvironment)
     {
+        assert(nullptr != aApplicationEnvironment);
+
         EEngineStatus status = EEngineStatus::Ok;
 
         Shared<CWSIDisplay> display = nullptr;

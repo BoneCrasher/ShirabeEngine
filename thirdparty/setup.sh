@@ -148,6 +148,7 @@ function update_one
         cd ${dir}
         git pull origin ${branch}
         cd ..
+        rm -rf ${DEPLOY_DIR}/${key} # Remove previous builds for buildLibraries.sh to pick up the updates
     fi
 }
 
@@ -227,7 +228,6 @@ function setup_vmem
     cp -rf packaged/* sources 
 }
 
-# Check, whether we should update.
 if [ ! -z ${1} ]; then
 
     if [ "${1}" = "--update" ]; then
@@ -235,18 +235,18 @@ if [ ! -z ${1} ]; then
 
         for library in "${LIBRARIES[@]}";
         do
-
             update_one ${library}
-
         done
 
         exit 1
     fi
 
+    if [ "${1}" = "--clean" ]; then
+        clean_env
+    fi
 fi
 
 test_env
-clean_env
 setup_base
 setup_spirv_tools
 setup_spirv_cross
