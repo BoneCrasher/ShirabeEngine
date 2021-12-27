@@ -14,7 +14,7 @@ buildOne ()
     # cmake --build . -- -j12
     # cmake --build . --target install
 
-    if [!-d ${deploy_directory}/source]; then
+    if [ ! -d ${deploy_directory}/source ]; then
         mkdir ${deploy_directory}/source
     fi
     
