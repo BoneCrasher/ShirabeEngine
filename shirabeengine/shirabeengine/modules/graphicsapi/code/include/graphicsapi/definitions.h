@@ -18,9 +18,10 @@ namespace engine
          */
         enum class EGFXAPI
         {
-            DirectX = 1,
-            OpenGL  = 2,
-            Vulkan  = 4
+            Undefined = 0,
+            DirectX   = 1,
+            OpenGL    = 2,
+            Vulkan    = 4
         };
 
         /**
@@ -28,6 +29,7 @@ namespace engine
          */
         enum class EGFXAPIVersion
         {
+            Undefined = 0,
             DirectX_11_0,
             DirectX_11_1,
             DirectX_11_2,

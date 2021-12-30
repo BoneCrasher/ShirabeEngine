@@ -684,7 +684,7 @@ namespace engine
         template <typename T>
         class CRenderGraphResourcesRef
         {
-        protected:
+        public:
             /**
              * Insert a new resource reference.
              *

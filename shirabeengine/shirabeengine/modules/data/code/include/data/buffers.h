@@ -5,6 +5,7 @@
 #define __SHIRABEDEVELOPMENT_GPURESOURCE_BUFFERS_H__
 
 #include <util/architecture/engine_locator.h>
+#include <rhi/rhilayer.h>
 #include <rhi/vulkan_resources/resources/types/vulkanbufferresource.h>
 #include "data/base.h"
 

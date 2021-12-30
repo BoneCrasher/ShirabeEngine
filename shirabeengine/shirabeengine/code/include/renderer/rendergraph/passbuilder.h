@@ -46,9 +46,9 @@ namespace engine
         {
         public_constructors:
             SHIRABE_INLINE SPassResourceConstraint(
-                    SRenderGraphResource         const &aTarget,
-                    SRenderGraphResource         const &aSource,
-                    EPassResourceConstraintFlags const &aFlags)
+                SRenderGraphResource         const &aTarget,
+                SRenderGraphResource         const &aSource,
+                EPassResourceConstraintFlags const &aFlags)
                 : target(aTarget)
                 , source(aSource)
                 , flags(aFlags)
@@ -77,10 +77,10 @@ namespace engine
              * @param aOutResourceData Container for the pass' resources requested/used.
              */
             CPassBuilder(
-                PassUID_t              const &aPassUID,
+                PassUID_t                  const &aPassUID,
                     Shared<CPassBase>             aPass,
                     Shared<CRenderPass>           aEnclosingRenderPass,
-                    CRHIResourceManager const       &aResourceManager,
+                    CRHIResourceManager    const &aResourceManager,
                     CRenderGraphMutableResources &aOutResourceData);
 
         public_methods:
@@ -96,7 +96,7 @@ namespace engine
             }
 
             /**
-             * Request the creation of a texture resource in the rendergraph.
+             * Request the dynamic creation of a texture resource in the rendergraph.
              *
              * @param aName       Name of the texture to create.
              * @param aDescriptor Descriptor of the texture to create.
@@ -104,15 +104,24 @@ namespace engine
              *                    creation.
              */
             CEngineResult<SRenderGraphImage> createImage(
-                std::string                         const &aName,
+                String                              const &aName,
                 SRenderGraphDynamicImageDescription const &aDescriptor);
 
+            /**
+             * Import a pre-created image. If he described image doesn't exist, it won't be created.
+             *
+             * @param aName
+             * @param aDescriptor
+             * @return
+             */
             CEngineResult<SRenderGraphImage> importImage(
-                std::string                            const &aName,
+                String                                 const &aName,
                 SRenderGraphPersistentImageDescription const &aDescriptor);
 
             /**
-             * Request the creation of a texture resource in the rendergraph.
+             * Request the creation of a render target texture resource in the rendergraph.
+             * This will sample from a render target pool and may alias underlying resources
+             * for re-use.
              *
              * @param aName       Name of the texture to create.
              * @param aDescriptor Descriptor of the texture to create.
@@ -120,7 +129,7 @@ namespace engine
              *                    creation.
              */
             CEngineResult<SRenderGraphRenderTarget> createRenderTarget(
-                std::string                           const &aName,
+                String                              const &aName,
                 SRenderGraphDynamicImageDescription const &aDescriptor);
 
             /**
@@ -183,21 +192,55 @@ namespace engine
                 SRenderGraphImage                      &subjacentTargetResource,
                 SRenderGraphTextureResourceFlags const &aFlags);
 
+            /**
+             * Create a dynamic buffer resource in the frame graph.
+             *
+             * @param aName
+             * @param aBufferDescription
+             * @return
+             */
             CEngineResult<SRenderGraphBuffer> createBuffer(
-                std::string                          const &aName,
+                String                               const &aName,
                 SRenderGraphDynamicBufferDescription const &aBufferDescription);
 
+            /**
+             * Import an existing buffer resources into the frame graph.
+             *
+             * @param aName
+             * @param aBufferDescription
+             * @return
+             */
             CEngineResult<SRenderGraphBuffer> importBuffer(
-                std::string                             const &aName,
+                String                                  const &aName,
                 SRenderGraphPersistentBufferDescription const &aBufferDescription);
 
+            /**
+             * Read a buffer resource subrange.
+             *
+             * @param subjacentTargetResource
+             * @param aSubrange
+             * @return
+             */
             CEngineResult<SRenderGraphBufferView> readBuffer(
                 SRenderGraphBuffer &subjacentTargetResource,
                 CRange const       &aSubrange);
 
+            /**
+             * Register and use a mesh resource and it's dependencies (buffers)
+             *
+             * @param aMeshDescription
+             * @return
+             */
             CEngineResult<SRenderGraphMesh> useMesh(SRenderGraphMeshDescription const &aMeshDescription);
 
-            CEngineResult<SRenderGraphMaterial> useMaterial(std::string const &aMaterialId, SRenderGraphPipelineConfig const &aPipelineConfigOverride);
+            /**
+             * Register and use a material instance and it's dependencies (buffers, images, ...)
+             *
+             * @param aMaterialId
+             * @param aPipelineConfigOverride
+             * @return
+             */
+            CEngineResult<SRenderGraphMaterial> useMaterial(String const &aMaterialId, SRenderGraphPipelineConfig const &aPipelineConfigOverride);
 
             // Buffers?
 
@@ -290,7 +333,7 @@ namespace engine
              * @return                 True, if no simultaneous overlapping reads are performed.
              */
             CEngineResult<bool> isImageBeingReadInSubresourceRange(
-                    RefIndex_t           const &aResourceViews,
+                    RefIndex_t            const &aResourceViews,
                     CRenderGraphResources const &aResources,
                     SRenderGraphResource  const &aSourceResource,
                     CRange                const &aArraySliceRange,

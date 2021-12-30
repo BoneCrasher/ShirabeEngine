@@ -8,6 +8,7 @@
 #ifndef __SHIRABE_ENGINETYPEHELPER_H__
 #define __SHIRABE_ENGINETYPEHELPER_H__
 
+#include <atomic>
 #include <any>
 #include <optional>
 #include <memory>
@@ -23,6 +24,9 @@
 
 namespace engine
 {
+    template <typename T>
+    using Atomic = std::atomic<T>;
+
     /**
      *
      */

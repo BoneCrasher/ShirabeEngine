@@ -31,7 +31,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphRenderTarget> CPassBuilder::createRenderTarget(
-            std::string                         const &aName,
+            String                         const &aName,
             SRenderGraphDynamicImageDescription const &aDescriptor)
         {
             SRenderGraphImageDescription description;
@@ -62,7 +62,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImage> CPassBuilder::createImage(
-            std::string                         const &aName,
+            String                         const &aName,
             SRenderGraphDynamicImageDescription const &aDescriptor)
         {
             SRenderGraphImageDescription description;
@@ -93,7 +93,7 @@ namespace engine
         //<
         //<-----------------------------------------------------------------------------
         CEngineResult<SRenderGraphImage> CPassBuilder::importImage(
-            std::string                            const &aName,
+            String                            const &aName,
             SRenderGraphPersistentImageDescription const &aDescriptor)
         {
             SRenderGraphImageDescription description;
@@ -544,7 +544,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<SRenderGraphBuffer> CPassBuilder::createBuffer(std::string const &aName, SRenderGraphDynamicBufferDescription const &aBufferDescription)
+        CEngineResult<SRenderGraphBuffer> CPassBuilder::createBuffer(String const &aName, SRenderGraphDynamicBufferDescription const &aBufferDescription)
         {
             SRenderGraphBuffer buffer = mResourceData.spawnResource<SRenderGraphBuffer>();
             buffer.readableName                 = aName;
@@ -565,7 +565,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<SRenderGraphBuffer> CPassBuilder::importBuffer(std::string const &aName, SRenderGraphPersistentBufferDescription const &aBufferDescription)
+        CEngineResult<SRenderGraphBuffer> CPassBuilder::importBuffer(String const &aName, SRenderGraphPersistentBufferDescription const &aBufferDescription)
         {
             SRenderGraphBuffer buffer = mResourceData.spawnResource<SRenderGraphBuffer>();
             buffer.readableName                 = aName;
@@ -647,7 +647,7 @@ namespace engine
         //<-----------------------------------------------------------------------------
         //
         //<-----------------------------------------------------------------------------
-        CEngineResult<SRenderGraphMaterial> CPassBuilder::useMaterial(std::string const &aMaterialId, SRenderGraphPipelineConfig const &aPipelineConfigOverride)
+        CEngineResult<SRenderGraphMaterial> CPassBuilder::useMaterial(String const &aMaterialId, SRenderGraphPipelineConfig const &aPipelineConfigOverride)
         {
             // TODO: Fetch material from material system and create specialization
             SRenderGraphMaterialDescription renderGraphMaterialDescription;

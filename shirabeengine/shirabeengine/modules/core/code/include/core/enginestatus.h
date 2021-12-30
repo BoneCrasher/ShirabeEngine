@@ -77,6 +77,10 @@ namespace engine
         GFXAPI_UnloadResourceFailed                                     =  -50211,
         ResourceTaskBackend_FunctionNotFound                            =  -50500,
         ResourceTaskBackend_FunctionTypeInvalid                         =  -50501,
+        RHI_Generic                                                     = -100000, // RHI
+        RHI_Generic_LayerNotAvailable                                   = -100001,
+        RHI_Generic_AlreadyInitialized                                  = -100010,
+        RHI_Generic_NotInitialized                                      = -100011,
         DXGI_FactoryCreationFailed                                      = -100300, // DXGI
         DXGI_FactoryGetAdapterFailed                                    = -100302,
         DXGI_AdapterGetDescFailed                                       = -100303,

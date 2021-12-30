@@ -10,7 +10,6 @@ namespace engine::vulkan
     using engine::wsi::CWindowHandleWrapper;
     using engine::graphicsapi::EFormat;
 
-
     class CVulkanFrameContext
             : public IVkFrameContext
     {

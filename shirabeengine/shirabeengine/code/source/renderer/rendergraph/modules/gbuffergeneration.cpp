@@ -11,9 +11,11 @@ namespace engine
         <
             CRenderGraphModule<SGBufferModuleTag_t>::SGBufferGenerationExportData
         >
-        CRenderGraphModule<SGBufferModuleTag_t>::addGBufferGenerationPass(std::string const                  &aPassName
-                                                                          , CGraphBuilder                    &aGraphBuilder
-                                                                          , SBufferGenerationInputData const &aInputData)
+        CRenderGraphModule<SGBufferModuleTag_t>
+            ::addGBufferGenerationPass(
+                std::string const                  &aPassName
+                , CGraphBuilder                    &aGraphBuilder
+                , SBufferGenerationInputData const &aInputData)
         {
             /**
              * The SState struct is the internal state of the gbuffer generation pass.
@@ -158,7 +160,7 @@ namespace engine
                                        {
                                            SRenderGraphMaterialDescription const renderableMaterial = materials[k];
 
-                                           auto const [result, material]         = aBuilder.useMaterial(renderableMaterial, );
+                                           auto const [result, material]         = aBuilder.useMaterial(renderableMaterial, config);
                                            auto const [pipelineResult, pipeline] = aBuilder.usePipeline(renderableMaterial.sharedMaterialResourceId, config);
 
                                            SRenderGraphRenderObjectMaterial objectMaterial;

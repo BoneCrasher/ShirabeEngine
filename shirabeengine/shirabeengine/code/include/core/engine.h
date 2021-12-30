@@ -8,6 +8,7 @@
 #include <core/benchmarking/timer/timer.h>
 #include <wsi/windowmanager.h>
 #include <asset/assetstorage.h>
+#include <rhi/rhilayer.h>
 
 #include <renderer/rendergraph/framegraphcontexts.h>
 #include <rhi/resource_management/cresourcemanager.h>
@@ -32,6 +33,7 @@ namespace engine
     using namespace engine::os;
     using namespace engine::wsi;
     using namespace engine::vulkan;
+    using rhi::CRHILayer;
     using material::CMaterialLoader;
     using mesh::CMeshLoader;
     using textures::CTextureLoader;
@@ -102,8 +104,8 @@ namespace engine
         Shared<CMeshLoader>                 mMeshLoader;
         Shared<CTextureLoader>              mTextureLoader;
 
-        // Rendering
-        Shared<CVulkanEnvironment>          mVulkanEnvironment;
+        // RHI & Rendering
+        Shared<CRHILayer>                   mRHILayer;
         Shared<SRenderGraphRenderContext>   mRenderContext;
         Shared<SRenderGraphResourceContext> mResourceContext;
         Shared<CRenderer>                   mRenderer;

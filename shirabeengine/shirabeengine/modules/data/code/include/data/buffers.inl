@@ -29,10 +29,12 @@ GPUDATABUFFERGENERIC_IMPL::CGpuDataBufferGeneric()
 GPUDATABUFFERGENERIC_DECL
 EEngineStatus GPUDATABUFFERGENERIC_IMPL::initRHIResource()
 {
-    Shared<CRHILayer> rhi = util::CEngineLocator::get().template locateEngineComponentByType<CRHILayer>();
-    if(not rhi)
+    using namespace engine::rhi;
+
+    Shared<CRHILayer> rhiLayer = util::CEngineLocator::get().locateEngineComponentByType<CRHILayer>();
+    if(not rhiLayer)
     {
-        return EEngineStatus::RHILayerNotAvailable;
+        return EEngineStatus::RHI_Generic_LayerNotAvailable;
     }
 
     // Do something.
@@ -47,10 +49,12 @@ EEngineStatus GPUDATABUFFERGENERIC_IMPL::initRHIResource()
 GPUDATABUFFERGENERIC_DECL
 EEngineStatus GPUDATABUFFERGENERIC_IMPL::releaseRHIResource()
 {
-    Shared<CRHILayer> rhi = util::CEngineLocator::get().template locateEngineComponentByType<CRHILayer>();
-    if(not rhi)
+    using namespace engine::rhi;
+
+    Shared<CRHILayer> rhiLayer = util::CEngineLocator::get().locateEngineComponentByType<CRHILayer>();
+    if(not rhiLayer)
     {
-        return EEngineStatus::RHILayerNotAvailable;
+        return EEngineStatus::RHI_Generic_LayerNotAvailable;
     }
 
     return EEngineStatus::NotImplemented;
@@ -63,10 +67,12 @@ EEngineStatus GPUDATABUFFERGENERIC_IMPL::releaseRHIResource()
 GPUDATABUFFERGENERIC_DECL
 EEngineStatus GPUDATABUFFERGENERIC_IMPL::updateRHIResource()
 {
-    Shared<CRHILayer> rhi = util::CEngineLocator::get().template locateEngineComponentByType<CRHILayer>();
-    if(not rhi)
+    using namespace engine::rhi;
+
+    Shared<CRHILayer> rhiLayer = util::CEngineLocator::get().locateEngineComponentByType<CRHILayer>();
+    if(not rhiLayer)
     {
-        return EEngineStatus::RHILayerNotAvailable;
+        return EEngineStatus::RHI_Generic_LayerNotAvailable;
     }
 
     return EEngineStatus::NotImplemented;

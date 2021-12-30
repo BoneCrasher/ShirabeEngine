@@ -92,7 +92,7 @@ namespace engine
         , mMainWindow       (nullptr)
         , mAssetStorage     (nullptr)
         , mResourceManager  (nullptr)
-        , mVulkanEnvironment(nullptr)
+        , mRHILayer         (nullptr)
         , mRenderer         (nullptr)
         , mScene            ({})
     { }
@@ -134,14 +134,11 @@ namespace engine
 
         status = display->initialize();
 
-        SOSDisplayDescriptor const&displayDesc = display->screenInfo()[display->primaryScreenIndex()];
+        SOSDisplayDescriptor const &displayDesc = display->screenInfo()[display->primaryScreenIndex()];
 
         uint32_t const
                 windowWidth  = displayDesc.bounds.size.x(),
                 windowHeight = displayDesc.bounds.size.y();
-
-        EGFXAPI        gfxApi        = EGFXAPI::Vulkan;
-        EGFXAPIVersion gfxApiVersion = EGFXAPIVersion::Vulkan_1_1;
 
         auto const fnCreatePlatformWindowSystem = [&, this] () -> CEngineResult<>
         {
@@ -195,49 +192,23 @@ namespace engine
             return { EEngineStatus::Ok };
         };
 
-        rendering::SRendererConfiguration rendererConfiguration = {};
-        rendererConfiguration.enableVSync             = false;
-        rendererConfiguration.frustum                 = CVector4D<float>({ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f });
-        rendererConfiguration.preferredBackBufferSize = CVector2D<uint32_t>({ windowWidth, windowHeight });
-        rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
-        rendererConfiguration.requestFullscreen       = false;
-
-        auto const fnCreateDefaultGFXAPI = [&, this] () -> CEngineResult<>
+        auto const fnCreateRHILayer = [&, this] () -> CEngineResult<>
         {
-            if(EGFXAPI::Vulkan == gfxApi)
+            SRHILayerInitArgs rhiLayerInitArgs;
+            rhiLayerInitArgs.applicationEnvironment = aApplicationEnvironment;
+            rhiLayerInitArgs.displayDescriptor      = displayDesc;
+            rhiLayerInitArgs.display                = x11Display;
+            rhiLayerInitArgs.mainWindow             = std::static_pointer_cast<x11::CX11Window>(mMainWindow);
+
+            auto rhiLayer = makeShared<CRHILayer>();
+            EEngineStatus const rhiLayerInitStatus = rhiLayer->initializeLayer(rhiLayerInitArgs);
+            if(CheckEngineError(rhiLayerInitStatus))
             {
-                mVulkanEnvironment = makeShared<CVulkanEnvironment>();
-                EEngineStatus status = mVulkanEnvironment->initialize(*mApplicationEnvironment);
-
-                if(CheckEngineError(status))
-                {
-                    EngineStatusPrintOnError(status, logTag(), "Vulkan initialization failed.");
-
-                    return { status };
-                }
-
-
-                CEngineResult<VkSurfaceKHR> surfaceCreation = vulkan::CX11VulkanSurface::create(mVulkanEnvironment, x11Display, std::static_pointer_cast<x11::CX11Window>(mMainWindow));
-                if(not surfaceCreation.successful())
-                {
-                    CLog::Error(logTag(), "Failed to create vk surface.");
-                    mVulkanEnvironment->deinitialize();
-
-                    return { surfaceCreation.result() };
-                }
-
-                mVulkanEnvironment->setSurface(surfaceCreation.data());
-
-                VkFormat const requiredFormat = CVulkanDeviceCapsHelper::convertFormatToVk(EFormat::R8G8B8A8_UNORM);
-                mVulkanEnvironment->createSwapChain(
-                             displayDesc.bounds,
-                             requiredFormat,
-                             VK_COLORSPACE_SRGB_NONLINEAR_KHR);
-
-                mVulkanEnvironment->initializeRecordingAndSubmission();
+                CLog::Error(logTag(), "Failed to initialize RHI Layer");
+                return { rhiLayerInitStatus };
             }
 
-            return { EEngineStatus::Ok };
+            mRHILayer = rhiLayer;
         };
 
         auto const fnCreatePlatformResourceSystem = [&, this] () -> CEngineResult<>
@@ -271,7 +242,7 @@ namespace engine
             // This way, the resources can simply be reloaded on demand.
             // Nonetheless, a regular backend reset has to take place in order to have the proxies remain in a valid state!
             // The reset of the taskbackend should thus occur through the resource backend.
-            if(EGFXAPI::Vulkan == gfxApi)
+            if(EGFXAPI::Vulkan == mRHILayer->getSelectedGraphicsAPI())
             {
             }
 
@@ -284,6 +255,13 @@ namespace engine
         auto const fnCreatePlatformRenderer = [&, this] () -> CEngineResult<>
         {
             using engine::framegraph::SRenderGraphRenderContext;
+
+            rendering::SRendererConfiguration rendererConfiguration = {};
+            rendererConfiguration.enableVSync             = false;
+            rendererConfiguration.frustum                 = CVector4D<float>({ static_cast<float const>(windowWidth), static_cast<float const>(windowHeight), 0.1f, 1000.0f });
+            rendererConfiguration.preferredBackBufferSize = CVector2D<uint32_t>({ windowWidth, windowHeight });
+            rendererConfiguration.preferredWindowSize     = rendererConfiguration.preferredBackBufferSize;
+            rendererConfiguration.requestFullscreen       = false;
 
             // How to decouple?
             SRenderGraphRenderContext   renderGraphRenderContext {};
@@ -312,7 +290,7 @@ namespace engine
             // mTimer.setTickDeltaMilliseconds(1000.0 / 60.0);
 
             creation = fnCreatePlatformWindowSystem();
-            creation = fnCreateDefaultGFXAPI();
+            creation = fnCreateRHILayer();
             creation = fnCreatePlatformResourceSystem();
             creation = fnCreatePlatformRenderer();
 

@@ -29,7 +29,7 @@ namespace engine::util
 
     public_methods:
         template <typename TEngineComponentType>
-        TEngineComponentType &locateEngineComponentByType()
+        Shared<TEngineComponentType> locateEngineComponentByType()
         {
 
         };
