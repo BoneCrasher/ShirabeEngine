@@ -8,6 +8,8 @@
 
 namespace engine::ecws
 {
+    SHIRABE_DECLARE_LOG_TAG(CEntity)
+
     /**
      * A CEntity instance describes an engine entity, which can be enriched by various
      * types of engine components.
@@ -15,20 +17,30 @@ namespace engine::ecws
     class CEntity
     {
     public_typedefs:
+        using UID_t = uint64_t;
         using ComponentAssignmentMap_t = Map<PublicComponentId_t, Shared<IComponent>>;
         using ComponentHierarchyTree_t = CAdjacencyTree<PublicComponentId_t>;
 
     private_members:
+        UID_t                    mUid;
         String                   mName;
         Shared<IComponent>       mRootComponent;
         ComponentAssignmentMap_t mAssignedComponents;
         ComponentHierarchyTree_t mComponentHierarchy;
 
+        Atomic<bool> mInitialized;
+
     public_constructors:
         explicit CEntity(String aName);
+        CEntity(CEntity const&) = delete;
+        CEntity(CEntity &&)     = delete;
 
     public_destructors:
         ~CEntity();
+
+    public_operators:
+        CEntity &operator=(CEntity const&) = delete;
+        CEntity &operator=(CEntity &&)     = delete;
 
     public_methods:
         /**
@@ -64,18 +76,31 @@ namespace engine::ecws
          */
         EEngineStatus update(CTimer const &aTimer);
 
+        [[nodiscard]]
+        SHIRABE_INLINE UID_t uid() const
+        {
+            return mUid;
+        }
+
         SHIRABE_INLINE String const &name() const
         {
             return mName;
         }
 
     protected_methods:
-        bool addComponent(PublicComponentId_t   aParentComponentId
-                          , Shared<IComponent>  aComponent);
+        bool addComponent(PublicComponentId_t         aParentComponentId
+                          , Shared<IComponent> const& aComponent);
 
-        bool removeComponent(PublicComponentId_t aComponentId);
+        bool removeComponent(PublicComponentId_t aComponentId, bool bReattachChildren = true);
 
         bool containsComponent(PublicComponentId_t aComponentId);
+
+    private_methods:
+        static UID_t getUID()
+        {
+            Atomic<UID_t> gEntityUIDStore = 0;
+            return ++gEntityUIDStore;
+        };
     };
 
     //<-----------------------------------------------------------------------------

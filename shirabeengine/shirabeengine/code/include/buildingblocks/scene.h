@@ -5,6 +5,7 @@
 #include <core/datastructures/adjacencytree.h>
 #include <buildingblocks/camera.h>
 #include <ecws/icomponentfactory.h>
+#include <ecws/componentsystem.h>
 #include <ecws/entity.h>
 
 namespace engine
@@ -42,8 +43,21 @@ namespace engine
      */
     class CScene
     {
+
+    public_typedefs:
+        using EntityRegistry_t         = Map<ecws::CEntity::UID_t,      Unique<ecws::CEntity>>;
+        using ComponentRegistry_t      = Map<ecws::PublicComponentId_t, Shared<ecws::IComponent>>;
+        using ComponentHierarchyTree_t = CAdjacencyTree<ecws::PublicComponentId_t>;
+
     public_static_constants:
         static constexpr char const *sEmptyEntityName = "";
+
+    private_members:
+        Shared<ecws::IComponentFactory> mComponentFactory;
+
+        EntityRegistry_t mEntities;
+
+        CTimer  mTimer;
 
     public_constructors:
         /**
@@ -63,11 +77,11 @@ namespace engine
          *
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
-        CEngineResult<> initialize(Shared<asset::CAssetStorage>        aAssetStorage
+        CEngineResult<> initialize(Shared<asset::CAssetStorage>               aAssetStorage
                                  , Shared<resources::CRHIResourceManagerBase> aResourceManager
-                                 , Shared<mesh::CMeshLoader>           aMeshLoader
-                                 , Shared<material::CMaterialLoader>   aMaterialLoader
-                                 , Shared<textures::CTextureLoader>    aTextureLoader);
+                                 , Shared<mesh::CMeshLoader>                  aMeshLoader
+                                 , Shared<material::CMaterialLoader>          aMaterialLoader
+                                 , Shared<textures::CTextureLoader>           aTextureLoader);
 
         CEngineResult<> initializeResources();
 
@@ -87,36 +101,15 @@ namespace engine
          */
         CEngineResult<> update(CTimer const &aTimer);
 
-        CEngineResult<> addEntity(Unique<ecws::CEntity> aEntity, std::string const &aParentEntityName = sEmptyEntityName);
-
-        CEngineResult<> removeEntity(Unique<ecws::CEntity> aEntity);
+        CEngineResult<> addEntity(Unique<ecws::CEntity> aEntity, ecws::CEntity::UID_t aParentEntityId);
+        CEngineResult<> removeEntity(ecws::CEntity::UID_t aEntityId);
 
         [[nodiscard]]
         SHIRABE_INLINE
-        Vector<Unique<ecws::CEntity>> const &getEntities() const { return mEntities; }
+        Map<ecws::CEntity::UID_t , Unique<ecws::CEntity>> const &getEntities() const { return mEntities; }
 
-        Unique<ecws::CEntity> const &findEntity(String const &aName)
-        {
-            for(auto const &e : mEntities)
-            {
-                if(aName == e->name())
-                {
-                    return e;
-                }
-            }
-
-            static Unique<ecws::CEntity> gNullEntity = nullptr;
-            return gNullEntity;
-        }
-
-    private_members:
-        Shared<ecws::IComponentFactory> mComponentFactory;
-
-        CTimer  mTimer;
-        CCamera mPrimaryCamera;
-
-        Vector<Unique<ecws::CEntity>> mEntities;
-        CAdjacencyTree<std::string>   mHierarchy;
+        Unique<ecws::CEntity> const &findEntity(ecws::CEntity::UID_t aEntityId);
+        Unique<ecws::CEntity> const &findEntity(String const &aName);
     };
 }
 

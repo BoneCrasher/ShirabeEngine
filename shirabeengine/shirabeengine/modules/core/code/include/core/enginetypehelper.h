@@ -252,9 +252,6 @@ namespace engine
     template <typename T>
     using OptionalRef_t = Optional_t<RefWrapper_t<T>>;
 
-    using UnencodedString = std::string;
-    using String          = std::u8string;
-
     /**
     * @brief bind a member function of type T with a variable number of arguments and a specific instance of
     *        type T together as a callable std::function.

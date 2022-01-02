@@ -25,9 +25,9 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CScene::CScene()
         : mComponentFactory(nullptr)
-        , mTimer()
-        , mPrimaryCamera()
         , mEntities()
+        , mSceneComponentHierarchy()
+        , mTimer()
     {}
     //<-----------------------------------------------------------------------------
     //
@@ -146,7 +146,7 @@ namespace engine
         auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
         coreMaterialComponent->setMaterialInstance(mat_core);
 
-        auto coreEntity = makeUnique<ecws::CEntity>("core");
+        auto coreEntity = makeUnique<ecws::CEntity>(u8"core");
         coreEntity->addComponent(coreTransform);
         coreEntity->addComponent(coreMaterialComponent);
 
@@ -323,21 +323,16 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::addEntity(Unique<ecws::CEntity> aEntity, std::string const &aParentEntityName)
+    CEngineResult<> CScene::addEntity(Unique<ecws::CEntity> aEntity, ecws::CEntity::UID_t aParentEntityId)
     {
-        auto const iterator = std::find(mEntities.cbegin(), mEntities.cend(), aEntity);
+        auto const iterator = mEntities.find(aEntity->uid());
         if(mEntities.end() != iterator)
         {
             return EEngineStatus::Error;
         }
 
-        mHierarchy.add(aEntity->name());
-
-        if(not aParentEntityName.empty()) {
-            mHierarchy.connect(aParentEntityName, aEntity->name());
-        }
-
-        mEntities.emplace_back(std::move(aEntity));
+        aEntity->initialize(); // No-op, if already done.
+        mEntities.insert({aEntity->uid(), std::move(aEntity)});
 
         return EEngineStatus::Ok;
     }
@@ -346,22 +341,53 @@ namespace engine
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    CEngineResult<> CScene::removeEntity(Unique<ecws::CEntity> aEntity)
+    CEngineResult<> CScene::removeEntity(ecws::CEntity::UID_t aEntityId)
     {
-        auto const iterator = std::find(mEntities.cbegin(), mEntities.cend(), aEntity);
+        auto iterator = mEntities.find(aEntityId);
         if(mEntities.end() == iterator)
         {
             return EEngineStatus::Ok;
         }
 
-        Unique<ecws::CEntity> const &entity = *iterator;
-
-        mHierarchy.disconnectMany(aEntity->name());
-        mHierarchy.remove(aEntity->name());
-
+        auto &entity = iterator->second;
+        entity->deinitialize();
         mEntities.erase(iterator);
 
         return EEngineStatus::Ok;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    Unique<ecws::CEntity> const& CScene::findEntity(ecws::CEntity::UID_t const aEntityId)
+    {
+        static Unique<ecws::CEntity> gNullEntity = nullptr;
+
+        auto iterator = mEntities.find(aEntityId);
+        if(mEntities.end() == iterator)
+        {
+            return gNullEntity;
+        }
+        return iterator->second;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    Unique<ecws::CEntity> const& CScene::findEntity(String const &aName)
+    {
+        static Unique<ecws::CEntity> gNullEntity = nullptr;
+
+        for(auto const &e : mEntities)
+        {
+            if(aName == e.second->name())
+            {
+                return e.second;
+            }
+        }
+        return gNullEntity;
     }
     //<-----------------------------------------------------------------------------
 }

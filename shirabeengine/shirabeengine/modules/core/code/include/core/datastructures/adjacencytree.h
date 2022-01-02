@@ -202,15 +202,19 @@ namespace engine::datastructures
         };
 
     public_api:
+        void reset();
+
         bool add       (TIdType const &aId);
         bool remove    (TIdType const &aId);
         bool connect   (TIdType const &aSource, TIdType const &aTarget);
         bool disconnect(TIdType const &aSource, TIdType const &aTarget);
         bool disconnectMany(TIdType const &aId, EDisconnectAllType const aType = EDisconnectAllType::All);
 
-        std::vector<TIdType> topologicalSort();
+        List_t<TIdType> getParents(TIdType aElementId) const;
+        List_t<TIdType> getChildren(TIdType aElementId) const;
+        List_t<TIdType> getAdjacentFor(TIdType const &aId) const;
 
-        List_t<TIdType> const getAdjacentFor(TIdType const &aId);
+        std::vector<TIdType> topologicalSort();
 
         bool foreachEdgeFromRoot(std::function<bool(TIdType const &aSource, TIdType const &aTarget)> aCallback, TIdType aRoot, EOrder const aOrder = EOrder::RootFirst, bool const aAbortOnFirstError = true)
         {
@@ -342,6 +346,19 @@ namespace engine::datastructures
         List_t<TIdType> mReverseRoots;
     };
     //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    void CAdjacencyTree<TIdType>::reset()
+    {
+        mForwardTree.clear();
+        mReverseTree.clear();
+        mForwardRoots.clear();
+        mReverseRoots.clear();
+    }
+    //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
     template <typename TIdType>
@@ -443,14 +460,38 @@ namespace engine::datastructures
     //
     //<-----------------------------------------------------------------------------
     template <typename TIdType>
-    List_t<TIdType> const CAdjacencyTree<TIdType>::getAdjacentFor(TIdType const &aId)
+    List_t<TIdType> CAdjacencyTree<TIdType>::getParents(TIdType aElementId) const
+    {
+        if(not CAdjacencyTreeHelper::treeContainsElementFn(mReverseTree, aElementId))
+        {
+            return {};
+        }
+        return mReverseTree.at(aElementId);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    List_t<TIdType> CAdjacencyTree<TIdType>::getChildren(TIdType aElementId) const
+    {
+        return getAdjacentFor(aElementId);
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
+    template <typename TIdType>
+    List_t<TIdType> CAdjacencyTree<TIdType>::getAdjacentFor(TIdType const &aId) const
     {
         if(not CAdjacencyTreeHelper::treeContainsElementFn(mForwardTree, aId))
         {
             return {};
         }
 
-        return mForwardTree[aId];
+        return mForwardTree.at(aId);
     }
     //<-----------------------------------------------------------------------------
 

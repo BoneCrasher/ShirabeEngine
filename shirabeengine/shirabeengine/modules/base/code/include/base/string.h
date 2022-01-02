@@ -20,6 +20,19 @@
 
 namespace engine
 {
+
+    using UnencodedString = std::string;
+#define SHIRABEENGINE_STRING_IS_UTF8 0
+#if SHIRABEENGINE_STRING_IS_UTF8
+    using String = std::u8string;
+    #define TEXT(str) u8##str
+    #define TO_UNENCODED_TEXT(str) reinterpret_cast<char const*>(str)
+#else
+    using String = std::string;
+    #define TEXT(str) str
+    #define TO_UNENCODED_TEXT(str) str
+#endif
+
     /**
      * The StaticStringHelpers class provides helpers to convert 8 and 16-bit
      * strings to each other or format a string with a variadic number

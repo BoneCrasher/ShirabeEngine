@@ -37,10 +37,10 @@ namespace engine
          *       iii) If i) && ii) -> Add to visible elements
          */
 
+        // CFrustum const &frustum = mCamera->getFrustum();
+
         // For now, just pass along all entities from the scene until
         // physics, AABB/OBB/Spheres and frustum culling is implemented.
-        CFrustum const &frustum = mCamera->getFrustum();
-        
 
         return EEngineStatus::Ok;
     }

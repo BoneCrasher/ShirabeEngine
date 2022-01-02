@@ -12,7 +12,6 @@
 #include <base/declaration.h>
 
 #include <fmt/format.h>
-
 #include <base/string.h>
 
 #ifdef SHIRABE_PLATFORM_WINDOWS
@@ -49,9 +48,9 @@ namespace engine
         #endif
     #endif
 
-    #define SHIRABE_DECLARE_LOG_TAG(className)                                 \
-        constexpr static  char const* const kLogTag = #className;              \
-        constexpr static inline char const* logTag() { return kLogTag; }
+    #define SHIRABE_DECLARE_LOG_TAG(className)                                       \
+        constexpr static String::value_type const* const kLogTag = TEXT(#className); \
+        constexpr static inline String::value_type const* logTag() { return kLogTag; }
 
     /**
      * Static entry point for any kind of log-calls.
@@ -81,18 +80,18 @@ namespace engine
          * @param aLevel The loglevel to convert.
          * @return       A string representation of the provided log level.
          */
-        static std::string ELogLevelToString(ELogLevel const &aLevel)
+        static String ELogLevelToString(ELogLevel const &aLevel)
         {
             switch(aLevel)
             {
-            case CLog::ELogLevel::Verbose: return "VERBOSE";
-            case CLog::ELogLevel::Debug:   return "DEBUG";
-            case CLog::ELogLevel::Status:  return "STATUS";
-            case CLog::ELogLevel::Warning: return "WARNING";
-            case CLog::ELogLevel::Error:   return "ERROR";
-            case CLog::ELogLevel::WTF:     return "WTF";
+            case CLog::ELogLevel::Verbose: return TEXT("VERBOSE");
+            case CLog::ELogLevel::Debug:   return TEXT("DEBUG");
+            case CLog::ELogLevel::Status:  return TEXT("STATUS");
+            case CLog::ELogLevel::Warning: return TEXT("WARNING");
+            case CLog::ELogLevel::Error:   return TEXT("ERROR");
+            case CLog::ELogLevel::WTF:     return TEXT("WTF");
             }
-            return "UNKNOWN";
+            return TEXT("UNKNOWN");
         }
 
         /**
@@ -104,9 +103,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void Verbose(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+                String const   &aLogTag,
+                String const   &aFormat,
+                TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::Verbose, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -119,9 +118,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void Status(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::Status, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -135,9 +134,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void Debug(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::Debug, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -151,9 +150,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void Warning(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::Warning, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -167,9 +166,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void Error(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::Error, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -182,9 +181,9 @@ namespace engine
          */
         template <typename... TArguments>
         static void WTF(
-                std::string const &aLogTag,
-                std::string const &aFormat,
-                TArguments    &&...aArguments)
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
             LogImpl(ELogLevel::WTF, aLogTag, aFormat, std::forward<TArguments>(aArguments)...);
         }
@@ -192,13 +191,13 @@ namespace engine
     private_static_functions:
         template <typename... TArguments>
         static void LogImpl(
-                ELogLevel       const &aLevel,
-                std::string     const &aLogTag,
-                std::string     const &aFormat,
-                TArguments       &&...aArguments)
+            ELogLevel       const &aLevel,
+            String const   &aLogTag,
+            String const   &aFormat,
+            TArguments &&...aArguments)
         {
-            std::string_view format_view {aFormat.c_str(), aFormat.size()};
-            std::string const message = fmt::vformat(aFormat, fmt::make_format_args(std::forward<TArguments>(aArguments)...));
+            std::basic_string_view<String::value_type> view = { aFormat.c_str(), aFormat.size() };
+            UnencodedString const message = fmt::vformat(view, fmt::make_format_args(std::forward<TArguments>(aArguments)...));
             LogImpl(aLevel, aLogTag, message);
         }
 
@@ -211,22 +210,22 @@ namespace engine
          * @param aMessage -
          */
         static void LogImpl(
-                ELogLevel       const &aLevel,
-                std::string     const &aLogTag,
-                std::string     const &aMessage)
+                ELogLevel  const &aLevel,
+                String     const &aLogTag,
+                String     const &aMessage)
         {
             if(MinimumLogLevel > aLevel)
                 // Only print in case of a valid loglevel
                 return;
 
-            std::stringstream ss;
+            std::basic_stringstream<String::value_type> ss;
             ss
                 << std::setw(7)
                 << ELogLevelToString(aLevel) << ": "
                 << "[" << aLogTag << "]"     << " --> \n"
                 << aMessage      << "\n";
 
-            std::string const formatted = ss.str();
+            String const formatted = ss.str();
 
             #ifdef SHIRABE_PLATFORM_WINDOWS
             #ifdef _UNICODE
@@ -238,7 +237,11 @@ namespace engine
                     WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), msg.c_str(), ((DWORD)msg.size()), &written, nullptr);
             #endif
             #else
+            #if SHIRABEENGINE_STRING_IS_UTF8
+            std::cout << reinterpret_cast<const char*>(formatted.c_str()) << std::endl;
+            #else
             std::cout << formatted << std::endl;
+            #endif
             #endif
         }
     };
