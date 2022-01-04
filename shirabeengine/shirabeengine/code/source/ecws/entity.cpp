@@ -32,6 +32,50 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
+    bool CEntity::foreachChildOf(Shared<IComponent> &aComponent
+                                 , std::function<EEngineStatus(Shared<IComponent>&)> aForeachChildFn
+                                 , CAdjacencyTree<PublicComponentId_t>::EOrder aOrder)
+    {
+        bool result = true;
+        auto const iterator =
+               [&, this] (PublicComponentId_t  const &aParentId
+                         , PublicComponentId_t const &aChildId) -> bool
+                   {
+                       SHIRABE_UNUSED(aParentId);
+                       auto &currentChild = mAssignedComponents.at(aChildId);
+                       if(nullptr != currentChild)
+                       {
+                           EEngineStatus const status = aForeachChildFn(currentChild);
+                           if(CheckEngineError(status))
+                           {
+                               CLog::Error(logTag(), TEXT("Failed to process component '%s' of entity '%s'"), currentChild->getComponentName(), this->name());
+                               return false;
+                           }
+                       }
+                       return true;
+                   };
+
+        mComponentHierarchy.foreachEdgeFromRoot(
+            iterator
+            , aComponent->getComponentId()
+            , aOrder);
+
+        EEngineStatus const status = aForeachChildFn(aComponent);
+        #if SHIRABE_DEBUG
+        if(CheckEngineError(status))
+        {
+            CLog::Error(logTag(), TEXT("Failed to process component '%s' of entity '%s'"), mRootComponent->getComponentName(), this->name());
+            return false;
+        }
+        #endif
+
+        return result;
+    }
+    //<-----------------------------------------------------------------------------
+
+    //<-----------------------------------------------------------------------------
+    //
+    //<-----------------------------------------------------------------------------
     EEngineStatus CEntity::initialize()
     {
         if(mInitialized)
@@ -43,34 +87,15 @@ namespace engine::ecws
 
         if(mRootComponent)
         {
-            auto const initializeComponentTree =
-               [this] (PublicComponentId_t const &aParentId
-                       , PublicComponentId_t const &aChildId) -> bool
-                   {
-                       SHIRABE_UNUSED(aParentId);
-                       auto &currentChild = mAssignedComponents.at(aChildId);
-                       if(nullptr != currentChild)
-                       {
-                           EEngineStatus const status = currentChild->initialize();
-                           if(CheckEngineError(status))
-                           {
-                               CLog::Error(logTag(), TEXT("Failed to initialize component '%s' of entity '%s'"), currentChild->getComponentName(), this->name());
-                               return false;
-                           }
-                       }
-                       return true;
-                   };
-
-            mComponentHierarchy.foreachEdgeFromRoot(
-                initializeComponentTree
-                , mRootComponent->getComponentId()
-                , CAdjacencyTree<PublicComponentId_t>::EOrder::LeafFirst);
-
-            EEngineStatus const status = mRootComponent->initialize();
-            if(CheckEngineError(status))
+            auto const handlerFn
+               = [] (Shared<IComponent> &c) -> EEngineStatus
+                    {
+                        return (c ? c->initialize() : EEngineStatus::Error);
+                    };
+            bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
+            if(not bTraversalSuccessful)
             {
-                CLog::Error(logTag(), TEXT("Failed to initialize component '%s' of entity '%s'"), mRootComponent->getComponentName(), this->name());
-                return EEngineStatus::Error;
+                sdf;klajdf
             }
         }
 
@@ -86,38 +111,20 @@ namespace engine::ecws
     {
         if(mRootComponent)
         {
-            auto const deinitializeComponentTree =
-                [this] (PublicComponentId_t const &aParentId
-                      , PublicComponentId_t const &aChildId) -> bool
+            auto const handlerFn
+                = [] (Shared<IComponent> &c) -> EEngineStatus
                     {
-                        SHIRABE_UNUSED(aParentId);
-                        auto &currentChild = mAssignedComponents.at(aChildId);
-                        if(nullptr != currentChild)
-                        {
-                            EEngineStatus const status = currentChild->deinitialize();
-                            if(CheckEngineError(status))
-                            {
-                                CLog::Error(logTag(), TEXT("Failed to deinitialize component '%s' of entity '%s'"), currentChild->getComponentName(), this->name());
-                                return false;
-                            }
-                        }
-                        return true;
+                        return (c ? c->deinitialize() : EEngineStatus::Error);
                     };
-
-            mComponentHierarchy.foreachEdgeFromRoot(
-                deinitializeComponentTree
-                , mRootComponent->getComponentId()
-                , CAdjacencyTree<PublicComponentId_t>::EOrder::LeafFirst);
-
-            EEngineStatus const status = mRootComponent->deinitialize();
-            if(CheckEngineError(status))
+            bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
+            if(not bTraversalSuccessful)
             {
-                CLog::Error(logTag(), TEXT("Failed to deinitialize component '%s' of entity '%s'"), mRootComponent->getComponentName(), this->name());
-                return EEngineStatus::Error;
+                sdf;klajdf
             }
-            mComponentHierarchy.reset();
-            mAssignedComponents.clear();
         }
+        mComponentHierarchy.reset();
+        mAssignedComponents.clear();
+
         return EEngineStatus::Ok;
     }
     //<-----------------------------------------------------------------------------
@@ -152,6 +159,8 @@ namespace engine::ecws
             return false;
         }
 
+        auto &component = mAssignedComponents.at(aComponentId);
+
         // TODO: Handle non-leaf removals, i.e. by reattaching all children to the previous parent.
         if(bReattachChildren)
         {
@@ -167,14 +176,27 @@ namespace engine::ecws
         }
         else
         {
-            auto const children = mComponentHierarchy.getChildren(aComponentId);
-            asdkj;asfdkl
-            Use tree traversal functions to delete all chilren leaf first!
-            Add functions like deinitialize/initialize/update children for reuse!
+            auto const handlerFn
+                = [this] (Shared<IComponent> &child) -> EEngineStatus
+                    {
+                        if(child)
+                        {
+                            EEngineStatus const status = child->deinitialize();
+                            mComponentHierarchy.remove(child->getComponentId());
+                            mAssignedComponents.erase(child->getComponentId());
+                            return status;
+                        }
+                    };
+            bool const bTraversalSuccessful = foreachChildOf(component, handlerFn);
+            if(not bTraversalSuccessful)
+            {
+                sdf;klajdf
+            }
         }
 
         mComponentHierarchy.remove(aComponentId);
         mAssignedComponents.erase(aComponentId);
+        return true;
     }
     //<-----------------------------------------------------------------------------
 
@@ -194,36 +216,18 @@ namespace engine::ecws
     {
         if(mRootComponent)
         {
-            auto const updateComponentTree =
-               [&, this] (PublicComponentId_t   const &aParentId
-                          , PublicComponentId_t const &aChildId) -> bool
-                   {
-                       SHIRABE_UNUSED(aParentId);
-                       auto &currentChild = mAssignedComponents.at(aChildId);
-                       if(nullptr != currentChild)
-                       {
-                           EEngineStatus const status = currentChild->update(aTimer);
-                           if(CheckEngineError(status))
-                           {
-                               CLog::Error(logTag(), TEXT("Failed to update component '%s' of entity '%s'"), currentChild->getComponentName(), this->name());
-                               return false;
-                           }
-                       }
-                       return true;
-                   };
-
-            // TODO: Trace then Bubble? What about cases, where we need to propagate something
-            //       down first and then handle reactions to it?
-            mComponentHierarchy.foreachEdgeFromRoot(
-                updateComponentTree
-                , mRootComponent->getComponentId()
-                , CAdjacencyTree<PublicComponentId_t>::EOrder::RootFirst);
-
-            EEngineStatus const status = mRootComponent->update(aTimer);
-            if(CheckEngineError(status))
+            auto const handlerFn
+               = [&, this] (Shared<IComponent> &child) -> EEngineStatus
+                    {
+                        if(child)
+                        {
+                            return child->update(aTimer);
+                        }
+                    };
+            bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
+            if(not bTraversalSuccessful)
             {
-                CLog::Error(logTag(), TEXT("Failed to update component '%s' of entity '%s'"), mRootComponent->getComponentName(), this->name());
-                return EEngineStatus::Error;
+                sdf;klajdf
             }
         }
         return EEngineStatus::Ok;

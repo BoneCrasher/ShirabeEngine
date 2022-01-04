@@ -95,12 +95,17 @@ namespace engine::ecws
 
         bool containsComponent(PublicComponentId_t aComponentId);
 
-    private_methods:
+    private_static_functions:
         static UID_t getUID()
         {
             Atomic<UID_t> gEntityUIDStore = 0;
             return ++gEntityUIDStore;
         };
+
+    private_methods:
+        bool foreachChildOf(Shared<IComponent> &aComponent
+                            , std::function<EEngineStatus(Shared<IComponent>&)> aForeachChildFn
+                            , CAdjacencyTree<PublicComponentId_t>::EOrder aOrder = CAdjacencyTree<PublicComponentId_t>::EOrder::LeafFirst);
     };
 
     //<-----------------------------------------------------------------------------
