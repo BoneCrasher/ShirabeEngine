@@ -29,6 +29,7 @@ namespace engine::ecws
         ComponentHierarchyTree_t mComponentHierarchy;
 
         Atomic<bool> mInitialized;
+        Atomic<bool> mStateIsValid;
 
     public_constructors:
         explicit CEntity(String aName);
@@ -48,13 +49,13 @@ namespace engine::ecws
          *
          * @return A weak reference to the entity's root component.
          */
-        SHIRABE_INLINE Weak<IComponent> getRootComponent() { return mRootComponent; };
+        SHIRABE_INLINE Shared<IComponent> getRootComponent() { return mRootComponent; };
         /**
          * Fetch this entity's root component
          *
          * @return An immutable weak reference to the entity's root component.
          */
-        SHIRABE_INLINE Weak<IComponent> const getRootComponent() const { return mRootComponent; };
+        SHIRABE_INLINE Shared<IComponent> const getRootComponent() const { return mRootComponent; };
 
         /**
          * Initialize this entity and all components, if any.
@@ -87,12 +88,16 @@ namespace engine::ecws
             return mName;
         }
 
-    protected_methods:
+        SHIRABE_INLINE bool isInitialized() const { return mInitialized; }
+        SHIRABE_INLINE bool isStateValid()  const { return mStateIsValid; }
+
+    public_methods:
         bool addComponent(PublicComponentId_t         aParentComponentId
                           , Shared<IComponent> const& aComponent);
 
         bool removeComponent(PublicComponentId_t aComponentId, bool bReattachChildren = true);
 
+    protected_methods:
         bool containsComponent(PublicComponentId_t aComponentId);
 
     private_static_functions:

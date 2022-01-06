@@ -78,6 +78,7 @@ namespace engine
          * @return EEngineStatus::Ok, if successful. An error code otherwise.
          */
         CEngineResult<> initialize(Shared<asset::CAssetStorage>               aAssetStorage
+                                 , Shared<ecws::CComponentSystemManager>      aComponentSystemManager
                                  , Shared<resources::CRHIResourceManagerBase> aResourceManager
                                  , Shared<mesh::CMeshLoader>                  aMeshLoader
                                  , Shared<material::CMaterialLoader>          aMaterialLoader

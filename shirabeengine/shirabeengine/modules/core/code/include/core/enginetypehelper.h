@@ -243,6 +243,9 @@ namespace engine
     template <typename T>
     using Optional_t = std::optional<T>;
 
+    template <typename... T>
+    using Tuple = std::tuple<T...>;
+
     /**
      *
      */
@@ -273,6 +276,15 @@ namespace engine
         return function;
     }
 
+#define SHIRABE_DECLARE_UID_TYPE(name) \
+    using name##Uid_t = uint64_t;
+
+#define SHIRABE_IMPLEMENT_NAMED_UID_PROVIDER(name) \
+    [[nodiscard]] static name##Uid_t get##name##Uid() \
+    { \
+        static Atomic<name##Uid_t> g##name##UidValue = 0; \
+        return ++g##name##UidValue; \
+    }
 }
 
 #endif

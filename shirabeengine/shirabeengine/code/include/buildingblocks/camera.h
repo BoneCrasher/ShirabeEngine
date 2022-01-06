@@ -123,10 +123,10 @@ namespace engine
          * @param aProjectionParameters Projection-settings of the camera.
          * @param aLookAt               Look-At target in case we have a target camera.
          */
-        CCamera(ECameraViewType       const &aViewType,
-                SFrustumParameters    const &aFrustumParameters,
-                SProjectionParameters const &aProjectionParameters,
-                CVector3D<float>           const &aLookAt = CVector3D<float>({ 0.0f, 0.0f, 0.0f }));
+        CCamera(ECameraViewType       const& aViewType,
+                SFrustumParameters    const& aFrustumParameters,
+                SProjectionParameters const& aProjectionParameters,
+                CVector3D<float>      const& aLookAt = CVector3D<float>({ 0.0f, 0.0f, 0.0f }));
 
     public_destructors:
         /**
@@ -140,7 +140,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE ECameraViewType const &viewType() const
+        SHIRABE_INLINE ECameraViewType const& viewType() const
         {
             return mViewType;
         }
@@ -150,7 +150,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE SFrustumParameters const &frustumParameters() const
+        SHIRABE_INLINE SFrustumParameters const& frustumParameters() const
         {
             return mFrustumParameters;
         }
@@ -160,7 +160,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE SProjectionParameters const &projectionParameters() const
+        SHIRABE_INLINE SProjectionParameters const& projectionParameters() const
         {
             return mProjectionParameters;
         }
@@ -170,7 +170,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CVector3D<float> const &lookAtTarget() const
+        SHIRABE_INLINE CVector3D<float> const& lookAtTarget() const
         {
             return mLookAtTarget;
         }
@@ -180,7 +180,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CMatrix4x4 const&view() const
+        SHIRABE_INLINE CMatrix4x4 const& view() const
         {
             return mViewMatrix;
         }
@@ -190,7 +190,7 @@ namespace engine
          *
          * @return See brief.
          */
-        SHIRABE_INLINE CMatrix4x4 const&projection() const
+        SHIRABE_INLINE CMatrix4x4 const& projection() const
         {
             return mProjectionMatrix;
         }
@@ -223,7 +223,7 @@ namespace engine
         ECameraViewType       mViewType;
         SFrustumParameters    mFrustumParameters;
         SProjectionParameters mProjectionParameters;
-        CVector3D<float>           mLookAtTarget;
+        CVector3D<float>      mLookAtTarget;
 
         CMatrix4x4            mViewMatrix;
         CMatrix4x4            mProjectionMatrix;

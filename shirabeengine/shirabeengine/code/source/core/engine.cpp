@@ -88,13 +88,14 @@ namespace engine
     //<-----------------------------------------------------------------------------
     CEngineInstance::CEngineInstance()
         : mApplicationEnvironment(nullptr)
-        , mWindowManager    (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
-        , mMainWindow       (nullptr)
-        , mAssetStorage     (nullptr)
-        , mResourceManager  (nullptr)
-        , mRHILayer         (nullptr)
-        , mRenderer         (nullptr)
-        , mScene            ({})
+        , mWindowManager         (nullptr) // Do not initialize here, to avoid exceptions in constructor. Memory leaks!!!
+        , mMainWindow            (nullptr)
+        , mAssetStorage          (nullptr)
+        , mResourceManager       (nullptr)
+        , mComponentSystemManager(nullptr)
+        , mRHILayer              (nullptr)
+        , mRenderer              (nullptr)
+        , mScene                 ({})
     { }
     //<-----------------------------------------------------------------------------
 
@@ -282,6 +283,21 @@ namespace engine
             return { status };
         };
 
+        auto const fnInitECWS = [&, this] () -> CEngineResult<>
+        {
+            mComponentSystemManager = makeShared<ecws::CComponentSystemManager>();
+            EEngineStatus const ecwsManagerInit = mComponentSystemManager->initialize().result();
+            if(CheckEngineError(ecwsManagerInit))
+            {
+                CLog::Error(logTag(), TEXT("Failed to initialize component system manager."));
+                return ecwsManagerInit;
+            }
+
+            // Add each subsystem as required
+            Shared<ecws::IComponentSystem> cameraComponentSystem = ...;
+            CEngineResult<ecws::ComponentSystemId_t> result = mComponentSystemManager->registerComponentSystem(std::move(cameraComponentSystem));
+        };
+
         try
         {
             CEngineResult<> creation = { EEngineStatus::Ok };
@@ -293,6 +309,7 @@ namespace engine
             creation = fnCreateRHILayer();
             creation = fnCreatePlatformResourceSystem();
             creation = fnCreatePlatformRenderer();
+            creation = fnInitECWS();
 
             // Setup scene
             CEngineResult<> initialization = mScene.initialize(mAssetStorage

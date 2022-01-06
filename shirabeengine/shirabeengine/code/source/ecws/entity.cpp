@@ -17,6 +17,7 @@ namespace engine::ecws
         , mAssignedComponents()
         , mComponentHierarchy()
         , mInitialized(false)
+        , mStateIsValid(false)
     {}
     //<-----------------------------------------------------------------------------
 
@@ -32,11 +33,10 @@ namespace engine::ecws
     //<-----------------------------------------------------------------------------
     //
     //<-----------------------------------------------------------------------------
-    bool CEntity::foreachChildOf(Shared<IComponent> &aComponent
+    bool CEntity::foreachChildOf(Shared<IComponent>                                 &aComponent
                                  , std::function<EEngineStatus(Shared<IComponent>&)> aForeachChildFn
-                                 , CAdjacencyTree<PublicComponentId_t>::EOrder aOrder)
+                                 , CAdjacencyTree<PublicComponentId_t>::EOrder       aOrder)
     {
-        bool result = true;
         auto const iterator =
                [&, this] (PublicComponentId_t  const &aParentId
                          , PublicComponentId_t const &aChildId) -> bool
@@ -46,30 +46,36 @@ namespace engine::ecws
                        if(nullptr != currentChild)
                        {
                            EEngineStatus const status = aForeachChildFn(currentChild);
+                           #if SHIRABE_DEBUG
                            if(CheckEngineError(status))
                            {
                                CLog::Error(logTag(), TEXT("Failed to process component '%s' of entity '%s'"), currentChild->getComponentName(), this->name());
                                return false;
                            }
+                           #else
+                               return (not CheckEngineError(status));
+                           #endif
                        }
                        return true;
                    };
 
-        mComponentHierarchy.foreachEdgeFromRoot(
-            iterator
-            , aComponent->getComponentId()
-            , aOrder);
+        bool const bChildTraversalSuccessful
+            = mComponentHierarchy.foreachEdgeFromRoot(
+                iterator
+                , aComponent->getComponentId()
+                , aOrder
+                , /* aAbortOnFirstError */ false);
 
         EEngineStatus const status = aForeachChildFn(aComponent);
+        bool const bRootHandlingSuccessful = not CheckEngineError(status);
         #if SHIRABE_DEBUG
-        if(CheckEngineError(status))
+        if(not bRootHandlingSuccessful)
         {
             CLog::Error(logTag(), TEXT("Failed to process component '%s' of entity '%s'"), mRootComponent->getComponentName(), this->name());
-            return false;
         }
         #endif
 
-        return result;
+        return (bChildTraversalSuccessful && bRootHandlingSuccessful);
     }
     //<-----------------------------------------------------------------------------
 
@@ -95,7 +101,7 @@ namespace engine::ecws
             bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
             if(not bTraversalSuccessful)
             {
-                sdf;klajdf
+                mStateIsValid = false;
             }
         }
 
@@ -119,7 +125,7 @@ namespace engine::ecws
             bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
             if(not bTraversalSuccessful)
             {
-                sdf;klajdf
+                mStateIsValid = false;
             }
         }
         mComponentHierarchy.reset();
@@ -190,7 +196,7 @@ namespace engine::ecws
             bool const bTraversalSuccessful = foreachChildOf(component, handlerFn);
             if(not bTraversalSuccessful)
             {
-                sdf;klajdf
+                mStateIsValid = false;
             }
         }
 
@@ -224,10 +230,11 @@ namespace engine::ecws
                             return child->update(aTimer);
                         }
                     };
-            bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn);
+
+            bool const bTraversalSuccessful = foreachChildOf(mRootComponent, handlerFn, CAdjacencyTree<PublicComponentId_t>::EOrder::RootFirst);
             if(not bTraversalSuccessful)
             {
-                sdf;klajdf
+                mStateIsValid = false;
             }
         }
         return EEngineStatus::Ok;

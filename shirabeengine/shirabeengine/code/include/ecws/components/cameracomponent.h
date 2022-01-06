@@ -43,6 +43,13 @@ namespace engine::ecws
         void setCamera(Shared<CCamera> const &aCamera);
 	};
 
+    class CCameraComponent
+        : public CCameraComponentImpl<SCameraComponentState, class CCameraComponentSystem>
+    {
+    public_constructors:
+        using CCameraComponentImpl<SCameraComponentState, class CCameraComponentSystem>::CCameraComponentImpl;
+    };
+
     #include "ecws/components/cameracomponent.inl"
 }
 #endif

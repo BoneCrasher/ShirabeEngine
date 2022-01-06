@@ -22,6 +22,7 @@
 
 #include "buildingblocks/scene.h"
 #include "ecws/componentmanager.h"
+#include "ecws/componentsystem.h"
 
 class EngineTime; // Fwd Definition to expose concept, but spare definition for later classes.
 
@@ -103,6 +104,9 @@ namespace engine
         Shared<CMaterialLoader>             mMaterialLoader;
         Shared<CMeshLoader>                 mMeshLoader;
         Shared<CTextureLoader>              mTextureLoader;
+
+        // ECWS
+        Shared<ecws::CComponentSystemManager> mComponentSystemManager;
 
         // RHI & Rendering
         Shared<CRHILayer>                   mRHILayer;

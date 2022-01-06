@@ -100,14 +100,23 @@ namespace engine
     //
     //<-----------------------------------------------------------------------------
     CEngineResult<> CScene::initialize(Shared<asset::CAssetStorage>        aAssetStorage
-                                     , Shared<resources::CRHIResourceManagerBase> aResourceManager
-                                     , Shared<mesh::CMeshLoader>           aMeshLoader
-                                     , Shared<material::CMaterialLoader>   aMaterialLoader
-                                     , Shared<textures::CTextureLoader>    aTextureLoader)
+                                       , Shared<ecws::CComponentSystemManager>      aComponentSystemManager
+                                       , Shared<resources::CRHIResourceManagerBase> aResourceManager
+                                       , Shared<mesh::CMeshLoader>           aMeshLoader
+                                       , Shared<material::CMaterialLoader>   aMaterialLoader
+                                       , Shared<textures::CTextureLoader>    aTextureLoader)
     {
         using mesh::CMeshInstance;
         using material::CMaterialInstance;
         using textures::CTextureInstance;
+
+        // Fetch and validate component systems
+        auto cameraComponentSystem = aComponentSystemManager->findComponentSystemByComponentType<ecws::CCameraComponent>();
+
+        if(not cameraComponentSystem)
+        {
+            return EEngineStatus::Error;
+        }
 
         //
         // Load assets
@@ -139,25 +148,25 @@ namespace engine
         //
         // Configure entities
         //
-        mat_standard->getMutableConfiguration().setSampledImage("diffuseTexture", util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
-        mat_standard->getMutableConfiguration().setSampledImage("normalTexture",  util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
+        mat_standard->getMutableConfiguration().setSampledImage(TEXT("diffuseTexture"), util::crc32FromString("textures/BarramundiFish_baseColor.texture.meta"));
+        mat_standard->getMutableConfiguration().setSampledImage(TEXT("normalTexture"),  util::crc32FromString("textures/BarramundiFish_normal.texture.meta"));
 
-        auto coreTransform         = makeShared<ecws::CTransformComponent>("core_transform");
-        auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>("core_material");
+        auto coreTransform         = makeShared<ecws::CTransformComponent>(TEXT("core_transform"));
+        auto coreMaterialComponent = makeShared<ecws::CMaterialComponent>(TEXT("core_material"));
         coreMaterialComponent->setMaterialInstance(mat_core);
 
-        auto coreEntity = makeUnique<ecws::CEntity>(u8"core");
-        coreEntity->addComponent(coreTransform);
+        auto coreEntity = makeUnique<ecws::CEntity>(TEXT("core"));
+        coreEntity->addComponent(coreTransform, );
         coreEntity->addComponent(coreMaterialComponent);
 
-        auto transformComponent = makeShared<ecws::CTransformComponent>("barramundi_transform");
-        auto meshComponent      = makeShared<ecws::CMeshComponent>     ("barramundi_mesh");
-        auto materialComponent  = makeShared<ecws::CMaterialComponent> ("barramundi_material");
+        auto transformComponent = makeShared<ecws::CTransformComponent>(TEXT("barramundi_transform"));
+        auto meshComponent      = makeShared<ecws::CMeshComponent>     (TEXT("barramundi_mesh"));
+        auto materialComponent  = makeShared<ecws::CMaterialComponent> (TEXT("barramundi_material"));
 
         meshComponent    ->setMeshInstance(mesh_fish);
         materialComponent->setMaterialInstance(mat_standard);
 
-        auto barramundi = makeUnique<ecws::CEntity>("barramundi");
+        auto barramundi = makeUnique<ecws::CEntity>(TEXT("barramundi"));
         barramundi->addComponent(materialComponent);
         barramundi->addComponent(meshComponent);
         barramundi->addComponent(transformComponent);
@@ -176,18 +185,18 @@ namespace engine
                                                      , frustum
                                                      , projection);
 
-        auto cameraTransform = makeShared<ecws::CTransformComponent>("primaryCamera_transform");
-        auto cameraComponent = makeShared<ecws::CCameraComponent>("primaryCamera_camera");
+        auto cameraTransform = makeShared<ecws::CTransformComponent>(TEXT("primaryCamera_transform"));
+        auto cameraComponent = makeShared<ecws::CCameraComponent>(TEXT("primaryCamera_camera"));
         cameraTransform->getMutableTransform().translate(CVector3D<float>({0.0, 0.1, -1.0}));
         cameraComponent->setCamera(camera);
 
-        auto cameraEntity = makeUnique<ecws::CEntity>("primaryCamera");
+        auto cameraEntity = makeUnique<ecws::CEntity>(TEXT("primaryCamera"));
         cameraEntity->addComponent(cameraTransform);
         cameraEntity->addComponent(cameraComponent);
 
         this->addEntity(std::move(coreEntity));
-        this->addEntity(std::move(barramundi), "core");
-        this->addEntity(std::move(cameraEntity), "barramundi");
+        this->addEntity(std::move(barramundi), TEXT("core"));
+        this->addEntity(std::move(cameraEntity), TEXT("barramundi"));
 
         return EEngineStatus::Ok;
     }
